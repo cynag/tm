@@ -39,31 +39,6 @@
       <!-- Botão Organizar -->
       <button type="button" class="inventory-sort" style="margin-bottom: 10px;">Organizar Inventário</button>
 
-      <div class="inventory-grid"
-           data-grid-width="10"
-           data-grid-height="5"
-           style="
-             display: grid;
-             grid-template-columns: repeat(10, 50px);
-             grid-template-rows: repeat(5, 50px);
-             gap: 0px;
-             outline: 2px solid #555;
-             padding: 0px;
-             position: relative;
-             box-sizing: border-box;
-             width: calc(10 * 50px);
-             height: calc(5 * 50px);
-             background-color: #1a1a1a !important;
-             background-image: 
-               linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
-               linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
-             background-size: 50px 50px;
-             background-origin: content-box;
-             background-position: top left;
-             overflow: visible; /* importante: evitar clipping */
-           ">
-
-        <!-- INVENTORY GRID SEM LOOP DUPLO -->
 
 <div class="inventory-grid"
      data-grid-width="10"
@@ -109,7 +84,7 @@
   {{#each resolvedItems as |item|}}
     {{#unless (eq ../pickupItemId item._id)}}
 
-      {{debug "RENDER ITEM" item=item}}
+    
 
       <div class="grid-item"
            data-item-id="{{item._id}}"

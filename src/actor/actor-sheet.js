@@ -31,11 +31,10 @@ export class TMActorSheet extends ActorSheet {
   context.pickupItemId = InventoryGridManager._currentPickupItemId;
   context.resolvedItems = this.actor.items.contents;
 
-  console.log("[TMActorSheet] getData resolvedItems:", context.resolvedItems.length);
-
-context.resolvedItems.forEach(i => {
-  console.log(`[DEBUG][getData] Item=${i.name} | gridX=${i.system.gridX} | gridY=${i.system.gridY} | gridW=${i.system.gridWidth} | gridH=${i.system.gridHeight} | rotated=${i.system.rotated}`);
-});
+  //console.log("[TMActorSheet] getData resolvedItems:", context.resolvedItems.length);
+  //context.resolvedItems.forEach(i => {
+  //console.log(`[DEBUG][getData] Item=${i.name} | gridX=${i.system.gridX} | gridY=${i.system.gridY} | gridW=${i.system.gridWidth} | gridH=${i.system.gridHeight} | rotated=${i.system.rotated}`);
+  //});
   return context;
 }
 

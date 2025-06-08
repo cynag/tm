@@ -11,7 +11,7 @@ export class TMObject extends Item {
   data.gridY = Number.isInteger(data.gridY) ? data.gridY : 0;
   
   data.rotated = data.rotated ?? false;
-  console.log(`[DEBUG][prepareBaseData] ${this.name} → gridX=${data.gridX}, gridY=${data.gridY}, gridW=${data.gridWidth}, gridH=${data.gridHeight}, rotated=${data.rotated}`);
+  //console.log(`[DEBUG][prepareBaseData] ${this.name} → gridX=${data.gridX}, gridY=${data.gridY}, gridW=${data.gridWidth}, gridH=${data.gridHeight}, rotated=${data.rotated}`);
 
 }
 

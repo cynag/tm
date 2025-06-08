@@ -20,8 +20,8 @@ export class TMActor extends Actor {
     }
 
     const itemData = item.toObject();
-    console.log("[TM1E] itemData resolvido a partir do UUID:", itemData);
-    console.log(`[DEBUG][onDropItem] BEFORE placement → ${itemData.name} gridW=${itemData.system.gridWidth}, gridH=${itemData.system.gridHeight}`);
+    //console.log("[TM1E] itemData resolvido a partir do UUID:", itemData);
+    //console.log(`[DEBUG][onDropItem] BEFORE placement → ${itemData.name} gridW=${itemData.system.gridWidth}, gridH=${itemData.system.gridHeight}`);
 
     const isPhysical = ["object", "weapon", "armor", "potion", "food"].includes(itemData.type);
     console.log(`[TM1E] Item type: ${itemData.type} → Físico: ${isPhysical}`);
@@ -66,7 +66,7 @@ export class TMActor extends Actor {
 
     await this.createEmbeddedDocuments("Item", [itemSource]);
 
-    console.log(`[DEBUG][onDropItem] FINAL → creating item ${itemSource.name} at X=${itemSource.system.gridX}, Y=${itemSource.system.gridY}, W=${itemSource.system.gridWidth}, H=${itemSource.system.gridHeight}`);
+    //console.log(`[DEBUG][onDropItem] FINAL → creating item ${itemSource.name} at X=${itemSource.system.gridX}, Y=${itemSource.system.gridY}, W=${itemSource.system.gridWidth}, H=${itemSource.system.gridHeight}`);
 
     console.log(`[TM1E] Item criado com sucesso!`);
 
