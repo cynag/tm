@@ -1,0 +1,31 @@
+/* Terras Malditas - RPG - CSS */
+
+.tm .window-content {
+  font-family: "Signika", sans-serif;
+  background: #f9f9f9;
+  color: #222;
+  padding: 10px;
+}
+
+.tm.actor-sheet .header,
+.tm.item-sheet .header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.tm.actor-sheet .profile-img img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 2px solid #444;
+  border-radius: 8px;
+}
+
+.tm.actor-sheet .profile-name input,
+.tm.item-sheet .header input {
+  width: 100%;
+  font-size: 1.5em;
+  padding: 6px 10px;
+}
