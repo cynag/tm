@@ -4,223 +4,232 @@ export class InventoryGridManager {
   static _pickupConfirming = false;
   static _currentPickupItemId = null;
 
-  static init(html, actor) {
-    // Limpa ghost e cursor ativo
-    document.body.classList.remove("inventory-pickup-active");
-    document.querySelectorAll(".inventory-ghost").forEach(e => e.remove());
-    console.log("[InventoryGrid] Init (click&pickup mode)");
+ static init(html, actor) {
+  // Limpa ghost e cursor ativo
+  document.body.classList.remove("inventory-pickup-active");
+  document.querySelectorAll(".inventory-ghost").forEach(e => e.remove());
+  console.log("[InventoryGrid] Init (click&pickup mode)");
 
-    
+  // Reset pickup state
+  InventoryGridManager._pickupState = {
+    active: false,
+    item: null,
+    ghostEl: null
+  };
 
-    // Reset pickup state
-    InventoryGridManager._pickupState = {
-      active: false,
-      item: null,
-      ghostEl: null
-    };
+  // CLICK NA GRID → tenta colocar o item
+  html.find(".inventory-grid .inventory-cell").on("click", async ev => {
+    if (InventoryGridManager._pickupConfirming) {
+      console.log("[InventoryGrid] Ignorando click na grid, confirm dialog ativo.");
+      return;
+    }
 
+    const state = InventoryGridManager._pickupState;
+    if (!state.active || !state.item) return;
 
-    // CLICK NA GRID → tenta colocar o item
+    ev.preventDefault();
 
-    html.find(".inventory-grid .inventory-cell").on("click", async ev => {
-  if (InventoryGridManager._pickupConfirming) {
-    console.log("[InventoryGrid] Ignorando click na grid, confirm dialog ativo.");
-    return;
-  }
+    const cell = ev.currentTarget;
+    const cellX = Number(cell.dataset.cellX);
+    const cellY = Number(cell.dataset.cellY);
 
-  const state = InventoryGridManager._pickupState;
-  if (!state.active || !state.item) return;
+    console.log(`[InventoryGrid] Click em célula X=${cellX}, Y=${cellY}`);
 
-  ev.preventDefault();
+    // Verifica se há item na célula
+    const clickedItem = actor.items.find(i =>
+      i.system.gridX === cellX &&
+      i.system.gridY === cellY
+    );
 
-  const cell = ev.currentTarget;
-  const cellX = Number(cell.dataset.cellX);
-  const cellY = Number(cell.dataset.cellY);
+    if (clickedItem) {
+      console.log(`[InventoryGrid] SWAP: colocando ${state.item.name} na posição de ${clickedItem.name}`);
 
-  console.log(`[InventoryGrid] Click em célula X=${cellX}, Y=${cellY}`);
+      InventoryGridManager._currentPickupItemId = clickedItem.id;
 
-  // Verifica se há item na célula
-  const clickedItem = actor.items.find(i =>
-    i.system.gridX === cellX &&
-    i.system.gridY === cellY
-  );
+      actor.sheet.options.render = false;
 
-  if (clickedItem) {
-    console.log(`[InventoryGrid] SWAP: colocando ${state.item.name} na posição de ${clickedItem.name}`);
-
-    InventoryGridManager._currentPickupItemId = clickedItem.id;
-
-    actor.sheet.options.render = false;
-
-    await actor.updateEmbeddedDocuments("Item", [{
-      _id: state.item.id,
-      "system.gridX": clickedItem.system.gridX,
-      "system.gridY": clickedItem.system.gridY
-    }]);
-
-    await new Promise(resolve => setTimeout(resolve, 0));
-
-    Hooks.once("renderActorSheet", async (sheet, html, data) => {
-      console.log("[InventoryGrid] SWAP: renderActorSheet detectado → aguardando microtask.");
+      await actor.updateEmbeddedDocuments("Item", [{
+        _id: state.item.id,
+        "system.gridX": clickedItem.system.gridX,
+        "system.gridY": clickedItem.system.gridY
+      }]);
 
       await new Promise(resolve => setTimeout(resolve, 0));
 
-      const freshClickedItem = sheet.object.items.get(clickedItem.id);
+      Hooks.once("renderActorSheet", async (sheet, html, data) => {
+        console.log("[InventoryGrid] SWAP: renderActorSheet detectado → aguardando microtask.");
 
-      console.log(`[InventoryGrid][DEBUG] freshClickedItem → id=${freshClickedItem.id}, name=${freshClickedItem.name}, gridX=${freshClickedItem.system.gridX}, gridY=${freshClickedItem.system.gridY}`);
+        await new Promise(resolve => setTimeout(resolve, 0));
 
-      const ghost = document.createElement("img");
-      ghost.src = freshClickedItem.img;
-      ghost.classList.add("inventory-ghost");
-      ghost.style.width = `${freshClickedItem.system.gridWidth * 50}px`;
-      ghost.style.height = `${freshClickedItem.system.gridHeight * 50}px`;
-      ghost.style.left = `${ev.clientX - (freshClickedItem.system.gridWidth * 50) / 2}px`;
-      ghost.style.top = `${ev.clientY - (freshClickedItem.system.gridHeight * 50) / 2}px`;
+        const freshClickedItem = sheet.object.items.get(clickedItem.id);
 
-      document.body.appendChild(ghost);
+        console.log(`[InventoryGrid][DEBUG] freshClickedItem → id=${freshClickedItem.id}, name=${freshClickedItem.name}, gridX=${freshClickedItem.system.gridX}, gridY=${freshClickedItem.system.gridY}`);
 
-      InventoryGridManager._pickupState = {
-        active: true,
-        item: freshClickedItem,
-        ghostEl: ghost
-      };
+        const ghost = document.createElement("img");
+        ghost.src = freshClickedItem.img;
+        ghost.classList.add("inventory-ghost");
+        ghost.style.width = `${freshClickedItem.system.gridWidth * 50}px`;
+        ghost.style.height = `${freshClickedItem.system.gridHeight * 50}px`;
+        ghost.style.left = `${ev.clientX - (freshClickedItem.system.gridWidth * 50) / 2}px`;
+        ghost.style.top = `${ev.clientY - (freshClickedItem.system.gridHeight * 50) / 2}px`;
 
-      InventoryGridManager._pickupConfirming = false;
+        document.body.appendChild(ghost);
 
-      document.body.classList.add("inventory-pickup-active");
+        InventoryGridManager._pickupState = {
+          active: true,
+          item: freshClickedItem,
+          ghostEl: ghost
+        };
 
-      document.addEventListener("mousemove", InventoryGridManager._onMouseMove);
-      document.addEventListener("contextmenu", InventoryGridManager._onGlobalContextMenu);
+        InventoryGridManager._pickupConfirming = false;
 
-      console.log(`[InventoryGrid] SWAP concluído. Agora pegando: ${freshClickedItem.name}`);
+        document.body.classList.add("inventory-pickup-active");
+
+        document.addEventListener("mousemove", InventoryGridManager._onMouseMove);
+        document.addEventListener("contextmenu", InventoryGridManager._onGlobalContextMenu);
+
+        console.log(`[InventoryGrid] SWAP concluído. Agora pegando: ${freshClickedItem.name}`);
+      });
+
+      actor.sheet.options.render = true;
+      await actor.sheet.render(false);
+
+      console.log("[InventoryGrid] SWAP: aguardando renderActorSheet...");
+      return;
+    }
+
+    // Se célula livre → colocar normal
+    console.log(`[InventoryGrid] Tentando colocar em X=${cellX}, Y=${cellY}`);
+
+    const canPlace = InventoryGridManager._canPlaceAt(actor, state.item, cellX, cellY, state.item.system.gridWidth, state.item.system.gridHeight);
+
+    if (!canPlace) {
+      console.warn("[InventoryGrid] Posição inválida!");
+      return;
+    }
+
+    InventoryGridManager._endPickup();
+    await state.item.update({
+      "system.gridX": cellX,
+      "system.gridY": cellY
     });
 
-    actor.sheet.options.render = true;
-    await actor.sheet.render(false);
-
-    console.log("[InventoryGrid] SWAP: aguardando renderActorSheet...");
-    return;
-  }
-
-  // Se célula livre → colocar normal
-  console.log(`[InventoryGrid] Tentando colocar em X=${cellX}, Y=${cellY}`);
-
-  const canPlace = InventoryGridManager._canPlaceAt(actor, state.item, cellX, cellY, state.item.system.gridWidth, state.item.system.gridHeight);
-
-  if (!canPlace) {
-    console.warn("[InventoryGrid] Posição inválida!");
-    return;
-  }
-
-  InventoryGridManager._endPickup();
-  await state.item.update({
-    "system.gridX": cellX,
-    "system.gridY": cellY
+    console.log("[InventoryGrid] Item colocado!");
   });
 
-  console.log("[InventoryGrid] Item colocado!");
-});
+  // MOUSEDOWN NO ITEM → inicia pickup
+  html.find(".inventory-grid .grid-item").on("mousedown", ev => {
+    if (InventoryGridManager._pickupConfirming) {
+      console.log("[InventoryGrid] Ignorando mousedown, confirm dialog ativo.");
+      return;
+    }
 
+    if (ev.button !== 0) return; // só botão esquerdo
 
-    // CONTEXTMENU NA GRID (protege contra cancelar pelo botão direito em espaço vazio)
-    html.find(".inventory-grid").on("contextmenu", ev => {
-      if (InventoryGridManager._pickupConfirming) {
-        console.log("[InventoryGrid] Ignorando contextmenu na grid, confirm dialog ativo.");
-        ev.preventDefault();
-        return;
-      }
+    const itemId = ev.currentTarget.dataset.itemId;
+    const item = actor.items.get(itemId);
+    if (!item) return;
 
-      // Se quiser, aqui você pode futuramente implementar menu da grid
-    });
+    InventoryGridManager._startPickup(item, ev.clientX, ev.clientY);
+  });
 
-    // MOUSE MOVE
-html.find(".inventory-grid").on("mousemove", ev => {
-  const state = InventoryGridManager._pickupState;
-  if (!state.active || !state.item) return;
-
-  const grid = ev.currentTarget;
-
-  const rect = grid.getBoundingClientRect();
-let x = Math.floor((ev.clientX - rect.left) / 50);
-let y = Math.floor((ev.clientY - rect.top) / 50);
-
-x = Math.max(0, Math.min(9, x));
-y = Math.max(0, Math.min(4, y)); // agora altura máxima é 4 (índice 0 a 4)
-
-
-  InventoryGridManager._updatePreview(grid, x, y, actor);
-});
-
-    // CONTEXT MENU NO ITEM
-    html.find(".inventory-grid .grid-item").on("contextmenu", ev => {
-      if (InventoryGridManager._pickupConfirming) {
-        console.log("[InventoryGrid] Ignorando contextmenu no item, confirm dialog ativo.");
-        ev.preventDefault();
-        return;
-      }
-
-      const state = InventoryGridManager._pickupState;
-
-      if (state.active) {
-        console.log("[InventoryGrid] Pickup cancelado (contextmenu)");
-        InventoryGridManager._endPickup();
-        return;
-      }
-
-      // Context menu normal
+  // CONTEXTMENU NA GRID
+  html.find(".inventory-grid").on("contextmenu", ev => {
+    if (InventoryGridManager._pickupConfirming) {
+      console.log("[InventoryGrid] Ignorando contextmenu na grid, confirm dialog ativo.");
       ev.preventDefault();
-      ev.stopPropagation();
+      return;
+    }
+    // Aqui você pode implementar menu da grid se quiser
+  });
 
-      document.querySelectorAll(".inventory-context-menu").forEach(e => e.remove());
+  // MOUSE MOVE NA GRID (preview)
+  html.find(".inventory-grid").on("mousemove", ev => {
+    const state = InventoryGridManager._pickupState;
+    if (!state.active || !state.item) return;
 
-      const itemId = ev.currentTarget.dataset.itemId;
-      const item = actor.items.get(itemId);
-      if (!item) return;
+    const grid = ev.currentTarget;
 
-      const menu = document.createElement("div");
-      menu.classList.add("inventory-context-menu");
-      menu.style.left = `${ev.pageX}px`;
-      menu.style.top = `${ev.pageY}px`;
+    const rect = grid.getBoundingClientRect();
+    let x = Math.floor((ev.clientX - rect.left) / 50);
+    let y = Math.floor((ev.clientY - rect.top) / 50);
 
-      menu.innerHTML = `
-        <div class="menu-item" data-action="use">Usar</div>
-        <div class="menu-item" data-action="drop">Largar</div>
-      `;
+    x = Math.max(0, Math.min(9, x));
+    y = Math.max(0, Math.min(4, y));
 
-      document.body.appendChild(menu);
+    InventoryGridManager._updatePreview(grid, x, y, actor);
+  });
 
-      menu.querySelectorAll(".menu-item").forEach(btn => {
-        btn.addEventListener("click", async e => {
-          const action = e.currentTarget.dataset.action;
+  // CONTEXTMENU NO ITEM
+  html.find(".inventory-grid .grid-item").on("contextmenu", ev => {
+    if (InventoryGridManager._pickupConfirming) {
+      console.log("[InventoryGrid] Ignorando contextmenu no item, confirm dialog ativo.");
+      ev.preventDefault();
+      return;
+    }
 
-          if (action === "use") {
-            ui.notifications.info(`Você usou ${item.name}!`);
-          } else if (action === "drop") {
-            await actor.deleteEmbeddedDocuments("Item", [itemId]);
-            await actor.sheet.render();
-          }
+    const state = InventoryGridManager._pickupState;
 
-          menu.remove();
-        });
-      });
+    if (state.active) {
+      console.log("[InventoryGrid] Pickup cancelado (contextmenu)");
+      InventoryGridManager._endPickup();
+      return;
+    }
 
-      document.addEventListener("pointerdown", function closeMenu(ev2) {
-        if (!menu.contains(ev2.target)) {
-          menu.remove();
-          document.removeEventListener("pointerdown", closeMenu);
+    // Context menu normal
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    document.querySelectorAll(".inventory-context-menu").forEach(e => e.remove());
+
+    const itemId = ev.currentTarget.dataset.itemId;
+    const item = actor.items.get(itemId);
+    if (!item) return;
+
+    const menu = document.createElement("div");
+    menu.classList.add("inventory-context-menu");
+    menu.style.left = `${ev.pageX}px`;
+    menu.style.top = `${ev.pageY}px`;
+
+    menu.innerHTML = `
+      <div class="menu-item" data-action="use">Usar</div>
+      <div class="menu-item" data-action="drop">Largar</div>
+    `;
+
+    document.body.appendChild(menu);
+
+    menu.querySelectorAll(".menu-item").forEach(btn => {
+      btn.addEventListener("click", async e => {
+        const action = e.currentTarget.dataset.action;
+
+        if (action === "use") {
+          ui.notifications.info(`Você usou ${item.name}!`);
+        } else if (action === "drop") {
+          await actor.deleteEmbeddedDocuments("Item", [itemId]);
+          await actor.sheet.render();
         }
+
+        menu.remove();
       });
     });
-    // Limpa listeners antigos
 
+    document.addEventListener("pointerdown", function closeMenu(ev2) {
+      if (!menu.contains(ev2.target)) {
+        menu.remove();
+        document.removeEventListener("pointerdown", closeMenu);
+      }
+    });
+  });
 
-    if (!InventoryGridManager._clickListenerAdded) {
-  document.addEventListener("pointerdown", InventoryGridManager._onDocumentClick);
-  document.addEventListener("keydown", InventoryGridManager._onGlobalKeyDown);
-  InventoryGridManager._clickListenerAdded = true;
-  console.log("[InventoryGrid] Document pointerdown listener ADDED.");
-}
+  // CLICK GLOBAL → proteção ESC / click fora
+  if (!InventoryGridManager._clickListenerAdded) {
+    document.addEventListener("pointerdown", InventoryGridManager._onDocumentClick);
+    document.addEventListener("keydown", InventoryGridManager._onGlobalKeyDown);
+    InventoryGridManager._clickListenerAdded = true;
+    console.log("[InventoryGrid] Document pointerdown listener ADDED.");
   }
+}
+
 
 
 
@@ -242,16 +251,6 @@ y = Math.max(0, Math.min(4, y)); // agora altura máxima é 4 (índice 0 a 4)
     state.ghostEl.style.top = `${ev.clientY - (state.item.system.gridHeight * 50) / 2}px`;
   }
 
-  
-
-
-
-
-
-
-
-
-  
   static async _onDocumentClick(event) {
   const state = InventoryGridManager._pickupState;
 
@@ -527,7 +526,34 @@ InventoryGridManager._currentPickupItemId = null;
     grid?.querySelectorAll(".grid-preview")?.forEach(e => e.remove());
   }
 
- 
+ static _startPickup(item, clientX, clientY) {
+  console.log(`[InventoryGrid] _startPickup: ${item.name}`);
+
+  const ghost = document.createElement("img");
+  ghost.src = item.img;
+  ghost.classList.add("inventory-ghost");
+  ghost.style.width = `${item.system.gridWidth * 50}px`;
+  ghost.style.height = `${item.system.gridHeight * 50}px`;
+  ghost.style.left = `${clientX - (item.system.gridWidth * 50) / 2}px`;
+  ghost.style.top = `${clientY - (item.system.gridHeight * 50) / 2}px`;
+
+  document.body.appendChild(ghost);
+
+  InventoryGridManager._pickupState = {
+    active: true,
+    item: item,
+    ghostEl: ghost
+  };
+
+  document.body.classList.add("inventory-pickup-active");
+
+  document.addEventListener("mousemove", InventoryGridManager._onMouseMove);
+  document.addEventListener("contextmenu", InventoryGridManager._onGlobalContextMenu);
+
+  console.log(`[InventoryGrid] Pickup iniciado: ${item.name}`);
+}
+
+
 static async _findNearestFreeCell(item, items) {
   const gridWidth = 10;
   const gridHeight = 5;
