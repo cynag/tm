@@ -164,11 +164,12 @@ InventoryGridManager._currentPickupItemId = clickedItem.id;
   const grid = ev.currentTarget;
 
   const rect = grid.getBoundingClientRect();
-  let x = Math.floor((ev.clientX - rect.left) / 48);
-  let y = Math.floor((ev.clientY - rect.top) / 48);
+let x = Math.floor((ev.clientX - rect.left) / 50);
+let y = Math.floor((ev.clientY - rect.top) / 50);
 
-  x = Math.max(0, Math.min(9, x));
-  y = Math.max(0, Math.min(9, y));
+x = Math.max(0, Math.min(9, x));
+y = Math.max(0, Math.min(4, y)); // agora altura máxima é 4 (índice 0 a 4)
+
 
   console.log(`[InventoryGrid] Tentando colocar em X=${x}, Y=${y}`);
 
@@ -216,12 +217,12 @@ html.find(".inventory-grid").on("mousemove", ev => {
   const grid = ev.currentTarget;
 
   const rect = grid.getBoundingClientRect();
-  let x = Math.floor((ev.clientX - rect.left) / 48);
-  let y = Math.floor((ev.clientY - rect.top) / 48);
+let x = Math.floor((ev.clientX - rect.left) / 50);
+let y = Math.floor((ev.clientY - rect.top) / 50);
 
-  // Clamp para evitar bug se mouse sair e voltar
-  x = Math.max(0, Math.min(9, x));
-  y = Math.max(0, Math.min(9, y));
+x = Math.max(0, Math.min(9, x));
+y = Math.max(0, Math.min(4, y)); // agora altura máxima é 4 (índice 0 a 4)
+
 
   InventoryGridManager._updatePreview(grid, x, y, actor);
 });
@@ -539,7 +540,7 @@ InventoryGridManager._currentPickupItemId = null;
 
   static _canPlaceAt(actor, item, x, y, iw, ih) {
     const maxW = 10;
-    const maxH = 10;
+    const maxH = 5;
 
     const grid = Array.from({ length: maxH }, () =>
       Array.from({ length: maxW }, () => false)

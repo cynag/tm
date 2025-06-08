@@ -44,20 +44,20 @@
 /* === INVENTORY GRID === */
 .inventory-grid {
   display: grid;
-  grid-template-columns: repeat(10, 48px);
-  grid-template-rows: repeat(10, 48px);
+  grid-template-columns: repeat(10, 50px);
+  grid-template-rows: repeat(5, 50px);
   gap: 0px;
   outline: 2px solid #555;
   padding: 0px;
   position: relative;
   box-sizing: border-box;
-  width: calc(10 * 48px);
-  height: calc(10 * 48px);
+  width: calc(10 * 50px);
+  height: calc(5 * 50px);
   background-color: #1a1a1a !important;
   background-image: 
     linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
-  background-size: 48px 48px;
+  background-size: 50px 50px;
   background-origin: content-box;
   background-position: top left;
   overflow: hidden;
