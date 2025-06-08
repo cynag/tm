@@ -1,11 +1,109 @@
-<!-- Terras Malditas - Actor Sheet -->
-<section class="tm actor-sheet">
-  <div class="header">
-    <div class="profile-img">
-      <img src="{{actor.img}}" alt="{{actor.name}}" title="{{actor.name}}" />
+<form class="{{cssClass}}" autocomplete="off">
+
+  <!-- HEADER -->
+  <header class="sheet-header">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="{{actor.img}}" data-edit="img" width="64" height="64" style="flex-shrink: 0;" />
+      <h1 class="charname" style="flex: 1;">
+        <input name="name" type="text" value="{{actor.name}}" placeholder="Nome do Personagem" />
+      </h1>
     </div>
-    <div class="profile-name">
-      <input type="text" name="name" value="{{actor.name}}" placeholder="Nome do Personagem" />
+  </header>
+
+  <!-- BODY -->
+  <section class="sheet-body" style="padding: 10px; display: flex; flex-direction: column; gap: 20px;">
+
+    <!-- EXEMPLO DE CAMPOS (HP / AP) -->
+    <div>
+      <h2>Pontos Vitais</h2>
+      <div style="display: flex; gap: 20px;">
+        <div>
+          <label>HP:</label>
+          <input type="number" name="system.hp_value.value" value="{{system.hp_value.value}}" style="width: 50px;" />
+          /
+          <input type="number" name="system.hp_value.max" value="{{system.hp_value.max}}" style="width: 50px;" />
+        </div>
+        <div>
+          <label>AP:</label>
+          <input type="number" name="system.ap_value.value" value="{{system.ap_value.value}}" style="width: 50px;" />
+          /
+          <input type="number" name="system.ap_value.max" value="{{system.ap_value.max}}" style="width: 50px;" />
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+
+    <!-- INVENTORY GRID (centralizado) -->
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <h2>Inventário</h2>
+
+      <!-- Botão Organizar -->
+      <button type="button" class="inventory-sort" style="margin-bottom: 10px;">Organizar Inventário</button>
+
+      <div class="inventory-grid"
+           data-grid-width="10"
+           data-grid-height="10"
+           style="
+             display: grid;
+             grid-template-columns: repeat(10, 48px);
+             grid-template-rows: repeat(10, 48px);
+             gap: 0px;
+             outline: 2px solid #555;
+             padding: 0px;
+             position: relative;
+             box-sizing: border-box;
+             width: calc(10 * 48px);
+             height: calc(10 * 48px);
+             background-color: #1a1a1a !important;
+             background-image: 
+               linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+               linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+             background-size: 48px 48px;
+             background-origin: content-box;
+             background-position: top left;
+             overflow: hidden;
+           ">
+
+        {{#each resolvedItems as |item|}}
+  {{#if item.system.gridWidth}}
+    {{debug "HANDLEBARS RENDER" itemId=item._id gridX=item.system.gridX gridY=item.system.gridY pickupItemId=../pickupItemId}}
+    {{#unless (eq ../pickupItemId item._id)}}
+
+
+
+            
+              <div class="grid-item
+                   {{#if this.system.rotated}}{{#unless (eq this.system.gridWidth this.system.gridHeight)}}rotated{{/unless}}{{/if}}"
+                   data-item-id="{{item._id}}"
+                   draggable="true"
+                   style="
+                     grid-column: {{add this.system.gridX 1}} / span {{this.system.gridWidth}};
+                     grid-row: {{add this.system.gridY 1}} / span {{this.system.gridHeight}};
+                     box-shadow: inset 0 0 0 1px red;
+                     background-color: rgba(255,255,255,0.2);
+                     display: flex;
+                     align-items: center;
+                     justify-content: center;
+                     cursor: grab;
+                     position: relative;
+                   ">
+
+                <!-- WRAPPER para rotação -->
+                <div class="grid-item-image-wrapper"
+                  {{#if this.system.rotated}}
+                    {{#unless (eq this.system.gridWidth this.system.gridHeight)}}
+                      style="transform: rotate(90deg); transform-origin: center center;"
+                    {{/unless}}
+                  {{/if}}>
+                  <img src="{{img}}" />
+                </div>
+
+              </div> <!-- fecha .grid-item -->
+            {{/unless}}
+          {{/if}}
+        {{/each}}
+
+      </div>
+    </div>
+
+  </section>
+</form>

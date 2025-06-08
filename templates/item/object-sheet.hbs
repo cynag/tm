@@ -1,0 +1,26 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <header class="sheet-header">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="{{item.img}}" data-edit="img" width="64" height="64" style="flex-shrink: 0;" />
+      <h1 class="itemname" style="flex: 1;">
+        <input name="name" type="text" value="{{item.name}}" placeholder="Nome do Objeto" />
+      </h1>
+    </div>
+  </header>
+
+  <section class="sheet-body">
+    <p>Exemplo de campo:</p>
+    <input type="text" name="system.exampleField" value="{{system.exampleField}}" />
+
+    <h3>Inventário</h3>
+    <div>
+      <label>Largura (gridWidth):</label>
+      <input type="number" name="system.gridWidth" value="{{system.gridWidth}}" min="1" />
+    </div>
+
+    <div>
+      <label>Altura (gridHeight):</label>
+      <input type="number" name="system.gridHeight" value="{{system.gridHeight}}" min="1" />
+    </div>
+  </section>
+</form>

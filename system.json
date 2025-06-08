@@ -1,20 +1,22 @@
 {
   "id": "tm",
-  "title": "Terras Malditas - RPG",
+  "title": "Terras Malditas 1ª Edição",
+  "description": "Sistema customizado para Terras Malditas no Foundry VTT.",
   "version": "0.1.0",
-  "description": "Sistema oficial de RPG para Terras Malditas no Foundry VTT.",
   "compatibility": {
-    "minimum": "13.344",
-    "verified": "13.344"
+    "minimum": "13.334",
+    "verified": "13.334"
   },
+  "url": "",
+  "manifest": "",
+  "download": "",
   "authors": [
-    { "name": "Cynag e Moacir" }
+    {
+      "name": "cynago"
+    }
   ],
   "esmodules": [
     "tm.mjs"
-  ],
-  "styles": [
-    "styles/tm.css"
   ],
   "documentTypes": {
     "Actor": {
@@ -26,5 +28,8 @@
   },
   "packs": [],
   "languages": [],
+  "styles": [
+    "styles/tm.css"
+  ],
   "primaryTokenAttribute": "system.hp"
 }
