@@ -176,3 +176,66 @@ body.inventory-confirm-active .app.window-app.actor {
   pointer-events: none !important;
   opacity: 0.6; /* opcional: visual de desativado */
 }
+/* === INVENTORY CELL === */
+.inventory-grid .inventory-cell {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
+}
+
+.inventory-grid .inventory-cell:hover {
+  background-color: rgba(100, 200, 255, 0.05);
+  border-color: rgba(100, 200, 255, 0.3);
+}
+
+.inventory-grid .inventory-cell:active {
+  background-color: rgba(100, 200, 255, 0.1);
+  border-color: rgba(100, 200, 255, 0.5);
+}
+/* === INVENTORY GRID ITEM IMAGE === */
+.grid-item-image-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-item-image-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.inventory-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.inventory-row {
+  display: flex;
+  gap: 2px;
+}
+
+.inventory-cell {
+  width: 60px;
+  height: 60px;
+  background: #222;
+  border: 1px solid #555;
+  position: relative;
+}
+
+.cell-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.inventory-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  object-fit: contain;
+  pointer-events: none; /* ou auto se quiser interatividade */
+}

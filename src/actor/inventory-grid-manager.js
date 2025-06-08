@@ -19,139 +19,10 @@ export class InventoryGridManager {
       ghostEl: null
     };
 
-////////////////////////////////////////////////
-// CLICK NO ITEM → inicia pickup ou executa SWAP
-////////////////////////////////////////////////
-html.find(".inventory-grid .grid-item").on("click", async ev => {
-  ev.preventDefault();
-  ev.stopPropagation();
-
-  const itemId = ev.currentTarget.dataset.itemId;
-  const clickedItem = actor.items.get(itemId);
-  if (!clickedItem) return;
-
-  const state = InventoryGridManager._pickupState;
-
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-
-if (state.active && state.item) {
-  console.log(`[InventoryGrid] SWAP: colocando ${state.item.name} na posição de ${clickedItem.name}`);
-
-  // ATUALIZA pickupItemId ANTES
-  InventoryGridManager._currentPickupItemId = clickedItem.id;
-
-  // Desativa render automático TEMPORARIAMENTE
-  actor.sheet.options.render = false;
-
-  // Faz o update
-  await actor.updateEmbeddedDocuments("Item", [{
-    _id: state.item.id,
-    "system.gridX": clickedItem.system.gridX,
-    "system.gridY": clickedItem.system.gridY
-  }]);
-
-  // Aguarda um microtask — garante prepareData completo
-  await new Promise(resolve => setTimeout(resolve, 0));
-
-  // AGORA arma o Hook
-  Hooks.once("renderActorSheet", async (sheet, html, data) => {
-    console.log("[InventoryGrid] SWAP: renderActorSheet detectado → aguardando microtask.");
-
-    // Aguarda mais um microtask — para total segurança
-    await new Promise(resolve => setTimeout(resolve, 0));
-
-    const freshClickedItem = sheet.object.items.get(clickedItem.id);
-
-    console.log(`[InventoryGrid][DEBUG] freshClickedItem → id=${freshClickedItem.id}, name=${freshClickedItem.name}, gridX=${freshClickedItem.system.gridX}, gridY=${freshClickedItem.system.gridY}`);
-
-    // Atualiza o pickupState com itemB → NÃO encerra pickup!
-    const ghost = document.createElement("img");
-    ghost.src = freshClickedItem.img;
-    ghost.classList.add("inventory-ghost");
-    ghost.style.width = `${freshClickedItem.system.gridWidth * 48}px`;
-    ghost.style.height = `${freshClickedItem.system.gridHeight * 48}px`;
-    ghost.style.left = `${ev.clientX - (freshClickedItem.system.gridWidth * 48) / 2}px`;
-    ghost.style.top = `${ev.clientY - (freshClickedItem.system.gridHeight * 48) / 2}px`;
-
-    document.body.appendChild(ghost);
-
-    InventoryGridManager._pickupState = {
-      active: true,
-      item: freshClickedItem,
-      ghostEl: ghost
-    };
-
-    InventoryGridManager._pickupConfirming = false;
-
-    document.body.classList.add("inventory-pickup-active");
-
-    document.addEventListener("mousemove", InventoryGridManager._onMouseMove);
-    document.addEventListener("contextmenu", InventoryGridManager._onGlobalContextMenu);
-
-    console.log(`[InventoryGrid] SWAP concluído. Agora pegando: ${freshClickedItem.name}`);
-
-    // 🚩 ATENÇÃO: NÃO chamar _endPickup() aqui! → pickup continua ativo
-  });
-
-  // Reativa render
-  actor.sheet.options.render = true;
-
-  // Só AGORA força o render manual
-  await actor.sheet.render(false);
-
-  console.log("[InventoryGrid] SWAP: aguardando renderActorSheet...");
-
-  // Return → impede pickup normal
-  return;
-}
-
-
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-
-
-
-  // Se não está em pickup → inicia pickup normal
-  console.log(`[InventoryGrid] Pickup iniciado para item: ${clickedItem.name}`);
-
-  ev.currentTarget.classList.add("being-picked-up");
-InventoryGridManager._currentPickupItemId = clickedItem.id;
-
-  const ghost = document.createElement("img");
-  ghost.src = clickedItem.img;
-  ghost.classList.add("inventory-ghost");
-  ghost.style.width = `${clickedItem.system.gridWidth * 48}px`;
-  ghost.style.height = `${clickedItem.system.gridHeight * 48}px`;
-  ghost.style.left = `${ev.clientX - (clickedItem.system.gridWidth * 48) / 2}px`;
-  ghost.style.top = `${ev.clientY - (clickedItem.system.gridHeight * 48) / 2}px`;
-
-  document.body.appendChild(ghost);
-
-  InventoryGridManager._pickupState = {
-    active: true,
-    item: clickedItem,
-    ghostEl: ghost
-  };
-
-  InventoryGridManager._pickupConfirming = false;
-
-  document.body.classList.add("inventory-pickup-active");
-
-  document.addEventListener("mousemove", InventoryGridManager._onMouseMove);
-  document.addEventListener("contextmenu", InventoryGridManager._onGlobalContextMenu);
-});
-
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-
-
 
     // CLICK NA GRID → tenta colocar o item
-    html.find(".inventory-grid").on("click", async ev => {
+
+    html.find(".inventory-grid .inventory-cell").on("click", async ev => {
   if (InventoryGridManager._pickupConfirming) {
     console.log("[InventoryGrid] Ignorando click na grid, confirm dialog ativo.");
     return;
@@ -161,19 +32,80 @@ InventoryGridManager._currentPickupItemId = clickedItem.id;
   if (!state.active || !state.item) return;
 
   ev.preventDefault();
-  const grid = ev.currentTarget;
 
-  const rect = grid.getBoundingClientRect();
-let x = Math.floor((ev.clientX - rect.left) / 50);
-let y = Math.floor((ev.clientY - rect.top) / 50);
+  const cell = ev.currentTarget;
+  const cellX = Number(cell.dataset.cellX);
+  const cellY = Number(cell.dataset.cellY);
 
-x = Math.max(0, Math.min(9, x));
-y = Math.max(0, Math.min(4, y)); // agora altura máxima é 4 (índice 0 a 4)
+  console.log(`[InventoryGrid] Click em célula X=${cellX}, Y=${cellY}`);
 
+  // Verifica se há item na célula
+  const clickedItem = actor.items.find(i =>
+    i.system.gridX === cellX &&
+    i.system.gridY === cellY
+  );
 
-  console.log(`[InventoryGrid] Tentando colocar em X=${x}, Y=${y}`);
+  if (clickedItem) {
+    console.log(`[InventoryGrid] SWAP: colocando ${state.item.name} na posição de ${clickedItem.name}`);
 
-  const canPlace = InventoryGridManager._canPlaceAt(actor, state.item, x, y, state.item.system.gridWidth, state.item.system.gridHeight);
+    InventoryGridManager._currentPickupItemId = clickedItem.id;
+
+    actor.sheet.options.render = false;
+
+    await actor.updateEmbeddedDocuments("Item", [{
+      _id: state.item.id,
+      "system.gridX": clickedItem.system.gridX,
+      "system.gridY": clickedItem.system.gridY
+    }]);
+
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    Hooks.once("renderActorSheet", async (sheet, html, data) => {
+      console.log("[InventoryGrid] SWAP: renderActorSheet detectado → aguardando microtask.");
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      const freshClickedItem = sheet.object.items.get(clickedItem.id);
+
+      console.log(`[InventoryGrid][DEBUG] freshClickedItem → id=${freshClickedItem.id}, name=${freshClickedItem.name}, gridX=${freshClickedItem.system.gridX}, gridY=${freshClickedItem.system.gridY}`);
+
+      const ghost = document.createElement("img");
+      ghost.src = freshClickedItem.img;
+      ghost.classList.add("inventory-ghost");
+      ghost.style.width = `${freshClickedItem.system.gridWidth * 50}px`;
+      ghost.style.height = `${freshClickedItem.system.gridHeight * 50}px`;
+      ghost.style.left = `${ev.clientX - (freshClickedItem.system.gridWidth * 50) / 2}px`;
+      ghost.style.top = `${ev.clientY - (freshClickedItem.system.gridHeight * 50) / 2}px`;
+
+      document.body.appendChild(ghost);
+
+      InventoryGridManager._pickupState = {
+        active: true,
+        item: freshClickedItem,
+        ghostEl: ghost
+      };
+
+      InventoryGridManager._pickupConfirming = false;
+
+      document.body.classList.add("inventory-pickup-active");
+
+      document.addEventListener("mousemove", InventoryGridManager._onMouseMove);
+      document.addEventListener("contextmenu", InventoryGridManager._onGlobalContextMenu);
+
+      console.log(`[InventoryGrid] SWAP concluído. Agora pegando: ${freshClickedItem.name}`);
+    });
+
+    actor.sheet.options.render = true;
+    await actor.sheet.render(false);
+
+    console.log("[InventoryGrid] SWAP: aguardando renderActorSheet...");
+    return;
+  }
+
+  // Se célula livre → colocar normal
+  console.log(`[InventoryGrid] Tentando colocar em X=${cellX}, Y=${cellY}`);
+
+  const canPlace = InventoryGridManager._canPlaceAt(actor, state.item, cellX, cellY, state.item.system.gridWidth, state.item.system.gridHeight);
 
   if (!canPlace) {
     console.warn("[InventoryGrid] Posição inválida!");
@@ -182,20 +114,12 @@ y = Math.max(0, Math.min(4, y)); // agora altura máxima é 4 (índice 0 a 4)
 
   InventoryGridManager._endPickup();
   await state.item.update({
-    "system.gridX": x,
-    "system.gridY": y
+    "system.gridX": cellX,
+    "system.gridY": cellY
   });
 
   console.log("[InventoryGrid] Item colocado!");
 });
-
-
-
-
-
-
-
-
 
 
     // CONTEXTMENU NA GRID (protege contra cancelar pelo botão direito em espaço vazio)
@@ -314,8 +238,8 @@ y = Math.max(0, Math.min(4, y)); // agora altura máxima é 4 (índice 0 a 4)
     const state = InventoryGridManager._pickupState;
     if (!state.active || !state.ghostEl) return;
 
-    state.ghostEl.style.left = `${ev.clientX - (state.item.system.gridWidth * 48) / 2}px`;
-    state.ghostEl.style.top = `${ev.clientY - (state.item.system.gridHeight * 48) / 2}px`;
+    state.ghostEl.style.left = `${ev.clientX - (state.item.system.gridWidth * 50) / 2}px`;
+    state.ghostEl.style.top = `${ev.clientY - (state.item.system.gridHeight * 50) / 2}px`;
   }
 
   
@@ -539,6 +463,8 @@ InventoryGridManager._currentPickupItemId = null;
   }
 
   static _canPlaceAt(actor, item, x, y, iw, ih) {
+    console.log(`[DEBUG][_canPlaceAt] Trying to place ${item.name} at X=${x}, Y=${y}, W=${iw}, H=${ih}`);
+
     const maxW = 10;
     const maxH = 5;
 
@@ -604,7 +530,7 @@ InventoryGridManager._currentPickupItemId = null;
  
 static async _findNearestFreeCell(item, items) {
   const gridWidth = 10;
-  const gridHeight = 10;
+  const gridHeight = 5;
 
   const occupied = new Set(items.map(other => `${other.system.gridX},${other.system.gridY}`));
 
@@ -680,6 +606,26 @@ static async _onGlobalKeyDown(ev) {
     // Atualiza ficha
     await actor.sheet.render();
   }
+}
+
+  // 🚀 PROCURA PRIMEIRO ESPAÇO LIVRE (usado por onDropItem e opcional para pickup futuro)
+  findFirstFreePosition(actor, w, h) {
+  console.log(`[DEBUG][findFirstFreePosition] Procurando espaço para ${w}x${h}`);
+
+  const gridW = 10;
+  const gridH = 5;
+
+  for (let y = 0; y <= gridH - h; y++) {
+    for (let x = 0; x <= gridW - w; x++) {
+      if (InventoryGridManager._canPlaceAt(actor, { _id: null }, x, y, w, h)) {
+        console.log(`[DEBUG][findFirstFreePosition] Espaço encontrado em X=${x}, Y=${y}`);
+        return { x, y };
+      }
+    }
+  }
+
+  console.warn(`[DEBUG][findFirstFreePosition] INVENTÁRIO CHEIO!`);
+  return null;
 }
 
 

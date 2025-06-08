@@ -25,17 +25,19 @@ export class TMActorSheet extends ActorSheet {
     return this.actor.onDropItem(event, data);
   }
 
-  // 🚀 Adiciona o getData para expor pickupItemId
   async getData(options = {}) {
-    const context = await super.getData(options);
-    context.system = this.actor.system;
+  const context = await super.getData(options);
+  context.system = this.actor.system;
+  context.pickupItemId = InventoryGridManager._currentPickupItemId;
+  context.resolvedItems = this.actor.items.contents;
 
-    context.pickupItemId = InventoryGridManager._currentPickupItemId;
+  console.log("[TMActorSheet] getData resolvedItems:", context.resolvedItems.length);
 
-    // FORÇA os embedded documents atualizados
-    context.resolvedItems = await this.actor.getEmbeddedCollection("Item");
+context.resolvedItems.forEach(i => {
+  console.log(`[DEBUG][getData] Item=${i.name} | gridX=${i.system.gridX} | gridY=${i.system.gridY} | gridW=${i.system.gridWidth} | gridH=${i.system.gridHeight} | rotated=${i.system.rotated}`);
+});
+  return context;
+}
 
-    return context;
-  }
 
 }

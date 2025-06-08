@@ -10,8 +10,36 @@ import { TMObjectSheet } from "./src/item/object-sheet.js";
 Handlebars.registerHelper("add", function (a, b) {
   return Number(a) + Number(b);
 });
+
 Handlebars.registerHelper("debug", function(...args) {
   console.log("HANDLEBARS DEBUG:", ...args);
+});
+
+Handlebars.registerHelper("range", function(from, to) {
+  let result = [];
+  for (let i = from; i <= to; i++) {
+    result.push(i);
+  }
+  return result;
+});
+
+Handlebars.registerHelper("mod", function(a, b) {
+  return a % b;
+});
+
+Handlebars.registerHelper("divide", function(a, b) {
+  return a / b;
+});
+
+Handlebars.registerHelper("number", function (value) {
+  return Number(value);
+});
+
+Handlebars.registerHelper("floor", function(a) {
+  return Math.floor(a);
+});
+Handlebars.registerHelper("eq", function (a, b) {
+  return a === b;
 });
 
 // === INIT ===
