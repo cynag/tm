@@ -69,6 +69,8 @@ export class InventoryGrid {
 
       itemsLayer.append(div);
     }
+    // 🚀 Debug visual da grid
+    InventoryGrid.debugInventoryGrid(html, actor);
   }
 
   static _canPlaceAt(actor, item, gridX, gridY, gridW, gridH) {
@@ -145,5 +147,43 @@ export class InventoryGrid {
   // Não tem item na célula → não é Swap
   return null;
   }
+
+  static debugInventoryGrid(html, actor) {
+  // Limpa cor anterior
+  html.find(".inventory-cell").css("background-color", "");
+
+  html.find(".inventory-cell").each((_, el) => {
+    const cell = $(el);
+    const cellX = Number(cell.data("cell-x"));
+    const cellY = Number(cell.data("cell-y"));
+
+    // Verifica se a célula está ocupada
+    let occupied = false;
+
+    for (const item of actor.items) {
+      if (item.type !== "object") continue;
+
+      const ox = item.system.gridX;
+      const oy = item.system.gridY;
+      const ow = item.system.gridWidth;
+      const oh = item.system.gridHeight;
+
+      const overlapX = cellX >= ox && cellX < ox + ow;
+      const overlapY = cellY >= oy && cellY < oy + oh;
+
+      if (overlapX && overlapY) {
+        occupied = true;
+        break;
+      }
+    }
+
+    // Aplica a cor visual
+    if (occupied) {
+      cell.css("background-color", "rgba(255, 0, 0, 0.3)"); // vermelho
+    } else {
+      cell.css("background-color", "rgba(0, 255, 0, 0.3)"); // verde
+    }
+  });
+}
 
 }

@@ -8,7 +8,6 @@ export class InventoryManager {
   static _pickupOriginalY = null;
   static _pickupConfirming = false;
 
-
     static init(html, actor) {
     console.log("[InventoryManager] Init (GRID REAL)");
 
@@ -43,6 +42,7 @@ export class InventoryManager {
   InventoryManager._pickupItem = item;
   InventoryManager._pickupOriginalX = item.system.gridX;
   InventoryManager._pickupOriginalY = item.system.gridY;
+  item.inPickup = true; // 🚀 Proteção de render duplicado
 
   // Remove qualquer ghost existente
   $(".inventory-ghost").remove();
@@ -123,7 +123,12 @@ export class InventoryManager {
   const item = InventoryManager._pickupItem;
 
   // Se não está em pickup, não faz nada
-  if (!item) return;
+  // Proteção extra: se o item sumiu ou foi deletado (race condition)
+  if (!item || !actor.items.has(item.id)) {
+  console.warn("[InventoryManager] Pickup item inválido ou deletado — abortando drop.");
+  InventoryManager._endPickup(html, actor);
+  return;
+  }
 
   const gridEl = html.find(".inventory-grid")[0];
   const gridRect = gridEl.getBoundingClientRect();
@@ -156,7 +161,7 @@ export class InventoryManager {
       "system.gridX": swapTarget.system.gridX,
       "system.gridY": swapTarget.system.gridY
     });
-
+    InventoryGrid.renderItems(html, actor); // 🚀 Força re-render após swap
     // Coloca item B na mão
     InventoryManager._pickupItem = swapTarget;
     InventoryManager._pickupOriginalX = swapTarget.system.gridX;
@@ -271,10 +276,15 @@ export class InventoryManager {
       });
     });
     }
-    
+  
+  ///////////////////////////////
+
     static _endPickup(html, actor) {
   console.log("[InventoryManager] Encerrando pickup.");
-
+  // 🚀 Limpa flag inPickup
+  if (InventoryManager._pickupItem) {
+    InventoryManager._pickupItem.inPickup = false;
+  }
   // Limpa estado
   InventoryManager._pickupItem = null;
   InventoryManager._pickupGhost = null;
@@ -315,7 +325,9 @@ export class InventoryManager {
   } else {
     console.error(`[InventoryManager] Não foi possível reposicionar ${item.name} — inventário cheio!`);
   }
-
+  if (InventoryManager._pickupItem) {
+  InventoryManager._pickupItem.inPickup = false;
+  }
   InventoryManager._clearPreview(html);
   InventoryManager._endPickup(html, actor);
     }
@@ -327,9 +339,12 @@ export class InventoryManager {
 
   await actor.deleteEmbeddedDocuments("Item", [item.id]);
   ui.notifications.info(`${item.name} foi jogado fora!`);
-InventoryManager._clearPreview(html);
-InventoryManager._endPickup(html, actor);
 
+  if (InventoryManager._pickupItem) {
+  InventoryManager._pickupItem.inPickup = false;
+  }
+  InventoryManager._clearPreview(html);
+  InventoryManager._endPickup(html, actor);
     }
     static _updatePreview(html, actor, clientX, clientY) {
   const gridEl = html.find(".inventory-grid")[0];
@@ -427,7 +442,7 @@ InventoryManager._endPickup(html, actor);
   return cellSize;
     }
     static _clearPreview(html) {
-    html.find(".inventory-cell").removeClass("preview-valid preview-invalid");
+      html.find(".inventory-cell").removeClass("preview-valid preview-invalid preview-swap"); // 🚀 Completo
     }
 
 
