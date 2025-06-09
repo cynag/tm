@@ -1,106 +1,23 @@
-/* === FICHA BASE === */
-.tm1e.sheet.actor {
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  padding: 10px;
-}
-
-.tm1e.sheet.actor .sheet-header {
-  border-bottom: 1px solid #555;
-  margin-bottom: 10px;
-}
-
-.tm1e.sheet.actor h1 {
-  margin: 0;
-  font-size: 1.4em;
-}
-
-.tm1e.sheet.actor h2 {
-  margin: 10px 0 5px 0;
-  font-size: 1.2em;
-}
-
-.tm1e.sheet.actor h3 {
-  margin: 8px 0 4px 0;
-  font-size: 1em;
-  color: #ccc;
-}
-
-.tm1e.sheet.actor input[type="text"],
-.tm1e.sheet.actor input[type="number"] {
-  padding: 2px 4px;
-  border: 1px solid #555;
-  background-color: #222;
-  color: #eee;
-}
-
-.tm1e.sheet.actor select {
-  padding: 2px 4px;
-  border: 1px solid #555;
-  background-color: #222;
-  color: #eee;
-}
-
-/* === INVENTORY GRID === */
 .inventory-grid {
   display: grid;
   grid-template-columns: repeat(10, 50px);
   grid-template-rows: repeat(5, 50px);
   gap: 0px;
-  outline: 2px solid #555;
-  padding: 0px;
-  position: relative;
-  box-sizing: border-box;
-  width: calc(10 * 50px);
-  height: calc(5 * 50px);
-  background-color: #1a1a1a !important;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
-  background-size: 50px 50px;
-  background-origin: content-box;
-  background-position: top left;
-  overflow: hidden;
+  border: 2px solid #555;
+  background-color: #1a1a1a;
 }
 
-.inventory-grid .grid-item {
-  box-shadow: inset 0 0 0 2px rgb(255, 255, 255);
-  background-color: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-  transition: box-shadow 0.1s ease, background-color 0.1s ease;
+.inventory-cell {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* NÃO colocar width/height aqui! */
 }
 
-.inventory-grid .grid-item:hover {
-  box-shadow: inset 0 0 0 2px orange;
-  background-color: rgba(255, 255, 255, 0.3);
+.cell-inner {
+  width: 100%;
+  height: 100%;
 }
-
-.inventory-grid .grid-item img {
-  max-width: 90%;
-  max-height: 90%;
-  pointer-events: none;
-}
-
-/* === GRID PREVIEW === */
-.inventory-grid .grid-preview {
-  display: block;
-  pointer-events: none;
-  outline: 2px solid limegreen;
-  background-color: rgba(0, 255, 0, 0.1);
-  z-index: 5;
-}
-
-.inventory-grid.highlight-invalid .grid-preview {
-  outline: 2px solid red;
-  background-color: rgba(255, 0, 0, 0.1);
-}
-
-/* === CONTEXT MENU === */
 .inventory-context-menu {
-  position: absolute;
+  position: fixed; /* IMPORTANTE: trava no viewport */
   z-index: 1000;
   background: #1a1a1a;
   border: 2px solid #555;
@@ -112,130 +29,37 @@
   color: #eee;
   min-width: 120px;
 }
-
-.inventory-context-menu .menu-item {
-  padding: 5px 15px;
-  cursor: pointer;
-}
-
-.inventory-context-menu .menu-item:hover {
-  background: rgba(100,200,255,0.2);
-}
-
-/* === IMAGE WRAPPER === */
-.inventory-grid .grid-item-image-wrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
-  transform-origin: center center;
-}
-
-.inventory-grid .grid-item-image-wrapper img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-/* === ROTATED ITEM === */
-.inventory-grid .grid-item.rotated .grid-item-image-wrapper {
-  transform: rotate(90deg);
-  width: auto;
-  height: auto;
-}
-
-/* === GHOST (CLICK & PICKUP) === */
 .inventory-ghost {
   position: fixed;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 50px;
   pointer-events: none;
   opacity: 0.8;
-  filter: drop-shadow(0 0 5px rgba(0,255,255,0.7));
   z-index: 10000;
 }
-
-/* === PICKUP STATE === */
-.inventory-grid .grid-item.being-picked-up {
-  visibility: hidden;
+.inventory-ghost img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
-
+.inventory-cell.preview-valid {
+  outline: 2px solid limegreen;
+}
+.inventory-cell.preview-invalid {
+  outline: 2px solid red;
+}
 body.inventory-pickup-active {
   cursor: none !important;
 }
-
 body.inventory-pickup-active .inventory-grid {
   cursor: none !important;
 }
-
 body.inventory-pickup-active .inventory-grid .grid-item {
   cursor: none !important;
 }
-body.inventory-confirm-active .app.window-app.actor {
-  pointer-events: none !important;
-  opacity: 0.6; /* opcional: visual de desativado */
-}
-/* === INVENTORY CELL === */
-.inventory-grid .inventory-cell {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  cursor: pointer;
-  transition: background-color 0.1s ease, border-color 0.1s ease;
-}
-
-.inventory-grid .inventory-cell:hover {
-  background-color: rgba(100, 200, 255, 0.05);
-  border-color: rgba(100, 200, 255, 0.3);
-}
-
-.inventory-grid .inventory-cell:active {
-  background-color: rgba(100, 200, 255, 0.1);
-  border-color: rgba(100, 200, 255, 0.5);
-}
-/* === INVENTORY GRID ITEM IMAGE === */
-.grid-item-image-wrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.grid-item-image-wrapper img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-.inventory-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.inventory-row {
-  display: flex;
-  gap: 2px;
-}
-
-.inventory-cell {
-  width: 60px;
-  height: 60px;
-  background: #222;
-  border: 1px solid #555;
-  position: relative;
-}
-
-.cell-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.inventory-item {
-  position: absolute;
-  top: 0;
-  left: 0;
-  object-fit: contain;
-  pointer-events: none; /* ou auto se quiser interatividade */
+.inventory-cell.flash-red {
+  background-color: rgba(255, 0, 0, 0.3);
+  transition: background-color 0.1s ease;
 }
