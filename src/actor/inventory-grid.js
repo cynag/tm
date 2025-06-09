@@ -157,8 +157,8 @@ export class InventoryGrid {
     const cellX = Number(cell.data("cell-x"));
     const cellY = Number(cell.data("cell-y"));
 
-    // Conta quantos itens ocupam esta célula
-    let count = 0;
+    // Coleta quais itens ocupam esta célula
+    const occupyingItems = [];
 
     for (const item of actor.items) {
       if (item.type !== "object") continue;
@@ -172,20 +172,24 @@ export class InventoryGrid {
       const overlapY = cellY >= oy && cellY < oy + oh;
 
       if (overlapX && overlapY) {
-        count++;
+        occupyingItems.push(item.name);
       }
     }
 
-    // Aplica a cor visual com base na contagem
-    if (count === 0) {
+    // Aplica a cor visual com base na quantidade
+    if (occupyingItems.length === 0) {
       cell.css("background-color", "rgba(0, 255, 0, 0.3)"); // verde
-    } else if (count === 1) {
+    } else if (occupyingItems.length === 1) {
       cell.css("background-color", "rgba(255, 0, 0, 0.3)"); // vermelho
     } else {
       cell.css("background-color", "rgba(255, 0, 255, 0.4)"); // rosa → overlap!
+
+      // 🚨 Log no console
+      console.warn(`[InventoryGrid] OVERLAP detectado na célula (${cellX}, ${cellY}):`, occupyingItems.join(", "));
     }
   });
 }
+
 
 
 }
