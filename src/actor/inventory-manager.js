@@ -17,7 +17,8 @@ export class InventoryManager {
     //////////////////////////////////////////////////////
     // CLICK AND PICKUP -> PEGA O ITEM
     //////////////////////////////////////////////////////
-    html.find(".inventory-grid .grid-item").off("click").on("click", ev => {
+    html.find(".inventory-items-layer .grid-item").off("click").on("click", ev => {
+
   ev.preventDefault();
   ev.stopPropagation(); // ESSENCIAL!
 
@@ -35,20 +36,43 @@ export class InventoryManager {
   // Remove qualquer ghost existente
   $(".inventory-ghost").remove();
 
-  // Cria ghost
-  const ghost = $(`
-    <div class="inventory-ghost">
-      <img src="${item.img}" alt="${item.name}" />
-    </div>
-  `);
-  $("body").append(ghost);
-  InventoryManager._pickupGhost = ghost;
 
-  // POSICIONA IMEDIATAMENTE no mouse
-  InventoryManager._pickupGhost.css({
-    top: `${ev.clientY}px`,
-    left: `${ev.clientX}px`
-  });
+
+
+
+
+
+
+
+
+  // Cria ghost
+const ghost = $(`
+  <div class="inventory-ghost">
+    <img src="${item.img}" alt="${item.name}" />
+  </div>
+`);
+$("body").append(ghost);
+InventoryManager._pickupGhost = ghost;
+
+// Calcula tamanho correto do ghost
+const gridW = Math.max(1, item.system.gridWidth);
+const gridH = Math.max(1, item.system.gridHeight);
+const cellSize = InventoryManager._getCellSize(html);
+
+InventoryManager._pickupGhost.css({
+  width: `${gridW * cellSize}px`,
+  height: `${gridH * cellSize}px`,
+  top: `${ev.clientY - (gridH * cellSize) / 2}px`,
+  left: `${ev.clientX - (gridW * cellSize) / 2}px`
+});
+
+
+
+
+
+
+
+
 
   // Oculta o item na grid
   $(ev.currentTarget).css("visibility", "hidden");
@@ -56,63 +80,39 @@ export class InventoryManager {
   // Ativa modo pickup → cursor some
   $("body").addClass("inventory-pickup-active");
 
-  // Ativa movimento do ghost + preview
+  // === FORÇA ATUALIZAÇÃO DO PREVIEW IMEDIATA ===
+  InventoryManager._updatePreview(html, actor, ev.clientX, ev.clientY);
+
+  // === Ativa movimento do ghost + preview ===
   $(document).on("mousemove.inventoryPickup", ev2 => {
-    // Move o ghost
-    InventoryManager._pickupGhost.css({
-      top: `${ev2.clientY}px`,
-      left: `${ev2.clientX}px`
-    });
+  const rect = InventoryManager._pickupGhost[0].getBoundingClientRect();
+  const ghostW = rect.width;
+  const ghostH = rect.height;
 
-    // Calcula célula sob o mouse
-    const gridOffset = html.find(".inventory-grid").offset();
-    const cellSize = 50; // tamanho de uma célula
-
-    const relX = ev2.clientX - gridOffset.left;
-    const relY = ev2.clientY - gridOffset.top;
-
-    const cellX = Math.floor(relX / cellSize);
-    const cellY = Math.floor(relY / cellSize);
-
-    const gridWidth = Number(html.find(".inventory-grid").data("grid-width")) || 10;
-    const gridHeight = Number(html.find(".inventory-grid").data("grid-height")) || 5;
-
-    // Limpa qualquer preview anterior
-    html.find(".inventory-cell").removeClass("preview-valid preview-invalid");
-
-    // Se mouse está DENTRO da grid
-    if (cellX >= 0 && cellX < gridWidth && cellY >= 0 && cellY < gridHeight) {
-
-      const canPlace = InventoryGrid._canPlaceAt(
-        actor,
-        InventoryManager._pickupItem,
-        cellX,
-        cellY,
-        InventoryManager._pickupItem.system.gridWidth,
-        InventoryManager._pickupItem.system.gridHeight
-      );
-
-      // Define a área ocupada pelo item
-      for (let y = 0; y < InventoryManager._pickupItem.system.gridHeight; y++) {
-        for (let x = 0; x < InventoryManager._pickupItem.system.gridWidth; x++) {
-          const tx = cellX + x;
-          const ty = cellY + y;
-
-          // Só aplica se dentro da grid
-          if (tx >= 0 && tx < gridWidth && ty >= 0 && ty < gridHeight) {
-            const cell = html.find(`.inventory-cell[data-cell-x="${tx}"][data-cell-y="${ty}"]`);
-            if (canPlace) {
-              cell.addClass("preview-valid");
-            } else {
-              cell.addClass("preview-invalid");
-            }
-          }
-        }
-      }
-    }
+  InventoryManager._pickupGhost.css({
+    top: `${ev2.clientY - ghostH / 2}px`,
+    left: `${ev2.clientX - ghostW / 2}px`
   });
 
-  // ESC → cancela pickup
+  const gridEl = html.find(".inventory-grid")[0];
+  const gridRect = gridEl.getBoundingClientRect();
+  const cellSize = InventoryManager._getCellSize(html);
+
+  const gridWidth = Number(html.find(".inventory-grid").data("grid-width")) || 10;
+  const gridHeight = Number(html.find(".inventory-grid").data("grid-height")) || 5;
+
+  const relX = Math.max(0, ev2.clientX - gridRect.left);
+  const relY = Math.max(0, ev2.clientY - gridRect.top);
+
+  const cellX = Math.min(Math.floor(relX / cellSize), gridWidth - 1);
+  const cellY = Math.min(Math.floor(relY / cellSize), gridHeight - 1);
+
+  InventoryManager._updatePreview(html, actor, ev2.clientX, ev2.clientY);
+});
+
+
+
+  // === ESC → cancela pickup ===
   $(document).on("keydown.inventoryPickup", async ev2 => {
     if (ev2.key === "Escape") {
       console.log("[InventoryManager] Cancelando pickup (ESC)");
@@ -120,14 +120,16 @@ export class InventoryManager {
     }
   });
 
-  // Botão direito → cancela pickup
+  // === Right Click → cancela pickup ===
   $(document).on("contextmenu.inventoryPickup", async ev2 => {
-    console.log("[InventoryManager] Cancelando pickup (Right Click)");
     ev2.preventDefault();
+    ev2.stopPropagation(); // ESSENCIAL
+
+    console.log("[InventoryManager] Cancelando pickup (Right Click)");
     await InventoryManager._cancelPickup(html, actor);
   });
 
-  // Click fora da ficha → joga fora
+  // === Click fora da ficha → joga fora ===
   $(document).on("mousedown.inventoryPickup", async ev2 => {
     if ($(ev2.target).closest(".window-app.actor").length > 0) return;
 
@@ -135,31 +137,28 @@ export class InventoryManager {
     ev2.preventDefault();
     await InventoryManager._discardPickup(html, actor);
   });
-    });
+});
     //////////////////////////////////////////////////////
     // CLICK AND DROP -> COLOCA O ITEM
     //////////////////////////////////////////////////////
     html.find(".inventory-grid .inventory-cell").off("click").on("click", async ev => {
   const item = InventoryManager._pickupItem;
 
-  // Se NÃO está em pickup → é um click "vazio" → faz flash
-  if (!item) {
-    console.log("[InventoryManager] Click em célula vazia → flash vermelho");
+  // Se não está em pickup, não faz nada
+  if (!item) return;
 
-    const cell = $(ev.currentTarget);
-    cell.addClass("flash-red");
+  const gridEl = html.find(".inventory-grid")[0];
+  const gridRect = gridEl.getBoundingClientRect();
+  const cellSize = InventoryManager._getCellSize(html);
 
-    // Remove a classe depois de 300ms
-    setTimeout(() => {
-      cell.removeClass("flash-red");
-    }, 300);
+  const gridWidth = Number(html.find(".inventory-grid").data("grid-width")) || 10;
+  const gridHeight = Number(html.find(".inventory-grid").data("grid-height")) || 5;
 
-    return; // NÃO faz mais nada
-  }
+  const relX = Math.max(0, ev.clientX - gridRect.left);
+  const relY = Math.max(0, ev.clientY - gridRect.top);
 
-  // Caso esteja em pickup → segue com o Place normal
-  const cellX = Number(ev.currentTarget.dataset.cellX);
-  const cellY = Number(ev.currentTarget.dataset.cellY);
+  const cellX = Math.min(Math.floor(relX / cellSize), gridWidth - 1);
+  const cellY = Math.min(Math.floor(relY / cellSize), gridHeight - 1);
 
   console.log(`[InventoryManager] Colocando ${item.name} em X=${cellX}, Y=${cellY}`);
 
@@ -178,18 +177,26 @@ export class InventoryManager {
       "system.gridY": cellY
     });
     console.log(`[InventoryManager] ${item.name} colocado em X=${cellX}, Y=${cellY}`);
+
+    InventoryManager._endPickup(html, actor);
   } else {
     console.warn(`[InventoryManager] Não cabe em X=${cellX}, Y=${cellY}`);
-  }
 
-  // Limpa pickup
-  InventoryManager._endPickup(html, actor);
+    // Feedback visual: flash vermelho no ghost
+    InventoryManager._pickupGhost.addClass("ghost-invalid");
+
+    // Remove o flash após um pequeno delay
+    setTimeout(() => {
+      InventoryManager._pickupGhost.removeClass("ghost-invalid");
+    }, 200);
+  }
 });
 
     //////////////////////////////////////////////////////
     // CONTEXT MENU
     //////////////////////////////////////////////////////
-    html.find(".inventory-grid .grid-item").off("contextmenu").on("contextmenu", ev => {
+    html.find(".inventory-items-layer .grid-item").off("contextmenu").on("contextmenu", ev => {
+
       ev.preventDefault();
       ev.stopPropagation();
 
@@ -236,23 +243,20 @@ export class InventoryManager {
         $(document).off("click.inventoryContext");
       });
     });
-    }
+}
     static _endPickup(html, actor) {
   console.log("[InventoryManager] Encerrando pickup.");
 
-  // Limpa estado
   InventoryManager._pickupItem = null;
   InventoryManager._pickupGhost = null;
   InventoryManager._pickupOriginalX = null;
   InventoryManager._pickupOriginalY = null;
 
-  // Remove ghost
   $(".inventory-ghost").remove();
-
-  // Remove TODOS os listeners do pickup
   $(document).off(".inventoryPickup");
 
-  // Força re-render da grid
+  $("body").removeClass("inventory-pickup-active"); // RESTAURA CURSOR
+
   InventoryManager.init(html, actor);
     }
     static async _cancelPickup(html, actor) {
@@ -289,9 +293,9 @@ export class InventoryManager {
       console.error(`[InventoryManager] Não foi possível reposicionar ${item.name} — inventário cheio!`);
     }
   }
+InventoryManager._clearPreview(html);
+InventoryManager._endPickup(html, actor);
 
-  // Finaliza pickup
-  InventoryManager._endPickup(html, actor);
     }
     static async _discardPickup(html, actor) {
   const item = InventoryManager._pickupItem;
@@ -301,8 +305,83 @@ export class InventoryManager {
 
   await actor.deleteEmbeddedDocuments("Item", [item.id]);
   ui.notifications.info(`${item.name} foi jogado fora!`);
+InventoryManager._clearPreview(html);
+InventoryManager._endPickup(html, actor);
 
-  // Finaliza pickup
-  InventoryManager._endPickup(html, actor);
     }
+    static _updatePreview(html, actor, clientX, clientY) {
+  const gridEl = html.find(".inventory-grid")[0];
+  const gridRect = gridEl.getBoundingClientRect();
+  const cellSize = InventoryManager._getCellSize(html);
+
+  const gridWidth = Number(html.find(".inventory-grid").data("grid-width")) || 10;
+  const gridHeight = Number(html.find(".inventory-grid").data("grid-height")) || 5;
+
+  const relX = Math.max(0, clientX - gridRect.left);
+  const relY = Math.max(0, clientY - gridRect.top);
+
+  const cellX = Math.min(Math.floor(relX / cellSize), gridWidth - 1);
+  const cellY = Math.min(Math.floor(relY / cellSize), gridHeight - 1);
+
+  html.find(".inventory-cell").removeClass("preview-valid preview-invalid");
+
+  if (cellX >= 0 && cellX < gridWidth && cellY >= 0 && cellY < gridHeight) {
+    let canPlace;
+    if (cellX === InventoryManager._pickupOriginalX && cellY === InventoryManager._pickupOriginalY) {
+      canPlace = true;
+    } else {
+      canPlace = InventoryGrid._canPlaceAt(
+        actor,
+        InventoryManager._pickupItem,
+        cellX,
+        cellY,
+        InventoryManager._pickupItem.system.gridWidth,
+        InventoryManager._pickupItem.system.gridHeight
+      );
+    }
+
+    for (let y = 0; y < InventoryManager._pickupItem.system.gridHeight; y++) {
+      for (let x = 0; x < InventoryManager._pickupItem.system.gridWidth; x++) {
+        const tx = cellX + x;
+        const ty = cellY + y;
+
+        if (tx >= 0 && tx < gridWidth && ty >= 0 && ty < gridHeight) {
+          const cell = html.find(`.inventory-cell[data-cell-x="${tx}"][data-cell-y="${ty}"]`);
+          if (canPlace) {
+            cell.addClass("preview-valid");
+          } else {
+            cell.addClass("preview-invalid");
+          }
+        }
+      }
+    }
+  }
+    }
+    static _getCellSize(html) {
+  const gridEl = html.find(".inventory-grid")[0];
+  if (!gridEl) {
+    console.error("[ERROR] .inventory-grid não encontrado!");
+    return 50; // fallback seguro
+  }
+
+  const cellSizePx = getComputedStyle(gridEl).getPropertyValue("--cell-size").trim();
+  if (!cellSizePx) {
+    console.error("[ERROR] --cell-size não definido!");
+    return 50; // fallback seguro
+  }
+
+  const cellSize = parseInt(cellSizePx.replace("px", ""));
+  if (isNaN(cellSize)) {
+    console.error("[ERROR] cellSize é NaN! cellSizePx =", cellSizePx);
+    return 50; // fallback seguro
+  }
+
+  return cellSize;
+    }
+    static _clearPreview(html) {
+    html.find(".inventory-cell").removeClass("preview-valid preview-invalid");
+    }
+
+
+
 }

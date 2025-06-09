@@ -1,121 +1,120 @@
 export class InventoryGrid {
 
   static generateGrid(html, actor) {
-    console.log("[InventoryGrid] Gerando grid dinâmica...");
+    console.log("[InventoryGrid] Grid gerada: 10x5");
 
-    const gridW = Number(html.find(".inventory-grid").data("grid-width")) || 10;
-    const gridH = Number(html.find(".inventory-grid").data("grid-height")) || 5;
+    const gridW = 10;
+    const gridH = 5;
 
-    const gridEl = html.find(".inventory-grid");
-    gridEl.empty(); // limpa o grid
+    const grid = html.find(".inventory-grid");
+    grid.empty();
 
+    // Gera as células fixas
     for (let y = 0; y < gridH; y++) {
       for (let x = 0; x < gridW; x++) {
         const cell = $(`
-          <div class="inventory-cell"
-               data-cell-x="${x}"
-               data-cell-y="${y}">
+          <div
+            class="inventory-cell"
+            data-cell-x="${x}"
+            data-cell-y="${y}"
+          >
             <div class="cell-inner"></div>
           </div>
         `);
-        gridEl.append(cell);
+
+        grid.append(cell);
       }
     }
 
-    console.log(`[InventoryGrid] Grid gerada: ${gridW}x${gridH}`);
+    // Cria a camada de itens (flutuante)
+    const itemsLayer = $(`<div class="inventory-items-layer"></div>`);
+    grid.append(itemsLayer);
   }
-////////////////////////////////////////////////
-// RENDERIZAÇÃO DE ITENS NA FICA
-///////////////////////////////////////////////
+
   static renderItems(html, actor) {
-  console.log("[InventoryGrid] Renderizando itens...");
+    console.log("[InventoryGrid] Renderizando itens...");
 
-  // Primeiro, limpa itens antigos
-  html.find(".inventory-grid .grid-item").remove();
+    const grid = html.find(".inventory-grid");
+    const itemsLayer = grid.find(".inventory-items-layer");
 
-  for (const item of actor.items) {
-    const gridX = item.system.gridX;
-    const gridY = item.system.gridY;
-    const gridW = item.system.gridWidth;
-    const gridH = item.system.gridHeight;
+    itemsLayer.empty();
 
-    // Cria o item como elemento GRID (ocupando área correta)
-    const itemEl = $(`
-      <div class="grid-item" data-item-id="${item.id}" draggable="true"
-           style="
-             grid-column: ${gridX + 1} / span ${gridW};
-             grid-row: ${gridY + 1} / span ${gridH};
-           ">
-        <div class="grid-item-image-wrapper"
-          ${item.system.rotated && gridW !== gridH ? 'style="transform: rotate(90deg); transform-origin: center center;"' : ''}>
-          <img src="${item.img}" alt="${item.name}" />
+    const gridMaxW = Number(grid.data("grid-width")) || 10;
+    const gridMaxH = Number(grid.data("grid-height")) || 5;
+
+    for (const item of actor.items) {
+      if (item.type !== "object") continue;
+
+      const gridX = Math.max(0, Math.min(item.system.gridX, gridMaxW - item.system.gridWidth));
+      const gridY = Math.max(0, Math.min(item.system.gridY, gridMaxH - item.system.gridHeight));
+      const gridW = Math.max(1, item.system.gridWidth);
+      const gridH = Math.max(1, item.system.gridHeight);
+
+      console.log(`[InventoryGrid] Renderizando item ${item.name} em X=${gridX}, Y=${gridY}, W=${gridW}, H=${gridH}`);
+
+      const div = $(`
+        <div
+          class="grid-item"
+          data-item-id="${item.id}"
+          style="
+            grid-column: ${gridX + 1} / span ${gridW};
+            grid-row: ${gridY + 1} / span ${gridH};
+          "
+        >
+          <div class="cell-inner">
+            <img src="${item.img}" alt="${item.name}" title="${item.name}" />
+          </div>
         </div>
-      </div>
-    `);
+      `);
 
-    // INSERE O ITEM DIRETAMENTE na .inventory-grid
-    html.find(".inventory-grid").append(itemEl);
-  }
-
-  console.log("[InventoryGrid] Itens renderizados.");
-  }
-////////////////////////////////////////////////
-// O ITEM PODE SER COLOCADO?
-///////////////////////////////////////////////
-  static _canPlaceAt(actor, item, x, y, iw, ih) {
-    const maxW = 10;
-    const maxH = 5;
-
-    const grid = Array.from({ length: maxH }, () =>
-      Array.from({ length: maxW }, () => false)
-    );
-
-    for (const i of actor.items) {
-      if (i.id === item.id) continue;
-
-      const ix = i.system.gridX;
-      const iy = i.system.gridY;
-      const iw2 = i.system.gridWidth;
-      const ih2 = i.system.gridHeight;
-
-      for (let yy = iy; yy < iy + ih2; yy++) {
-        for (let xx = ix; xx < ix + iw2; xx++) {
-          if (yy >= 0 && yy < maxH && xx >= 0 && xx < maxW) {
-            grid[yy][xx] = true;
-          }
-        }
-      }
+      itemsLayer.append(div);
     }
+  }
 
-    for (let yy = y; yy < y + ih; yy++) {
-      for (let xx = x; xx < x + iw; xx++) {
-        if (yy >= maxH || xx >= maxW || grid[yy][xx]) {
-          return false;
-        }
+  static _canPlaceAt(actor, item, gridX, gridY, gridW, gridH) {
+    const gridMaxW = 10;
+    const gridMaxH = 5;
+
+    // Check bounds
+    if (gridX < 0 || gridY < 0) return false;
+    if (gridX + gridW > gridMaxW) return false;
+    if (gridY + gridH > gridMaxH) return false;
+
+    // Check collision
+    for (const other of actor.items) {
+      if (other.id === item.id) continue;
+      if (other.type !== "object") continue;
+
+      const ox = other.system.gridX;
+      const oy = other.system.gridY;
+      const ow = other.system.gridWidth;
+      const oh = other.system.gridHeight;
+
+      const overlapX = gridX < ox + ow && gridX + gridW > ox;
+      const overlapY = gridY < oy + oh && gridY + gridH > oy;
+
+      if (overlapX && overlapY) {
+        return false;
       }
     }
 
     return true;
   }
-////////////////////////////////////////////////
-// PROCURAR O PRIMEIRO ESPAÇO COMPATIVEL
-///////////////////////////////////////////////
-  static findFirstFreePosition(actor, w, h) {
-    console.log(`[InventoryGrid] Procurando espaço para ${w}x${h} (PRIORIDADE VERTICAL)`);
 
-    const gridW = 10;
-    const gridH = 5;
+  static findFirstFreePosition(actor, gridW, gridH) {
+    const gridMaxW = 10;
+    const gridMaxH = 5;
 
-    for (let x = 0; x <= gridW - w; x++) {
-      for (let y = 0; y <= gridH - h; y++) {
-        if (InventoryGrid._canPlaceAt(actor, { id: null }, x, y, w, h)) {
-          console.log(`[InventoryGrid] Espaço encontrado em X=${x}, Y=${y}`);
+    for (let y = 0; y <= gridMaxH - gridH; y++) {
+      for (let x = 0; x <= gridMaxW - gridW; x++) {
+        const canPlace = InventoryGrid._canPlaceAt(actor, { id: null, type: "object" }, x, y, gridW, gridH);
+        if (canPlace) {
           return { x, y };
         }
       }
     }
 
-    console.warn("[InventoryGrid] Inventário cheio!");
     return null;
   }
+  
 }

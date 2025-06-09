@@ -1,21 +1,77 @@
+/* === INVENTORY GRID BASE === */
 .inventory-grid {
+  --cell-size: 50px;
+
   display: grid;
-  grid-template-columns: repeat(10, 50px);
-  grid-template-rows: repeat(5, 50px);
-  gap: 0px;
-  border: 2px solid #555;
+  grid-template-columns: repeat(10, var(--cell-size));
+  grid-template-rows: repeat(5, var(--cell-size));
+  gap: 0;
+  border: none; /* sem deslocamento visual */
   background-color: #1a1a1a;
+  box-sizing: border-box;
+  padding: 0;
+  position: relative; /* ESSENCIAL para .inventory-items-layer */
 }
 
+/* === INVENTORY CELL === */
 .inventory-cell {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  /* NÃO colocar width/height aqui! */
+  box-sizing: border-box;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  outline: 1px solid rgba(255, 255, 255, 0.1); /* Quadriculado */
 }
 
 .cell-inner {
   width: 100%;
   height: 100%;
 }
+
+/* === PREVIEW === */
+.inventory-cell.preview-valid {
+  outline: 2px solid limegreen;
+}
+
+.inventory-cell.preview-invalid {
+  outline: 2px solid red;
+}
+
+/* === FLASH RED === */
+.inventory-cell.flash-red {
+  background-color: rgba(255, 0, 0, 0.3);
+  transition: background-color 0.1s ease;
+}
+
+/* === INVENTORY ITEMS LAYER === */
+.inventory-items-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(10, var(--cell-size));
+  grid-template-rows: repeat(5, var(--cell-size));
+  width: calc(var(--cell-size) * 10);
+  height: calc(var(--cell-size) * 5);
+  pointer-events: none; /* ESSENCIAL: layer não intercepta mouse */
+  z-index: 10;
+}
+
+/* === INVENTORY GHOST === */
+.inventory-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 10000;
+}
+
+.inventory-ghost img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* === INVENTORY CONTEXT MENU === */
 .inventory-context-menu {
   position: fixed; /* IMPORTANTE: trava no viewport */
   z-index: 1000;
@@ -29,37 +85,21 @@
   color: #eee;
   min-width: 120px;
 }
-.inventory-ghost {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 50px;
-  height: 50px;
-  pointer-events: none;
-  opacity: 0.8;
-  z-index: 10000;
-}
-.inventory-ghost img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.inventory-cell.preview-valid {
-  outline: 2px solid limegreen;
-}
-.inventory-cell.preview-invalid {
-  outline: 2px solid red;
-}
+
+/* === CURSOR HIDDEN DURANTE PICKUP === */
 body.inventory-pickup-active {
   cursor: none !important;
 }
+
 body.inventory-pickup-active .inventory-grid {
   cursor: none !important;
 }
-body.inventory-pickup-active .inventory-grid .grid-item {
-  cursor: none !important;
+
+.grid-item {
+  pointer-events: auto; /* Apenas o item pode ser clicado */
+  cursor: pointer;
 }
-.inventory-cell.flash-red {
-  background-color: rgba(255, 0, 0, 0.3);
-  transition: background-color 0.1s ease;
+.inventory-ghost.ghost-invalid {
+  filter: drop-shadow(0 0 8px red) brightness(0.7);
+  transition: filter 0.1s ease;
 }
