@@ -5,6 +5,8 @@ import { TMActor } from "./src/actor/actor.js";
 import { TMObject } from "./src/item/item.js";
 import { TMActorSheet } from "./src/actor/actor-sheet.js";
 import { TMObjectSheet } from "./src/item/object-sheet.js";
+import { InventoryManager } from "./src/actor/inventory-manager.js";
+
 
 // === REGISTER HELPERS ===
 Handlebars.registerHelper("add", function (a, b) {
@@ -67,4 +69,10 @@ Hooks.once("init", async function() {
     makeDefault: true,
     types: ["object"]
   });
+});
+// === HOOK: Força grid sempre que a ficha renderiza ===
+
+Hooks.on("renderActorSheet", (app, html, data) => {
+  console.log("[InventoryManager] Hook renderActorSheet → init GRID");
+  InventoryManager.init(html, app.actor);
 });

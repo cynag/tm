@@ -10,7 +10,10 @@ export class InventoryManager {
 
     static init(html, actor) {
     console.log("[InventoryManager] Init (GRID REAL)");
-
+    // Proteção: se estou em pickup ativo, não re-inita a grid
+    if (InventoryManager._pickupItem) {
+    console.warn("[InventoryManager] Init ignorado — pickup ativo.");
+    }
     // Gera grid e renderiza itens
     InventoryGrid.generateGrid(html, actor);
     InventoryGrid.renderItems(html, actor);
@@ -154,43 +157,56 @@ export class InventoryManager {
   );
 
   if (swapTarget) {
-    console.log(`[InventoryManager] Fazendo SWAP com ${swapTarget.name}`);
+  console.log(`[InventoryManager] Fazendo SWAP com ${swapTarget.name}`);
 
-    // Coloca item A no lugar do item B
-    await item.update({
-      "system.gridX": swapTarget.system.gridX,
-      "system.gridY": swapTarget.system.gridY
-    });
-    InventoryGrid.renderItems(html, actor); // 🚀 Força re-render após swap
-    // Coloca item B na mão
-    InventoryManager._pickupItem = swapTarget;
-    InventoryManager._pickupOriginalX = swapTarget.system.gridX;
-    InventoryManager._pickupOriginalY = swapTarget.system.gridY;
+  // 1️⃣ Move item A pro lugar de B
+  await item.update({
+    "system.gridX": swapTarget.system.gridX,
+    "system.gridY": swapTarget.system.gridY
+  });
+  // 2️⃣ Move item B (swapTarget) pro lugar original de A
+  await swapTarget.update({
+    "system.gridX": InventoryManager._pickupOriginalX,
+    "system.gridY": InventoryManager._pickupOriginalY
+  });
+  // Força flush da collection de itens (garante que o swapTarget refletiu o update)
+  await actor.updateEmbeddedDocuments("Item", []);
+  // ⚠️ Agora pega o swapTarget atualizado com segurança
+  const updatedSwapTarget = actor.items.get(swapTarget.id);
+  // 3️⃣ Re-renderiza a grid (agora 100% consistente)
+  InventoryGrid.renderItems(html, actor);
+  // 4️⃣ Define o novo pickup (agora B atualizado)
+  InventoryManager._pickupItem = updatedSwapTarget;
+  InventoryManager._pickupOriginalX = updatedSwapTarget.system.gridX;
+  InventoryManager._pickupOriginalY = updatedSwapTarget.system.gridY;
+  updatedSwapTarget.inPickup = true; // ← ESSENCIAL!
+  // 5️⃣ Atualiza o ghost corretamente
+  $(".inventory-ghost").remove();
+  const ghost = $(`
+    <div class="inventory-ghost">
+      <img src="${updatedSwapTarget.img}" alt="${updatedSwapTarget.name}" />
+    </div>
+  `);
+  $("body").append(ghost);
+  InventoryManager._pickupGhost = ghost;
+  const gridW = Math.max(1, updatedSwapTarget.system.gridWidth);
+  const gridH = Math.max(1, updatedSwapTarget.system.gridHeight);
+  const cellSize = InventoryManager._getCellSize(html);
+  InventoryManager._pickupGhost.css({
+    width: `${gridW * cellSize}px`,
+    height: `${gridH * cellSize}px`,
+    top: `${ev.clientY - (gridH * cellSize) / 2}px`,
+    left: `${ev.clientX - (gridW * cellSize) / 2}px`
+  });
+  console.log(`[InventoryManager] Pickup agora é ${updatedSwapTarget.name}`);
+  // Atualiza preview imediatamente após swap
+  InventoryManager._updatePreview(html, actor, ev.clientX, ev.clientY);
+  //FIM
+}
 
-    // Atualiza o ghost pro novo item
-    $(".inventory-ghost").remove();
 
-    const ghost = $(`
-      <div class="inventory-ghost">
-        <img src="${swapTarget.img}" alt="${swapTarget.name}" />
-      </div>
-    `);
-    $("body").append(ghost);
-    InventoryManager._pickupGhost = ghost;
 
-    const gridW = Math.max(1, swapTarget.system.gridWidth);
-    const gridH = Math.max(1, swapTarget.system.gridHeight);
-
-    InventoryManager._pickupGhost.css({
-      width: `${gridW * cellSize}px`,
-      height: `${gridH * cellSize}px`,
-      top: `${ev.clientY - (gridH * cellSize) / 2}px`,
-      left: `${ev.clientX - (gridW * cellSize) / 2}px`
-    });
-
-    console.log(`[InventoryManager] Pickup agora é ${swapTarget.name}`);
-
-  } else {
+ else {
     // Não é swap → tenta place normal
     const canPlace = InventoryGrid._canPlaceAt(
       actor,
@@ -280,32 +296,33 @@ export class InventoryManager {
   ///////////////////////////////
 
     static _endPickup(html, actor) {
-  console.log("[InventoryManager] Encerrando pickup.");
-  // 🚀 Limpa flag inPickup
-  if (InventoryManager._pickupItem) {
+    console.log("[InventoryManager] Encerrando pickup.");
+    // 🚀 Limpa flag inPickup
+    if (InventoryManager._pickupItem) {
     InventoryManager._pickupItem.inPickup = false;
-  }
-  // Limpa estado
-  InventoryManager._pickupItem = null;
-  InventoryManager._pickupGhost = null;
-  InventoryManager._pickupOriginalX = null;
-  InventoryManager._pickupOriginalY = null;
-  InventoryManager._pickupConfirming = false; // Garante flag limpa
-
-  // Remove ghost
-  $(".inventory-ghost").remove();
-
-  // Remove handlers de movimento / cancelamento
-  $(document).off(".inventoryPickup");
-
-  // Restaura cursor
-  $("body").removeClass("inventory-pickup-active");
-
-  // Limpa preview
-  InventoryManager._clearPreview(html);
-
-  // Reinicializa a grid (pra garantir consistência visual)
-  InventoryGrid.renderItems(html, actor);
+    }
+    // Limpa preview
+    InventoryManager._clearPreview(html);
+    // Remove ghost se existir
+    if (InventoryManager._pickupGhost) {
+    InventoryManager._pickupGhost.remove();
+    InventoryManager._pickupGhost = null;
+    }
+    // Limpa estado
+    InventoryManager._pickupItem = null;
+    InventoryManager._pickupOriginalX = null;
+    InventoryManager._pickupOriginalY = null;
+    InventoryManager._pickupConfirming = false; // Garante flag limpa
+    // Remove handlers de movimento / cancelamento
+    $(document).off(".inventoryPickup");
+    // Restaura cursor
+    $("body").removeClass("inventory-pickup-active");
+    // Agora, com estado limpo → gera grid e renderiza
+    // 🚀 FINAL → Garante que a grid foi reinicializada com HTML atualizado
+    Hooks.once("renderActorSheet", (app, html, data) => {
+    console.log("[InventoryManager] Hook renderActorSheet → forçando init após _endPickup");
+    InventoryManager.init(html, actor);
+    });
     }
     static async _cancelPickup(html, actor) {
   const item = InventoryManager._pickupItem;
@@ -347,10 +364,17 @@ export class InventoryManager {
   InventoryManager._endPickup(html, actor);
     }
     static _updatePreview(html, actor, clientX, clientY) {
+    if (!html || !html.length) {
+    console.warn("[InventoryManager] HTML inválido no _updatePreview — ignorando.");
+    return;
+    }
   const gridEl = html.find(".inventory-grid")[0];
+  if (!gridEl) {
+  console.warn("[InventoryManager] Grid não encontrada no _updatePreview — ignorando.");
+  return;
+  }
   const gridRect = gridEl.getBoundingClientRect();
   const cellSize = InventoryManager._getCellSize(html);
-
   const gridWidth = Number(html.find(".inventory-grid").data("grid-width")) || 10;
   const gridHeight = Number(html.find(".inventory-grid").data("grid-height")) || 5;
 

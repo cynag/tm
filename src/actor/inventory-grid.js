@@ -2,13 +2,10 @@ export class InventoryGrid {
 
   static generateGrid(html, actor) {
     console.log("[InventoryGrid] Grid gerada: 10x5");
-
     const gridW = 10;
     const gridH = 5;
-
     const grid = html.find(".inventory-grid");
     grid.empty();
-
     // Gera as células fixas
     for (let y = 0; y < gridH; y++) {
       for (let x = 0; x < gridW; x++) {
@@ -25,7 +22,6 @@ export class InventoryGrid {
         grid.append(cell);
       }
     }
-
     // Cria a camada de itens (flutuante)
     const itemsLayer = $(`<div class="inventory-items-layer"></div>`);
     grid.append(itemsLayer);
