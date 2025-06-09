@@ -103,3 +103,9 @@ body.inventory-pickup-active .inventory-grid {
   filter: drop-shadow(0 0 8px red) brightness(0.7);
   transition: filter 0.1s ease;
 }
+.inventory-cell.preview-swap {
+  outline: 2px solid orange;
+}
+body.inventory-pickup-active .inventory-items-layer .grid-item {
+  pointer-events: none;
+}

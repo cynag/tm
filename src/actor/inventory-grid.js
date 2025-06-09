@@ -117,4 +117,33 @@ export class InventoryGrid {
     return null;
   }
   
+  static _canSwapAt(actor, pickupItem, targetX, targetY) {
+  // Varre os itens do inventário
+  for (const other of actor.items) {
+    if (other.id === pickupItem.id) continue; // Não comparar com o item na mão
+    if (other.type !== "object") continue;
+
+    const ox = other.system.gridX;
+    const oy = other.system.gridY;
+    const ow = other.system.gridWidth;
+    const oh = other.system.gridHeight;
+
+    // Verifica se a célula está ocupada por este item
+    const overlapX = targetX >= ox && targetX < ox + ow;
+    const overlapY = targetY >= oy && targetY < oy + oh;
+
+    if (overlapX && overlapY) {
+      // Verifica se é possível fazer o swap (mesmo tamanho)
+      if (pickupItem.system.gridWidth === ow && pickupItem.system.gridHeight === oh) {
+        return other; // Retorna o item que pode ser trocado
+      } else {
+        return null; // Tem item, mas não pode trocar
+      }
+    }
+  }
+
+  // Não tem item na célula → não é Swap
+  return null;
+  }
+
 }
