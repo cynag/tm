@@ -1,78 +1,19 @@
-// tm.mjs
-
 // === IMPORTS ===
 import { TMActor } from "./src/actor/actor.js";
 import { TMObject } from "./src/item/item.js";
 import { TMActorSheet } from "./src/actor/actor-sheet.js";
 import { TMObjectSheet } from "./src/item/object-sheet.js";
-import { InventoryManager } from "./src/actor/inventory-manager.js";
 
+// === CONFIG ===
+Hooks.once("init", function () {
+  console.log("Terras Malditas | Sistema inicializado");
 
-// === REGISTER HELPERS ===
-Handlebars.registerHelper("add", function (a, b) {
-  return Number(a) + Number(b);
-});
-
-Handlebars.registerHelper("debug", function(...args) {
-  console.log("HANDLEBARS DEBUG:", ...args);
-});
-
-Handlebars.registerHelper("range", function(from, to) {
-  let result = [];
-  for (let i = from; i <= to; i++) {
-    result.push(i);
-  }
-  return result;
-});
-
-Handlebars.registerHelper("mod", function(a, b) {
-  return a % b;
-});
-
-Handlebars.registerHelper("divide", function(a, b) {
-  return a / b;
-});
-
-Handlebars.registerHelper("number", function (value) {
-  return Number(value);
-});
-
-Handlebars.registerHelper("floor", function(a) {
-  return Math.floor(a);
-});
-Handlebars.registerHelper("eq", function (a, b) {
-  return a === b;
-});
-
-// === INIT ===
-Hooks.once("init", async function() {
-  console.log("TM | Initializing Terras Malditas 1ª Edição System");
-
-  // Register Actor class
   CONFIG.Actor.documentClass = TMActor;
-
-  // Register Actor Sheet
-  foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
-  foundry.documents.collections.Actors.registerSheet("tm", TMActorSheet, {
-    label: "TM Character Sheet",
-    makeDefault: true,
-    types: ["actor"]
-  });
-
-  // Register Item class
   CONFIG.Item.documentClass = TMObject;
 
-  // Register Item Sheet
-  foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
-  foundry.documents.collections.Items.registerSheet("tm", TMObjectSheet, {
-    label: "TM Object Sheet",
-    makeDefault: true,
-    types: ["object"]
-  });
-});
-// === HOOK: Força grid sempre que a ficha renderiza ===
+  Actors.unregisterSheet("core", ActorSheet);
+  Items.unregisterSheet("core", ItemSheet);
 
-Hooks.on("renderActorSheet", (app, html, data) => {
-  console.log("[InventoryManager] Hook renderActorSheet → init GRID");
-  InventoryManager.init(html, app.actor);
+  Actors.registerSheet("tm", TMActorSheet, { makeDefault: true });
+  Items.registerSheet("tm", TMObjectSheet, { makeDefault: true });
 });
