@@ -2,10 +2,7 @@ export class GridPickup {
   static pickupData = null;
 
   static start(actor, item, fromGrid = true, origin = null, event = null) {
-    // Cancela pickup anterior se houver
     if (this.pickupData) this.cancel();
-    console.log("[DEBUG] event:", event);
-    console.log("[DEBUG] mousePos:", event?.clientX, event?.clientY);
     console.log("[GridPickup] Pickup iniciado:", item.name);
 
     const w = item.system.grid?.w ?? 1;
@@ -25,11 +22,24 @@ export class GridPickup {
 
     this._activateCursorGhost();
     this._addListeners();
+
+    const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+    const gridDiv = app?.element.find("#grid-inventory")[0];
+    if (gridDiv) game.tm.GridOverlay.create(gridDiv);
   }
 
   static cancel() {
     if (!this.pickupData) return;
     console.log("[GridPickup] Pickup cancelado.");
+
+    const { actorId, itemId, origin, rotated } = this.pickupData;
+    if (origin) {
+      const actor = game.actors.get(actorId);
+      const item = actor.items.get(itemId);
+      if (actor && item) {
+        game.tm.GridPositioner.placeItem(actor, item, origin.x, origin.y, rotated);
+      }
+    }
 
     this.pickupData = null;
     this._removeCursorGhost();
@@ -45,38 +55,60 @@ export class GridPickup {
     ghost.style.pointerEvents = "none";
     ghost.style.opacity = "0.5";
     ghost.style.zIndex = "999";
-    ghost.style.width = `${this.pickupData.w * 50}px`;
-    ghost.style.height = `${this.pickupData.h * 50}px`;
-
-    // Posiciona ghost imediatamente no local do clique
-    const pos = this.pickupData.mousePos ?? { x: 0, y: 0 };
-    ghost.style.left = `${pos.x}px`;
-    ghost.style.top = `${pos.y}px`;
+    ghost.style.objectFit = "cover"; // ✅ aqui
 
     document.body.appendChild(ghost);
 
+    const actor = game.actors.get(this.pickupData.actorId);
+    const grid = game.tm.GridUtils.createVirtualGrid(actor);
+    const pos = this.pickupData.mousePos ?? { x: 0, y: 0 };
 
-    // Overlay dinâmico com base na posição do cursor
-const actor = game.actors.get(this.pickupData.actorId);
-const grid = game.tm.GridUtils.createVirtualGrid(actor);
-const container = document.getElementById("grid-overlay")?.parentElement;
+    const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+    const gridDiv = app?.element.find("#grid-inventory")[0];
+    const container = gridDiv?.querySelector("#grid-overlay")?.parentElement;
 
-const move = (e) => {
-  ghost.style.left = `${e.clientX}px`;
-  ghost.style.top = `${e.clientY}px`;
+    const move = (e) => {
+      const pickup = game.tm.GridPickup.pickupData;
+      ghost.style.left = `${e.clientX}px`;
+      ghost.style.top = `${e.clientY}px`;
 
-  if (!container) return;
 
-const bounds = container.getBoundingClientRect();
-const relX = e.clientX - bounds.left;
-const relY = e.clientY - bounds.top;
 
-game.tm.GridOverlay.update(actor, grid, relX, relY);
-};
 
+    if (pickup.rotated) {
+  ghost.style.width = `${pickup.h * 50}px`;
+  ghost.style.height = `${pickup.w * 50}px`;
+  ghost.style.transform = "rotate(90deg)";
+  ghost.style.transformOrigin = "top left";
+  ghost.style.translate = `${pickup.w * 50}px 0px`;
+} else {
+  ghost.style.width = `${pickup.w * 50}px`;
+  ghost.style.height = `${pickup.h * 50}px`;
+  ghost.style.transform = "";
+  ghost.style.transformOrigin = "";
+  ghost.style.translate = "";
+}
+
+
+
+
+
+      if (!container) return;
+
+      const bounds = container.getBoundingClientRect();
+      const relX = e.clientX - bounds.left;
+      const relY = e.clientY - bounds.top;
+      game.tm.GridOverlay.update(actor, grid, relX, relY);
+    };
 
     document.addEventListener("mousemove", move);
     this._ghostMoveHandler = move;
+
+    // Chamada imediata pra mostrar overlay mesmo sem mover
+    document.dispatchEvent(new MouseEvent("mousemove", {
+      clientX: pos.x,
+      clientY: pos.y
+    }));
   }
 
   static _removeCursorGhost() {
@@ -111,6 +143,6 @@ game.tm.GridOverlay.update(actor, grid, relX, relY);
   }
 
   static _removeOverlay() {
-     game.tm.GridOverlay.remove();
+    game.tm.GridOverlay.remove();
   }
 }

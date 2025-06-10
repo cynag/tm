@@ -3,30 +3,35 @@ export const GridUtils = {
   GRID_HEIGHT: 5,
 
   createVirtualGrid(actor) {
-    const grid = [];
+    const grid = this.createEmptyGrid();
 
-    for (let y = 0; y < this.GRID_HEIGHT; y++) {
-      grid[y] = [];
-      for (let x = 0; x < this.GRID_WIDTH; x++) {
-        grid[y][x] = {
-          occupied: false,
-          blocked: false,
-          itemId: null,
-          origin: false
-        };
+    const pickup = game.tm.GridPickup.pickupData;
+    const excludeId = pickup?.fromGrid && pickup?.actorId === actor.id ? pickup.itemId : null;
+
+    for (const item of actor.items) {
+      if (item.id === excludeId) continue;
+
+      const metaList = actor.system.gridInventory?.items ?? [];
+const meta = metaList.find(i => i.id === item.id);
+      if (!meta || meta.x === undefined || meta.y === undefined) continue;
+
+      const w = meta.rotated ? meta.h : meta.w;
+      const h = meta.rotated ? meta.w : meta.h;
+
+      for (let dx = 0; dx < w; dx++) {
+        for (let dy = 0; dy < h; dy++) {
+          const x = meta.x + dx;
+          const y = meta.y + dy;
+
+          if (grid[y] && grid[y][x]) {
+            grid[y][x].occupied = true;
+            if (dx === 0 && dy === 0) {
+              grid[y][x].origin = true;
+              grid[y][x].itemId = item.id;
+            }
+          }
+        }
       }
-    }
-
-    const blockedCells = actor.system.gridInventory?.blocked ?? [];
-    for (const cell of blockedCells) {
-      if (this._isInsideBounds(cell.x, cell.y)) {
-        grid[cell.y][cell.x].blocked = true;
-      }
-    }
-
-    const items = actor.system.gridInventory?.items ?? [];
-    for (const item of items) {
-      this._markOccupiedCells(grid, item);
     }
 
     return grid;
@@ -64,5 +69,18 @@ export const GridUtils = {
 
   _isInsideBounds(x, y) {
     return x >= 0 && y >= 0 && x < this.GRID_WIDTH && y < this.GRID_HEIGHT;
+  },
+  createEmptyGrid() {
+  const grid = [];
+  for (let y = 0; y < this.GRID_HEIGHT; y++) {
+    const row = [];
+    for (let x = 0; x < this.GRID_WIDTH; x++) {
+      row.push({ blocked: false, occupied: false, origin: false });
+    }
+    grid.push(row);
   }
+  return grid;
+},
+
+  
 };

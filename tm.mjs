@@ -29,15 +29,10 @@ Hooks.once("init", function () {
   GridInventory.init();
 });
 
-Hooks.once("ready", () => {
-  GridRotate.register();
-});
-
-// === GLOBAL ACCESS (DEV) ===
+// === READY ===
 Hooks.once("ready", () => {
   GridRotate.register();
 
-  // === GLOBAL ACCESS (DEV) ===
   game.tm = {
     GridInventory,
     GridUtils,

@@ -9,7 +9,7 @@ export class GridInventory {
    * Can be used after placing/removing items.
    */
   static refresh(actorSheet) {
-    console.log("[GridInventory] Refreshing inventory grid");
+    //console.log("[GridInventory] Refreshing inventory grid");
 
     const grid = game.tm.GridUtils.createVirtualGrid(actorSheet.actor);
     const container = actorSheet.element.find("#grid-inventory")[0];
