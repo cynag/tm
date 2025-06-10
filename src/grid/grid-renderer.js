@@ -1,3 +1,5 @@
+import { GridPickup } from "./grid-pickup.js";
+
 export class GridRenderer {
   static renderGrid(container, gridData) {
     console.log("[GridRenderer] Rendering inventory grid");
@@ -30,29 +32,35 @@ export class GridRenderer {
 
         grid.appendChild(div);
 
-        // Render image only on origin cell
         if (cell.origin && actor && cell.itemId) {
           const item = actor.items.get(cell.itemId);
           const meta = actor.system.gridInventory.items.find(i => i.id === item.id);
 
           if (item && meta) {
             const img = document.createElement("img");
+
+            img.addEventListener("mousedown", (e) => {
+  e.preventDefault();
+  if (e.button === 0) {
+    GridPickup.start(actor, item, true, { x, y }, e); // ✅ Correto: passando o evento
+  }
+});
+
             img.src = item.img;
             img.classList.add("grid-item-image");
             img.style.position = "absolute";
             img.style.left = `${x * 50}px`;
             img.style.top = `${y * 50}px`;
-            img.style.pointerEvents = "none";
+            img.style.pointerEvents = "auto";
             img.style.objectFit = "cover";
             img.style.zIndex = "5";
 
             if (meta.rotated) {
-              img.style.width = `${meta.h * 50}px`;            // Largura vira altura
-              img.style.height = `${meta.w * 50}px`;           // Altura vira largura
+              img.style.width = `${meta.h * 50}px`;
+              img.style.height = `${meta.w * 50}px`;
               img.style.transform = "rotate(90deg)";
               img.style.transformOrigin = "top left";
-              img.style.translate = `${meta.w * 50}px 0px`;     // Corrige para direita
-
+              img.style.translate = `${meta.w * 50}px 0px`;
             } else {
               img.style.width = `${meta.w * 50}px`;
               img.style.height = `${meta.h * 50}px`;

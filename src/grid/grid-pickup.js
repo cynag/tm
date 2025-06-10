@@ -1,39 +1,99 @@
 export class GridPickup {
-  static current = null; // { item, w, h, rotated }
+  static pickupData = null;
 
-  static start(item) {
-    const w = item?.system?.grid?.w ?? 1;
-    const h = item?.system?.grid?.h ?? 1;
-    GridPickup.current = { item, w, h, rotated: false };
-    console.log(`[GridPickup] Started: ${item.name}`);
+  static start(actor, item, fromGrid = true, origin = null, event = null) {
+    console.log("[DEBUG] event:", event);
+    console.log("[DEBUG] mousePos:", event?.clientX, event?.clientY);
+    console.log("[GridPickup] Pickup iniciado:", item.name);
+
+    const w = item.system.grid?.w ?? 1;
+    const h = item.system.grid?.h ?? 1;
+
+    this.pickupData = {
+      actorId: actor.id,
+      itemId: item.id,
+      w,
+      h,
+      rotated: false,
+      origin,
+      img: item.img,
+      fromGrid,
+      mousePos: event ? { x: event.clientX, y: event.clientY } : { x: 0, y: 0 }
+    };
+
+    this._activateCursorGhost();
+    this._addListeners();
   }
 
   static cancel() {
-    console.log("[GridPickup] Cancelled");
-    GridPickup.current = null;
+    if (!this.pickupData) return;
+    console.log("[GridPickup] Pickup cancelado.");
+
+    this.pickupData = null;
+    this._removeCursorGhost();
+    this._removeOverlay();
+    this._removeListeners();
   }
 
-  static rotate() {
-    if (!GridPickup.current) return;
+  static _activateCursorGhost() {
+    const ghost = document.createElement("img");
+    ghost.src = this.pickupData.img;
+    ghost.id = "pickup-ghost";
+    ghost.style.position = "fixed";
+    ghost.style.pointerEvents = "none";
+    ghost.style.opacity = "0.5";
+    ghost.style.zIndex = "999";
+    ghost.style.width = `${this.pickupData.w * 50}px`;
+    ghost.style.height = `${this.pickupData.h * 50}px`;
 
-    const { w, h } = GridPickup.current;
-    if (w === 1 && h === 1) return;
+    // Posiciona ghost imediatamente no local do clique
+    const pos = this.pickupData.mousePos ?? { x: 0, y: 0 };
+    ghost.style.left = `${pos.x}px`;
+    ghost.style.top = `${pos.y}px`;
 
-    GridPickup.current = {
-      ...GridPickup.current,
-      w: h,
-      h: w,
-      rotated: !GridPickup.current.rotated
+    document.body.appendChild(ghost);
+
+    const move = (e) => {
+      ghost.style.left = `${e.clientX}px`;
+      ghost.style.top = `${e.clientY}px`;
     };
 
-    console.log(`[GridPickup] Rotated. Now: ${h}x${w}`);
+    document.addEventListener("mousemove", move);
+    this._ghostMoveHandler = move;
   }
 
-  static isValid(actor, x, y) {
-    if (!GridPickup.current) return false;
+  static _removeCursorGhost() {
+    const ghost = document.getElementById("pickup-ghost");
+    if (ghost) ghost.remove();
 
-    const grid = game.tm.GridUtils.createVirtualGrid(actor);
-    const { w, h } = GridPickup.current;
-    return game.tm.GridUtils.isSpaceFree(grid, x, y, w, h);
+    if (this._ghostMoveHandler) {
+      document.removeEventListener("mousemove", this._ghostMoveHandler);
+      this._ghostMoveHandler = null;
+    }
+  }
+
+  static _addListeners() {
+    this._escHandler = (e) => {
+      if (e.key === "Escape") this.cancel();
+    };
+
+    this._rmbHandler = (e) => {
+      if (e.button === 2) {
+        e.preventDefault();
+        this.cancel();
+      }
+    };
+
+    document.addEventListener("keydown", this._escHandler);
+    document.addEventListener("mousedown", this._rmbHandler);
+  }
+
+  static _removeListeners() {
+    document.removeEventListener("keydown", this._escHandler);
+    document.removeEventListener("mousedown", this._rmbHandler);
+  }
+
+  static _removeOverlay() {
+    // placeholder
   }
 }
