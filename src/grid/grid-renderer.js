@@ -47,16 +47,23 @@ export class GridRenderer {
             img.style.zIndex = "5";
 
             if (meta.rotated) {
-              img.style.width = `${meta.h * 50}px`;
-              img.style.height = `${meta.w * 50}px`;
-              img.style.transform = `rotate(90deg) translate(${meta.w * 50}px, 0px)`;
-              img.style.transformOrigin = "top left";
-            } else {
-              img.style.width = `${meta.w * 50}px`;
-              img.style.height = `${meta.h * 50}px`;
-              img.style.transform = "";
-              img.style.transformOrigin = "";
-            }
+  img.style.width = `${meta.h * 50}px`;
+  img.style.height = `${meta.w * 50}px`;
+  img.style.transform = `rotate(90deg)`;
+  img.style.transformOrigin = "top left";
+  img.style.left = `${x * 50}px`;
+  img.style.top = `${y * 50}px`;
+  img.style.translate = `${meta.w * 50}px 0px`;
+} else {
+  img.style.width = `${meta.w * 50}px`;
+  img.style.height = `${meta.h * 50}px`;
+  img.style.transform = "";
+  img.style.transformOrigin = "";
+  img.style.translate = "";
+  img.style.left = `${x * 50}px`;
+  img.style.top = `${y * 50}px`;
+}
+
 
             img.addEventListener("mousedown", (e) => {
               e.preventDefault();
