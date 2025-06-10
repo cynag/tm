@@ -74,5 +74,7 @@ export class GridRenderer {
 
     wrapper.appendChild(grid);
     container.appendChild(wrapper);
+    game.tm.GridOverlay.create(grid);
+
   }
 }

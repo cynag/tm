@@ -2,6 +2,8 @@ export class GridPickup {
   static pickupData = null;
 
   static start(actor, item, fromGrid = true, origin = null, event = null) {
+    // Cancela pickup anterior se houver
+    if (this.pickupData) this.cancel();
     console.log("[DEBUG] event:", event);
     console.log("[DEBUG] mousePos:", event?.clientX, event?.clientY);
     console.log("[GridPickup] Pickup iniciado:", item.name);
@@ -53,10 +55,25 @@ export class GridPickup {
 
     document.body.appendChild(ghost);
 
-    const move = (e) => {
-      ghost.style.left = `${e.clientX}px`;
-      ghost.style.top = `${e.clientY}px`;
-    };
+
+    // Overlay dinâmico com base na posição do cursor
+const actor = game.actors.get(this.pickupData.actorId);
+const grid = game.tm.GridUtils.createVirtualGrid(actor);
+const container = document.getElementById("grid-overlay")?.parentElement;
+
+const move = (e) => {
+  ghost.style.left = `${e.clientX}px`;
+  ghost.style.top = `${e.clientY}px`;
+
+  if (!container) return;
+
+const bounds = container.getBoundingClientRect();
+const relX = e.clientX - bounds.left;
+const relY = e.clientY - bounds.top;
+
+game.tm.GridOverlay.update(actor, grid, relX, relY);
+};
+
 
     document.addEventListener("mousemove", move);
     this._ghostMoveHandler = move;
@@ -94,6 +111,6 @@ export class GridPickup {
   }
 
   static _removeOverlay() {
-    // placeholder
+     game.tm.GridOverlay.remove();
   }
 }

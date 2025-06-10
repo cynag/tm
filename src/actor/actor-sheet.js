@@ -39,8 +39,14 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
     const grid = game.tm.GridUtils.createVirtualGrid(this.actor);
     game.tm.GridRenderer.renderGrid(container, grid);
   }
-}
 
+}
+  async close(...args) {
+  if (game.tm?.GridPickup?.pickupData?.actorId === this.actor.id) {
+    game.tm.GridPickup.cancel();
+  }
+  return super.close(...args);
+}
 
   async _onDrop(event) {
     event.preventDefault();

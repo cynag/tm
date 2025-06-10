@@ -11,6 +11,7 @@ import { GridPositioner } from "./src/grid/grid-positioner.js";
 import { DragManager } from "./src/grid/drag-manager.js";
 import { GridPickup } from "./src/grid/grid-pickup.js";
 import { GridRotate } from "./src/grid/grid-rotate.js";
+import { GridOverlay } from "./src/grid/grid-overlay.js";
 
 // === INIT ===
 Hooks.once("init", function () {
@@ -44,6 +45,7 @@ Hooks.once("ready", () => {
     GridPositioner,
     DragManager,
     GridPickup,
-    GridRotate
+    GridRotate,
+    GridOverlay
   };
 });
