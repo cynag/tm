@@ -3,120 +3,129 @@ export class GridPickup {
 
   static start(actor, item, fromGrid = true, origin = null, event = null) {
     if (this.pickupData) this.cancel();
-    console.log("[GridPickup] Pickup iniciado:", item.name);
+    console.log("[GridPickup] ✅ Pickup iniciado:", item.name);
 
-    const w = item.system.grid?.w ?? 1;
-    const h = item.system.grid?.h ?? 1;
+    const meta = actor.system.gridInventory?.items?.find(i => i.id === item.id);
+    const rotated = meta?.rotated ?? false;
+
+    const rawW = item.system.grid?.w ?? 1;
+    const rawH = item.system.grid?.h ?? 1;
+
+    const w = rotated ? rawH : rawW;
+    const h = rotated ? rawW : rawH;
 
     this.pickupData = {
       actorId: actor.id,
       itemId: item.id,
       w,
       h,
-      rotated: false,
+      rotated,
       origin,
       img: item.img,
       fromGrid,
       mousePos: event ? { x: event.clientX, y: event.clientY } : { x: 0, y: 0 }
     };
 
-    this._activateCursorGhost();
+    this._activatePreview();
     this._addListeners();
 
-    const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
-    const gridDiv = app?.element.find("#grid-inventory")[0];
-    if (gridDiv) game.tm.GridOverlay.create(gridDiv);
+    const waitForGridReady = async () => {
+      const maxTries = 20;
+      let tries = 0;
+
+      while (tries < maxTries) {
+        const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+        const container = app?.element.find("#grid-inventory")[0];
+        const grid = container?.querySelector(".grid");
+
+        if (grid && grid.offsetWidth > 0 && grid.offsetHeight > 0) {
+          console.log("[GridPickup] ✅ Overlay criado (via waitUntil)");
+          game.tm.GridOverlay.create(container);
+          return;
+        }
+
+        tries++;
+        await new Promise(r => setTimeout(r, 50));
+      }
+
+      console.warn("[GridPickup] ❌ Timeout: grid nunca ficou pronta");
+    };
+
+    waitForGridReady();
   }
 
   static cancel() {
     if (!this.pickupData) return;
-    console.log("[GridPickup] Pickup cancelado.");
+    console.log("[GridPickup] ❌ Pickup cancelado");
 
-    const { actorId, itemId, origin, rotated } = this.pickupData;
+    const { actorId, itemId, origin, w, h } = this.pickupData;
     if (origin) {
       const actor = game.actors.get(actorId);
       const item = actor.items.get(itemId);
       if (actor && item) {
-        game.tm.GridPositioner.placeItem(actor, item, origin.x, origin.y, rotated);
+        console.log("[GridPickup] ↩️ Item restaurado na posição original");
+        game.tm.GridPositioner.placeItem(actor, item, origin.x, origin.y, w > h);
       }
     }
 
     this.pickupData = null;
-    this._removeCursorGhost();
+    this._removePreview();
     this._removeOverlay();
     this._removeListeners();
   }
 
-  static _activateCursorGhost() {
-    const ghost = document.createElement("img");
-    ghost.src = this.pickupData.img;
-    ghost.id = "pickup-ghost";
-    ghost.style.position = "fixed";
-    ghost.style.pointerEvents = "none";
-    ghost.style.opacity = "0.5";
-    ghost.style.zIndex = "999";
-    ghost.style.objectFit = "cover"; // ✅ aqui
+  static _activatePreview() {
+    const pickup = this.pickupData;
+    const actor = game.actors.get(pickup.actorId);
 
-    document.body.appendChild(ghost);
-
-    const actor = game.actors.get(this.pickupData.actorId);
-    const grid = game.tm.GridUtils.createVirtualGrid(actor);
-    const pos = this.pickupData.mousePos ?? { x: 0, y: 0 };
-
-    const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
-    const gridDiv = app?.element.find("#grid-inventory")[0];
-    const container = gridDiv?.querySelector("#grid-overlay")?.parentElement;
+    game.tm.GridPreview.create(pickup);
 
     const move = (e) => {
-      const pickup = game.tm.GridPickup.pickupData;
-      ghost.style.left = `${e.clientX}px`;
-      ghost.style.top = `${e.clientY}px`;
+      if (!e || typeof e.clientX !== "number") return;
 
+      const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+      const container = app?.element.find("#grid-inventory")[0];
+      const gridEl = container?.querySelector(".grid");
 
+      let snap = false;
+      if (gridEl) {
+        const bounds = gridEl.getBoundingClientRect();
+        if (
+          e.clientX >= bounds.left &&
+          e.clientX <= bounds.right &&
+          e.clientY >= bounds.top &&
+          e.clientY <= bounds.bottom
+        ) {
+          snap = true;
+          const relX = e.clientX - bounds.left;
+          const relY = e.clientY - bounds.top;
+          const grid = game.tm.GridUtils.createVirtualGrid(actor);
+          game.tm.GridOverlay.update(actor, grid, relX, relY);
+          console.log("[GridPickup] 🟩 Snap + overlay update");
+        } else {
+          game.tm.GridOverlay.clear();
+        }
+      }
 
-
-    if (pickup.rotated) {
-  ghost.style.width = `${pickup.h * 50}px`;
-  ghost.style.height = `${pickup.w * 50}px`;
-  ghost.style.transform = "rotate(90deg)";
-  ghost.style.transformOrigin = "top left";
-  ghost.style.translate = `${pickup.w * 50}px 0px`;
-} else {
-  ghost.style.width = `${pickup.w * 50}px`;
-  ghost.style.height = `${pickup.h * 50}px`;
-  ghost.style.transform = "";
-  ghost.style.transformOrigin = "";
-  ghost.style.translate = "";
-}
-
-
-
-
-
-      if (!container) return;
-
-      const bounds = container.getBoundingClientRect();
-      const relX = e.clientX - bounds.left;
-      const relY = e.clientY - bounds.top;
-      game.tm.GridOverlay.update(actor, grid, relX, relY);
+      game.tm.GridPreview.update(e.clientX, e.clientY, snap);
     };
 
-    document.addEventListener("mousemove", move);
+    window.addEventListener("mousemove", move, { passive: true });
     this._ghostMoveHandler = move;
 
-    // Chamada imediata pra mostrar overlay mesmo sem mover
-    document.dispatchEvent(new MouseEvent("mousemove", {
-      clientX: pos.x,
-      clientY: pos.y
-    }));
+    // força render inicial
+    setTimeout(() => {
+      const { x, y } = pickup.mousePos;
+      document.dispatchEvent(new MouseEvent("mousemove", { clientX: x, clientY: y }));
+    }, 50);
   }
 
-  static _removeCursorGhost() {
-    const ghost = document.getElementById("pickup-ghost");
-    if (ghost) ghost.remove();
+  static _removePreview() {
+    game.tm.GridPreview.remove();
+    console.log("[GridPickup] 🧹 Preview removido");
 
     if (this._ghostMoveHandler) {
-      document.removeEventListener("mousemove", this._ghostMoveHandler);
+      window.removeEventListener("mousemove", this._ghostMoveHandler);
       this._ghostMoveHandler = null;
     }
   }
@@ -124,6 +133,13 @@ export class GridPickup {
   static _addListeners() {
     this._escHandler = (e) => {
       if (e.key === "Escape") this.cancel();
+    };
+
+    this._rotateHandler = (e) => {
+      if (e.key === "r" || e.key === "R") {
+        e.preventDefault();
+        game.tm.GridRotate.rotateCurrent();
+      }
     };
 
     this._rmbHandler = (e) => {
@@ -134,15 +150,22 @@ export class GridPickup {
     };
 
     document.addEventListener("keydown", this._escHandler);
+    document.addEventListener("keydown", this._rotateHandler);
     document.addEventListener("mousedown", this._rmbHandler);
+
+    console.log("[GridPickup] 🎧 Listeners adicionados");
   }
 
   static _removeListeners() {
     document.removeEventListener("keydown", this._escHandler);
+    document.removeEventListener("keydown", this._rotateHandler);
     document.removeEventListener("mousedown", this._rmbHandler);
+    this._rotateHandler = null;
+    console.log("[GridPickup] 🔇 Listeners removidos");
   }
 
   static _removeOverlay() {
     game.tm.GridOverlay.remove();
+    console.log("[GridPickup] 🧹 Overlay removido");
   }
 }

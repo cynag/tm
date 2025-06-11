@@ -1,7 +1,10 @@
 export class GridPositioner {
   static placeItem(actor, item, x, y, rotated = false) {
-    const w = item?.system?.grid?.w ?? 1;
-    const h = item?.system?.grid?.h ?? 1;
+    const rawW = item?.system?.grid?.w ?? 1;
+    const rawH = item?.system?.grid?.h ?? 1;
+
+    const w = rotated ? rawH : rawW;
+    const h = rotated ? rawW : rawH;
 
     const current = actor.system.gridInventory?.items ?? [];
     const filtered = current.filter(i => i.id !== item.id);

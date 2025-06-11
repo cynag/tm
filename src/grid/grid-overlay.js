@@ -2,70 +2,72 @@ export class GridOverlay {
   static overlay = null;
 
   static create(container) {
-  //console.log("[GridOverlay] create chamado");
-  this.overlay?.remove();
+    this.overlay?.remove();
 
-  const overlay = document.createElement("div");
-  overlay.id = "grid-overlay";
-  overlay.style.position = "absolute";
-  overlay.style.top = "0";
-  overlay.style.left = "0";
-  overlay.style.right = "0";
-  overlay.style.bottom = "0";
-  overlay.style.zIndex = "9999";
-  overlay.style.pointerEvents = "none";
-  overlay.style.display = "block";
+    const grid = container.querySelector(".grid");
+    if (!grid) {
+      console.warn("[GridOverlay] ❌ .grid não encontrada");
+      return;
+    }
 
-  if (container) {
-    //console.log("[GridOverlay] container encontrado:", container);
-    //console.log("[GridOverlay] container.innerHTML (antes):", container.innerHTML);
-    container.style.position = "relative";
-    container.style.overflow = "hidden";
-    container.appendChild(overlay);
-    //console.log("[GridOverlay] overlay inserido no DOM");
-  } else {
-    //console.warn("[GridOverlay] container é nulo ou indefinido!");
+    const overlay = document.createElement("div");
+    overlay.id = "grid-overlay";
+    overlay.style.position = "absolute";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = `${grid.offsetWidth}px`;
+    overlay.style.height = `${grid.offsetHeight}px`;
+    overlay.style.pointerEvents = "none";
+    overlay.style.zIndex = "9999";
+
+    grid.style.position = "relative";
+    grid.appendChild(overlay);
+
+    this.overlay = overlay;
+    console.log("[GridOverlay] ✅ Overlay criado");
   }
 
-  this.overlay = overlay;
-  
-}
+  static update(actor, gridData, relX, relY) {
+    if (!this.overlay) return;
 
+    this.clear();
 
-  static update(actor, grid, mouseX, mouseY) {
-  if (!this.overlay || !game.tm.GridPickup.pickupData) return;
+    const gridX = Math.floor(relX / 50);
+    const gridY = Math.floor(relY / 50);
 
-  const overlayBounds = this.overlay.getBoundingClientRect();
-  const localX = mouseX - overlayBounds.left;
-  const localY = mouseY - overlayBounds.top;
+    const pickup = game.tm.GridPickup.pickupData;
+    if (!pickup) return;
 
-  const { w, h, rotated } = game.tm.GridPickup.pickupData;
-  const gridX = Math.floor(localX / 50);
-  const gridY = Math.floor(localY / 50);
+    const w = pickup.w;
+    const h = pickup.h;
 
-      const valid = game.tm.GridUtils.isSpaceFree(grid, gridX, gridY, w, h);
-  const color = valid ? "rgba(0,255,0,0.3)" : "rgba(255,0,0,0.3)";
-  this.overlay.innerHTML = "";
+    const valid = game.tm.GridUtils.isSpaceFree(gridData, gridX, gridY, w, h);
 
-  const width = rotated ? h : w;
-  const height = rotated ? w : h;
-
-  for (let dx = 0; dx < width; dx++) {
-    for (let dy = 0; dy < height; dy++) {
-      const cell = document.createElement("div");
-      cell.style.position = "absolute";
-      cell.style.width = "50px";
-      cell.style.height = "50px";
-      cell.style.left = `${(gridX + dx) * 50}px`;
-      cell.style.top = `${(gridY + dy) * 50}px`;
-      cell.style.backgroundColor = color;
-      this.overlay.appendChild(cell);
+    for (let dx = 0; dx < w; dx++) {
+      for (let dy = 0; dy < h; dy++) {
+        const cell = document.createElement("div");
+        cell.classList.add("grid-cell");
+        cell.style.position = "absolute";
+        cell.style.left = `${(gridX + dx) * 50}px`;
+        cell.style.top = `${(gridY + dy) * 50}px`;
+        cell.style.width = "50px";
+        cell.style.height = "50px";
+        cell.style.backgroundColor = valid ? "rgba(0,255,0,0.3)" : "rgba(255,0,0,0.3)";
+        this.overlay.appendChild(cell);
+      }
     }
   }
-}
+
+  static clear() {
+    if (!this.overlay) return;
+    this.overlay.innerHTML = "";
+  }
 
   static remove() {
-    this.overlay?.remove();
-    this.overlay = null;
+    if (this.overlay) {
+      this.overlay.remove();
+      this.overlay = null;
+      console.log("[GridOverlay] 🧹 Overlay removido");
+    }
   }
 }

@@ -12,6 +12,7 @@ import { DragManager } from "./src/grid/drag-manager.js";
 import { GridPickup } from "./src/grid/grid-pickup.js";
 import { GridRotate } from "./src/grid/grid-rotate.js";
 import { GridOverlay } from "./src/grid/grid-overlay.js";
+import { GridPreview } from "./src/grid/grid-preview.js";
 
 // === INIT ===
 Hooks.once("init", function () {
@@ -31,8 +32,6 @@ Hooks.once("init", function () {
 
 // === READY ===
 Hooks.once("ready", () => {
-  GridRotate.register();
-
   game.tm = {
     GridInventory,
     GridUtils,
@@ -41,6 +40,10 @@ Hooks.once("ready", () => {
     DragManager,
     GridPickup,
     GridRotate,
-    GridOverlay
+    GridOverlay,
+    GridPreview
   };
+
+  console.log("Terras Malditas | Sistema pronto");
 });
+
