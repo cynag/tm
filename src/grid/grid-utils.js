@@ -64,5 +64,46 @@ export const GridUtils = {
       grid.push(row);
     }
     return grid;
+  },
+
+  getItemByCell(x, y, actor) {
+  const items = actor.system.gridInventory?.items ?? [];
+  for (const meta of items) {
+    if (
+      x >= meta.x &&
+      x < meta.x + meta.w &&
+      y >= meta.y &&
+      y < meta.y + meta.h
+    ) {
+      return actor.items.get(meta.id) ?? null;
+    }
   }
+  return null;
+},
+
+getItemsUnderArea(x, y, w, h, actor) {
+  const ids = new Set();
+  const items = actor.system.gridInventory?.items ?? [];
+
+  for (let dx = 0; dx < w; dx++) {
+    for (let dy = 0; dy < h; dy++) {
+      const cx = x + dx;
+      const cy = y + dy;
+
+      for (const meta of items) {
+        if (
+          cx >= meta.x &&
+          cx < meta.x + meta.w &&
+          cy >= meta.y &&
+          cy < meta.y + meta.h
+        ) {
+          ids.add(meta.id);
+        }
+      }
+    }
+  }
+
+  return [...ids];
+},
+
 };

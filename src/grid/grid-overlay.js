@@ -41,12 +41,10 @@ export class GridOverlay {
     const w = pickup.w;
     const h = pickup.h;
 
-    let valid = game.tm.GridUtils.isSpaceFree(gridData, gridX, gridY, w, h);
-let swapTarget = null;
+    const ids = game.tm.GridUtils.getItemsUnderArea(gridX, gridY, w, h, actor);
+const valid = ids.length === 0;
+const swapTarget = ids.length === 1;
 
-if (!valid) {
-  swapTarget = game.tm.GridSwap.detectSingleItemInArea(gridData, actor, gridX, gridY, w, h);
-}
 
 
     for (let dx = 0; dx < w; dx++) {
