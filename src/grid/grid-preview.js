@@ -32,7 +32,7 @@ if (pickupData.rotated) {
     document.body.appendChild(ghost);
     this.ghost = ghost;
 
-    console.log("[GridPreview] 👻 Ghost criado");
+    //console.log("[GridPreview] 👻 Ghost criado");
     const { x, y } = pickupData.mousePos;
 this.update(x, y, true); // ✅ já aplica snap imediatamente
 
@@ -80,7 +80,7 @@ else {
     if (this.ghost) {
       this.ghost.remove();
       this.ghost = null;
-      console.log("[GridPreview] 🧹 Ghost removido");
+      //console.log("[GridPreview] 🧹 Ghost removido");
     }
   }
 }

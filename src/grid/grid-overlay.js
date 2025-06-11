@@ -6,7 +6,7 @@ export class GridOverlay {
 
     const grid = container.querySelector(".grid");
     if (!grid) {
-      console.warn("[GridOverlay] ❌ .grid não encontrada");
+      //console.warn("[GridOverlay] ❌ .grid não encontrada");
       return;
     }
 
@@ -24,7 +24,7 @@ export class GridOverlay {
     grid.appendChild(overlay);
 
     this.overlay = overlay;
-    console.log("[GridOverlay] ✅ Overlay criado");
+    //console.log("[GridOverlay] ✅ Overlay criado");
   }
 
   static update(actor, gridData, relX, relY) {
@@ -41,7 +41,13 @@ export class GridOverlay {
     const w = pickup.w;
     const h = pickup.h;
 
-    const valid = game.tm.GridUtils.isSpaceFree(gridData, gridX, gridY, w, h);
+    let valid = game.tm.GridUtils.isSpaceFree(gridData, gridX, gridY, w, h);
+let swapTarget = null;
+
+if (!valid) {
+  swapTarget = game.tm.GridSwap.detectSingleItemInArea(gridData, actor, gridX, gridY, w, h);
+}
+
 
     for (let dx = 0; dx < w; dx++) {
       for (let dy = 0; dy < h; dy++) {
@@ -52,7 +58,12 @@ export class GridOverlay {
         cell.style.top = `${(gridY + dy) * 50}px`;
         cell.style.width = "50px";
         cell.style.height = "50px";
-        cell.style.backgroundColor = valid ? "rgba(0,255,0,0.3)" : "rgba(255,0,0,0.3)";
+        cell.style.backgroundColor = valid
+  ? "rgba(0,255,0,0.3)"
+  : swapTarget
+    ? "rgba(255,165,0,0.4)" // laranja
+    : "rgba(255,0,0,0.3)";
+
         this.overlay.appendChild(cell);
       }
     }
@@ -67,7 +78,7 @@ export class GridOverlay {
     if (this.overlay) {
       this.overlay.remove();
       this.overlay = null;
-      console.log("[GridOverlay] 🧹 Overlay removido");
+      //console.log("[GridOverlay] 🧹 Overlay removido");
     }
   }
 }

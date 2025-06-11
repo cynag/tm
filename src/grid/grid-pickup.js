@@ -39,7 +39,7 @@ export class GridPickup {
         const grid = container?.querySelector(".grid");
 
         if (grid && grid.offsetWidth > 0 && grid.offsetHeight > 0) {
-          console.log("[GridPickup] ✅ Overlay criado (via waitUntil)");
+          //console.log("[GridPickup] ✅ Overlay criado (via waitUntil)");
           game.tm.GridOverlay.create(container);
           return;
         }
@@ -48,31 +48,91 @@ export class GridPickup {
         await new Promise(r => setTimeout(r, 50));
       }
 
-      console.warn("[GridPickup] ❌ Timeout: grid nunca ficou pronta");
+      //console.warn("[GridPickup] ❌ Timeout: grid nunca ficou pronta");
     };
 
     waitForGridReady();
   }
 
   static cancel() {
-    if (!this.pickupData) return;
-    console.log("[GridPickup] ❌ Pickup cancelado");
+  if (!this.pickupData) return;
+  console.log("[GridPickup] ❌ Pickup cancelado");
 
-    const { actorId, itemId, origin, w, h } = this.pickupData;
-    if (origin) {
-      const actor = game.actors.get(actorId);
-      const item = actor.items.get(itemId);
-      if (actor && item) {
-        console.log("[GridPickup] ↩️ Item restaurado na posição original");
-        game.tm.GridPositioner.placeItem(actor, item, origin.x, origin.y, w > h);
+  const { actorId, itemId, origin, w, h, rotated } = this.pickupData;
+  const actor = game.actors.get(actorId);
+  const item = actor?.items.get(itemId);
+  if (!actor || !item) return;
+
+  const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+  const grid = game.tm.GridUtils.createVirtualGrid(actor);
+
+  let placed = false;
+
+  // 1️⃣ Tenta recolocar na posição original do swap (origin de itemA)
+  if (origin && game.tm.GridUtils.isSpaceFree(grid, origin.x, origin.y, w, h)) {
+    console.log("[GridPickup] ↩️ Reposicionado na posição original");
+    game.tm.GridPositioner.placeItem(actor, item, origin.x, origin.y, rotated);
+    placed = true;
+  }
+
+  // 2️⃣ Tenta recolocar em qualquer posição disponível
+  if (!placed) {
+    const shouldRotate = w !== h;
+const fallbackTries = shouldRotate ? [false, true] : [false];
+
+for (let ry of fallbackTries) {
+  const testW = ry ? h : w;
+  const testH = ry ? w : h;
+  const testRot = ry ? !rotated : rotated;
+
+  const gridTry = game.tm.GridUtils.createVirtualGrid(actor);
+
+  outer: for (let x = 0; x < game.tm.GridUtils.GRID_WIDTH; x++) {
+    for (let y = 0; y < game.tm.GridUtils.GRID_HEIGHT; y++) {
+      if (game.tm.GridUtils.isSpaceFree(gridTry, x, y, testW, testH)) {
+        console.log("[GridPickup] ↩️ Reposicionado em fallback", x, y);
+        game.tm.GridPositioner.placeItem(actor, item, x, y, testRot);
+        placed = true;
+        break outer;
       }
     }
-
-    this.pickupData = null;
-    this._removePreview();
-    this._removeOverlay();
-    this._removeListeners();
   }
+
+  if (placed) break;
+}
+
+
+
+  }
+
+  // 3️⃣ Se nada funcionar, notifica erro e mantém pickup
+  if (!placed) {
+    ui.notifications.error("Sem espaço para reposicionar o item.");
+    console.warn("[GridPickup] ❌ Falha ao reposicionar após cancelamento");
+    return; // mantém pickup ativo
+  }
+
+  this.pickupData = null;
+  this._removePreview();
+  this._removeOverlay();
+  this._removeListeners();
+  // Força remoção imediata de qualquer imagem do item no DOM
+const imgEl = app?.element.find(`.grid-item-image[style*="${item.img}"]`)[0];
+if (imgEl) imgEl.remove();
+
+
+// 🔧 Remove visual residual do item do DOM antes do refresh
+const gridEls = app?.element.find(".grid-item-image") ?? [];
+for (const el of gridEls) {
+  const bg = el.style.backgroundImage;
+  if (bg.includes(item.img)) el.remove(); // remove direto
+}
+const container = app?.element.find("#grid-inventory")[0];
+if (container) container.innerHTML = ""; // força reset visual
+
+  game.tm.GridInventory.refresh(app);
+}
+
 
   static _activatePreview() {
     const pickup = this.pickupData;
@@ -101,7 +161,7 @@ export class GridPickup {
           const relY = e.clientY - bounds.top;
           const grid = game.tm.GridUtils.createVirtualGrid(actor);
           game.tm.GridOverlay.update(actor, grid, relX, relY);
-          console.log("[GridPickup] 🟩 Snap + overlay update");
+          //console.log("[GridPickup] 🟩 Snap + overlay update");
         } else {
           game.tm.GridOverlay.clear();
         }
@@ -122,7 +182,7 @@ export class GridPickup {
 
   static _removePreview() {
     game.tm.GridPreview.remove();
-    console.log("[GridPickup] 🧹 Preview removido");
+    //console.log("[GridPickup] 🧹 Preview removido");
 
     if (this._ghostMoveHandler) {
       window.removeEventListener("mousemove", this._ghostMoveHandler);
@@ -153,7 +213,7 @@ export class GridPickup {
     document.addEventListener("keydown", this._rotateHandler);
     document.addEventListener("mousedown", this._rmbHandler);
 
-    console.log("[GridPickup] 🎧 Listeners adicionados");
+    //console.log("[GridPickup] 🎧 Listeners adicionados");
   }
 
   static _removeListeners() {
@@ -161,11 +221,11 @@ export class GridPickup {
     document.removeEventListener("keydown", this._rotateHandler);
     document.removeEventListener("mousedown", this._rmbHandler);
     this._rotateHandler = null;
-    console.log("[GridPickup] 🔇 Listeners removidos");
+    //console.log("[GridPickup] 🔇 Listeners removidos");
   }
 
   static _removeOverlay() {
     game.tm.GridOverlay.remove();
-    console.log("[GridPickup] 🧹 Overlay removido");
+    //console.log("[GridPickup] 🧹 Overlay removido");
   }
 }

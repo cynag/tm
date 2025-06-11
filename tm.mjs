@@ -13,6 +13,7 @@ import { GridPickup } from "./src/grid/grid-pickup.js";
 import { GridRotate } from "./src/grid/grid-rotate.js";
 import { GridOverlay } from "./src/grid/grid-overlay.js";
 import { GridPreview } from "./src/grid/grid-preview.js";
+import { GridSwap } from "./src/grid/grid-swap.js";
 
 // === INIT ===
 Hooks.once("init", function () {
@@ -31,6 +32,7 @@ Hooks.once("init", function () {
 });
 
 // === READY ===
+
 Hooks.once("ready", () => {
   game.tm = {
     GridInventory,
@@ -41,9 +43,9 @@ Hooks.once("ready", () => {
     GridPickup,
     GridRotate,
     GridOverlay,
-    GridPreview
+    GridPreview,
+    GridSwap   // ✅ adiciona aqui
   };
 
   console.log("Terras Malditas | Sistema pronto");
 });
-

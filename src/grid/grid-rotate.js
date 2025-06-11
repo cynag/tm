@@ -4,7 +4,7 @@ export class GridRotate {
     if (!pickup) return;
 
     if (pickup.w === pickup.h) {
-      console.log("[GridRotate] ⏭️ Item quadrado não rotaciona");
+      //console.log("[GridRotate] ⏭️ Item quadrado não rotaciona");
       return;
     }
 
