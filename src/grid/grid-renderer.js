@@ -60,18 +60,17 @@ export class GridRenderer {
   e.preventDefault();
   if (e.button !== 0) return;
 
-  // 🔒 Protege contra novo pickup durante pickup ativo
   const pickup = game.tm.GridPickup.pickupData;
-  if (pickup) {
-    console.log("[GridRenderer] 🟠 Interceptado: tentativa de pickup durante outro pickup");
-    return;
-  }
+
+  // 🛑 Se já estiver com item em mão, ignora clique na imagem
+  if (pickup) return;
 
   const origin = { x, y };
   game.tm.GridPositioner.removeItem(actor, item.id);
   game.tm.GridInventory.refresh(app);
   game.tm.GridPickup.start(actor, item, true, origin, e);
 });
+
 
 
 
@@ -116,16 +115,25 @@ requestAnimationFrame(() => {
 
       const valid = game.tm.GridUtils.isSpaceFree(gridData, gridX, gridY, w, h);
       if (valid) {
-  game.tm.GridPositioner.placeItem(actor, item, gridX, gridY, w > h);
+  game.tm.GridPositioner.placeItem(actor, item, gridX, gridY, pickup.rotated);
   game.tm.GridPickup.pickupData = null;
   game.tm.GridPickup._removePreview();
   game.tm.GridPickup._removeOverlay();
   game.tm.GridPickup._removeListeners();
   game.tm.GridInventory.refresh(app);
-} else {
-  // tenta swap
+  return;
+}
+
+// ⚠️ Só tenta swap se houver exatamente 1 item na área
+const simGrid = game.tm.GridUtils.createVirtualGrid(actor);
+const items = game.tm.GridUtils.getItemsUnderAreaFromGrid(simGrid, gridX, gridY, w, h);
+
+
+console.log(`[GridRenderer] 💡 Tentando swap com ${items.length} item(s) na área`);
+if (items.length === 1) {
   game.tm.GridSwap.attemptSwap(e.clientX, e.clientY);
 }
+
 
     });
   }

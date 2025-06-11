@@ -41,7 +41,8 @@ export class GridOverlay {
     const w = pickup.w;
     const h = pickup.h;
 
-    const ids = game.tm.GridUtils.getItemsUnderArea(gridX, gridY, w, h, actor);
+    const grid = game.tm.GridUtils.createVirtualGrid(actor);
+const ids = game.tm.GridUtils.getItemsUnderAreaFromGrid(grid, gridX, gridY, w, h);
 const valid = ids.length === 0;
 const swapTarget = ids.length === 1;
 

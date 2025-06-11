@@ -106,4 +106,19 @@ getItemsUnderArea(x, y, w, h, actor) {
   return [...ids];
 },
 
+getItemsUnderAreaFromGrid(grid, x, y, w, h) {
+  const ids = new Set();
+  for (let dx = 0; dx < w; dx++) {
+    for (let dy = 0; dy < h; dy++) {
+      const cx = x + dx;
+      const cy = y + dy;
+      if (!this._isInsideBounds(cx, cy)) continue;
+      const cell = grid[cy][cx];
+      if (cell.itemId) ids.add(cell.itemId);
+    }
+  }
+  return [...ids];
+}
+
+
 };
