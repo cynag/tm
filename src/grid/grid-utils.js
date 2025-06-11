@@ -3,38 +3,36 @@ export const GridUtils = {
   GRID_HEIGHT: 5,
 
   createVirtualGrid(actor) {
-    const grid = this.createEmptyGrid();
+  const grid = this.createEmptyGrid();
 
-    const pickup = game.tm.GridPickup.pickupData;
-    const excludeId = pickup?.fromGrid && pickup?.actorId === actor.id ? pickup.itemId : null;
+  const pickup = game.tm.GridPickup.pickupData;
+  const excludeId = pickup?.fromGrid && pickup?.actorId === actor.id ? pickup.itemId : null;
 
-    for (const item of actor.items) {
-      if (item.id === excludeId) continue;
+  for (const item of actor.items) {
+    if (item.id === excludeId) continue;
 
-      const metaList = actor.system.gridInventory?.items ?? [];
-      const meta = metaList.find(i => i.id === item.id);
-      if (!meta || meta.x === undefined || meta.y === undefined) continue;
+    const metaList = actor.system.gridInventory?.items ?? [];
+    const meta = metaList.find(i => i.id === item.id);
+    if (!meta || meta.x === undefined || meta.y === undefined) continue;
 
-      const { x: baseX, y: baseY, w, h } = meta;
+    const { x: baseX, y: baseY, w, h } = meta;
 
-      for (let dx = 0; dx < w; dx++) {
-        for (let dy = 0; dy < h; dy++) {
-          const x = baseX + dx;
-          const y = baseY + dy;
+    for (let dx = 0; dx < w; dx++) {
+      for (let dy = 0; dy < h; dy++) {
+        const x = baseX + dx;
+        const y = baseY + dy;
 
-          if (this._isInsideBounds(x, y)) {
-            grid[y][x].occupied = true;
-            if (dx === 0 && dy === 0) {
-              grid[y][x].origin = true;
-              grid[y][x].itemId = item.id;
-            }
-          }
+        if (this._isInsideBounds(x, y)) {
+          grid[y][x].occupied = true;
+          grid[y][x].itemId = item.id; // ✅ necessário para swap por qualquer célula
+          grid[y][x].origin = dx === 0 && dy === 0;
         }
       }
     }
+  }
 
-    return grid;
-  },
+  return grid;
+},
 
   isSpaceFree(grid, x, y, w, h) {
     for (let dy = 0; dy < h; dy++) {
@@ -118,7 +116,41 @@ getItemsUnderAreaFromGrid(grid, x, y, w, h) {
     }
   }
   return [...ids];
-}
+},
 
+getItemIdUnderPickup(grid, x, y, w, h) {
+  const ids = new Set();
+
+  for (let dx = 0; dx < w; dx++) {
+    for (let dy = 0; dy < h; dy++) {
+      const cx = x + dx;
+      const cy = y + dy;
+      if (!this._isInsideBounds(cx, cy)) continue;
+
+      const cell = grid[cy]?.[cx];
+      if (cell?.itemId) ids.add(cell.itemId);
+      else return null; // célula vazia ou inválida => não é swap válido
+    }
+  }
+
+  return ids.size === 1 ? [...ids][0] : null;
+},
+
+isItemRotated(actor, itemId) {
+  const item = actor.items.get(itemId);
+  if (!item) return false;
+
+  const meta = actor.system.gridInventory?.items?.find(i => i.id === itemId);
+  if (!meta) return false;
+
+  const original = item.flags?.["tm"]?.originalSize;
+  if (!original) return false;
+
+  return (
+    (meta.w === original.h && meta.h === original.w) ||
+    (meta.w < meta.h && original.w > original.h) ||
+    (meta.w > meta.h && original.w < original.h)
+  );
+}
 
 };

@@ -125,7 +125,7 @@ const metaA = {
     itemId: itemB.id,
     w: metaB.rotated ? metaB.h : metaB.w,
     h: metaB.rotated ? metaB.w : metaB.h,
-    rotated: metaB.rotated,
+    rotated: game.tm.GridUtils.isItemRotated(actor, itemB.id),
     origin: { x: metaB.x, y: metaB.y },
     img: itemB.img,
     fromGrid: true,

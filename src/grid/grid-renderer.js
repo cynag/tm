@@ -126,13 +126,15 @@ requestAnimationFrame(() => {
 
 // ⚠️ Só tenta swap se houver exatamente 1 item na área
 const simGrid = game.tm.GridUtils.createVirtualGrid(actor);
-const items = game.tm.GridUtils.getItemsUnderAreaFromGrid(simGrid, gridX, gridY, w, h);
 
+const ids = game.tm.GridUtils.getItemsUnderAreaFromGrid(simGrid, gridX, gridY, w, h);
+console.log("[GridRenderer] 💡 Tentando swap com", ids, "na área");
 
-console.log(`[GridRenderer] 💡 Tentando swap com ${items.length} item(s) na área`);
-if (items.length === 1) {
+if (ids.length === 1) {
   game.tm.GridSwap.attemptSwap(e.clientX, e.clientY);
 }
+
+
 
 
     });
