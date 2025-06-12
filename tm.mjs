@@ -1,4 +1,5 @@
 // === IMPORTS ===
+
 import { TMActor } from "./src/actor/actor.js";
 import { TMObject } from "./src/item/item.js";
 import { TMActorSheet } from "./src/actor/actor-sheet.js";
@@ -13,8 +14,11 @@ import { GridRotate } from "./src/grid/grid-rotate.js";
 import { GridOverlay } from "./src/grid/grid-overlay.js";
 import { GridPreview } from "./src/grid/grid-preview.js";
 import { GridSwap } from "./src/grid/grid-swap.js";
+import { GridAutoPosition } from "./src/grid/grid-auto-position.js";
+import { GridDelete } from "./src/grid/grid-delete.js";
 
 // === INIT ===
+
 Hooks.once("init", function () {
   console.log("Terras Malditas | System initialized");
 
@@ -42,7 +46,9 @@ Hooks.once("ready", () => {
     GridRotate,
     GridOverlay,
     GridPreview,
-    GridSwap   // ✅ adiciona aqui
+    GridAutoPosition,
+    GridSwap,
+    GridDelete,
   };
 
   console.log("Terras Malditas | Sistema pronto");

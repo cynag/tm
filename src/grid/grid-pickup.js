@@ -33,6 +33,8 @@ export class GridPickup {
     
     this._activatePreview();
     this._addListeners();
+    game.tm.GridDelete.enable();
+
 
     const waitForGridReady = async () => {
       const maxTries = 20;
@@ -121,6 +123,8 @@ for (let ry of fallbackTries) {
   this._removePreview();
   this._removeOverlay();
   this._removeListeners();
+  game.tm.GridDelete.disable();
+
   // Força remoção imediata de qualquer imagem do item no DOM
 const imgEl = app?.element.find(`.grid-item-image[style*="${item.img}"]`)[0];
 if (imgEl) imgEl.remove();
