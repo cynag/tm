@@ -36,6 +36,11 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
     html[0].addEventListener("drop", this._onDropBound);
     this._gridListenersBound = true;
   }
+  html.find(".auto-sort-btn").on("click", () => {
+  console.log("[AutoSort] 🔁 Auto-sort iniciado");
+  game.tm.GridAutoSort.sort(this.actor);
+});
+
 
   const container = html.find("#grid-inventory")[0];
   if (container) {

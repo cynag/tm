@@ -16,6 +16,7 @@ import { GridPreview } from "./src/grid/grid-preview.js";
 import { GridSwap } from "./src/grid/grid-swap.js";
 import { GridAutoPosition } from "./src/grid/grid-auto-position.js";
 import { GridDelete } from "./src/grid/grid-delete.js";
+import { GridAutoSort } from "./src/grid/grid-auto-sort.js";
 
 // === INIT ===
 
@@ -49,6 +50,7 @@ Hooks.once("ready", () => {
     GridAutoPosition,
     GridSwap,
     GridDelete,
+    GridAutoSort
   };
 
   console.log("Terras Malditas | Sistema pronto");
