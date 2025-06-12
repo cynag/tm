@@ -8,7 +8,6 @@ import { GridInventory } from "./src/grid/grid-inventory.js";
 import { GridUtils } from "./src/grid/grid-utils.js";
 import { GridRenderer } from "./src/grid/grid-renderer.js";
 import { GridPositioner } from "./src/grid/grid-positioner.js";
-import { DragManager } from "./src/grid/drag-manager.js";
 import { GridPickup } from "./src/grid/grid-pickup.js";
 import { GridRotate } from "./src/grid/grid-rotate.js";
 import { GridOverlay } from "./src/grid/grid-overlay.js";
@@ -39,7 +38,6 @@ Hooks.once("ready", () => {
     GridUtils,
     GridRenderer,
     GridPositioner,
-    DragManager,
     GridPickup,
     GridRotate,
     GridOverlay,
