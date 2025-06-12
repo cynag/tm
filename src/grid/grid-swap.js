@@ -119,26 +119,63 @@ const metaA = {
   // Coloca itemA no lugar de itemB
   game.tm.GridPositioner.placeItem(actor, itemA, gridX, gridY, pickup.rotated);
 
-  // Atualiza pickup com itemB
-  game.tm.GridPickup.pickupData = {
-    actorId: actor.id,
-    itemId: itemB.id,
-    w: metaB.rotated ? metaB.h : metaB.w,
-    h: metaB.rotated ? metaB.w : metaB.h,
-    rotated: game.tm.GridUtils.isItemRotated(actor, itemB.id),
-    origin: { x: metaB.x, y: metaB.y },
-    img: itemB.img,
-    fromGrid: true,
-    mousePos: { x, y }
-  };
+  // Atualiza pickup com itemB (ordem corrigida)
+const rotatedB = !!metaB.rotated;
 
-  // Força sincronização do estado antes de redesenhar
-  await actor.update({});
 
-  game.tm.GridPreview.remove();
-  game.tm.GridPreview.create(game.tm.GridPickup.pickupData);
-  game.tm.GridInventory.refresh(app);
+game.tm.GridPickup.pickupData = {
+  actorId: actor.id,
+  itemId: itemB.id,
+  w: metaB.w,
+h: metaB.h,
+  rotated: !!metaB.rotated,
+
+  origin: { x: metaB.x, y: metaB.y },
+  img: itemB.img,
+  fromGrid: true,
+  mousePos: { x, y },
+  original: {
+    w: itemB.system.grid?.w ?? 1,
+    h: itemB.system.grid?.h ?? 1
+  }
+};
+
+
+
+await actor.update({});
+
+GridSwap.finalizePickupAfterSwap(actor);
+
+
 }
 
+static finalizePickupAfterSwap(actor) {
+  const pickup = game.tm.GridPickup.pickupData;
+  if (!pickup) return;
+
+  const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+  const container = app?.element.find("#grid-inventory")[0];
+
+  game.tm.GridPreview.remove();
+  game.tm.GridOverlay.remove();
+
+  // Aguarda dois frames para garantir DOM e pickupData sincronizados
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      game.tm.GridPreview.create(pickup);
+
+      const gridEl = container?.querySelector(".grid");
+      if (gridEl) {
+        const bounds = gridEl.getBoundingClientRect();
+        const relX = pickup.mousePos.x - bounds.left;
+        const relY = pickup.mousePos.y - bounds.top;
+        const grid = game.tm.GridUtils.createVirtualGrid(actor);
+        game.tm.GridOverlay.update(actor, grid, relX, relY);
+      }
+
+      game.tm.GridInventory.refresh(app);
+    });
+  });
+}
 
 }

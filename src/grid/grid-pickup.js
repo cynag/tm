@@ -15,17 +15,22 @@ export class GridPickup {
     const h = rotated ? rawW : rawH;
 
     this.pickupData = {
-      actorId: actor.id,
-      itemId: item.id,
-      w,
-      h,
-      rotated,
-      origin,
-      img: item.img,
-      fromGrid,
-      mousePos: event ? { x: event.clientX, y: event.clientY } : { x: 0, y: 0 }
-    };
+  actorId: actor.id,
+  itemId: item.id,
+  w,
+  h,
+  rotated,
+  origin,
+  img: item.img,
+  fromGrid,
+  mousePos: event ? { x: event.clientX, y: event.clientY } : { x: 0, y: 0 },
+  original: {
+    w: rawW,
+    h: rawH
+  }
+};
 
+    
     this._activatePreview();
     this._addListeners();
 
