@@ -25,28 +25,28 @@ export class GearRenderer {
       const size = GearConstants.SLOT_LAYOUT[slotId];
       if (!pos || !size) continue;
 
-      const slot = document.createElement("div");
-      slot.classList.add("gear-slot");
-      slot.dataset.slotId = slotId;
-      slot.style.position = "absolute";
-      slot.style.left = `${pos.x * GearConstants.SLOT_WIDTH}px`;
-      slot.style.top = `${pos.y * GearConstants.SLOT_HEIGHT}px`;
-      slot.style.width = `${size.w * GearConstants.SLOT_WIDTH}px`;
-      slot.style.height = `${size.h * GearConstants.SLOT_HEIGHT}px`;
-      slot.style.border = "1px solid #888";
-      slot.style.display = "flex";
-      slot.style.alignItems = "center";
-      slot.style.justifyContent = "center";
-      slot.style.color = "#ccc";
-      slot.style.fontSize = "10px";
-      slot.style.textAlign = "center";
-      slot.style.overflow = "hidden";
-      slot.style.background = "rgba(255,255,255,0.05)";
+      const baseSlot = document.createElement("div");
+      baseSlot.classList.add("gear-slot");
+      baseSlot.dataset.slotId = slotId;
+      baseSlot.style.position = "absolute";
+      baseSlot.style.left = `${pos.x * GearConstants.SLOT_WIDTH}px`;
+      baseSlot.style.top = `${pos.y * GearConstants.SLOT_HEIGHT}px`;
+      baseSlot.style.width = `${size.w * GearConstants.SLOT_WIDTH}px`;
+      baseSlot.style.height = `${size.h * GearConstants.SLOT_HEIGHT}px`;
+      baseSlot.style.border = "1px solid #888";
+      baseSlot.style.display = "flex";
+      baseSlot.style.alignItems = "center";
+      baseSlot.style.justifyContent = "center";
+      baseSlot.style.color = "#ccc";
+      baseSlot.style.fontSize = "10px";
+      baseSlot.style.textAlign = "center";
+      baseSlot.style.overflow = "hidden";
+      baseSlot.style.background = "rgba(255,255,255,0.05)";
 
       const label = document.createElement("div");
       label.innerText = slotId.replace("slot_", "").toUpperCase();
       label.style.pointerEvents = "none";
-      slot.appendChild(label);
+      baseSlot.appendChild(label);
 
       if (slotData.itemId) {
         const item = actor.items.get(slotData.itemId);
@@ -58,14 +58,15 @@ export class GearRenderer {
           img.style.height = "100%";
           img.style.objectFit = "cover";
           img.style.zIndex = "1";
-          slot.appendChild(img);
+          baseSlot.appendChild(img);
         }
       }
+
+      const slot = baseSlot.cloneNode(true); // remove qualquer listener antigo
 
       slot.addEventListener("mousedown", async (e) => {
         e.preventDefault();
         const pickup = game.tm.GridPickup.pickupData;
-
         const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
         const gearContainer = app?.element.find("#gear-slots")[0];
         const gridContainer = app?.element.find("#grid-inventory")[0];
@@ -133,10 +134,10 @@ export class GearRenderer {
       wrapper.appendChild(slot);
     }
 
+    if (!this._renderedActors) this._renderedActors = new Set();
+    this._renderedActors.add(actor.id);
     setTimeout(() => {
-      if (this._renderedActors) this._renderedActors.delete(actor.id);
-
-
+      this._renderedActors.delete(actor.id);
     }, 100);
 
     container.appendChild(wrapper);

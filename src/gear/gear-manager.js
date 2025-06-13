@@ -1,9 +1,16 @@
 // src/gear/gear-manager.js
 export class GearManager {
+  static _equiping = new Set();
+  static _unequiping = new Set();
+
   static async equipItem(actor, item, slotId) {
-    // 🛑 Já está equipado nesse slot → não faz nada
+    const key = `${actor.id}-${item.id}-${slotId}`;
+    if (this._equiping.has(key)) return;
+    this._equiping.add(key);
+
     if (actor.system.gearSlots[slotId]?.itemId === item.id) {
       console.log(`[GearManager] ⚠️ ${item.name} já está equipado em ${slotId}`);
+      this._equiping.delete(key);
       return;
     }
 
@@ -31,14 +38,26 @@ export class GearManager {
         game.tm.GridRenderer.renderGrid(gridContainer, grid);
       }
     }
+
+    setTimeout(() => this._equiping.delete(key), 100);
   }
 
   static async unequipItem(actor, slotId) {
+    const key = `${actor.id}-${slotId}`;
+    if (this._unequiping.has(key)) return;
+    this._unequiping.add(key);
+
     const current = actor.system.gearSlots[slotId]?.itemId;
-    if (!current) return;
+    if (!current) {
+      this._unequiping.delete(key);
+      return;
+    }
 
     const item = actor.items.get(current);
-    if (!item) return;
+    if (!item) {
+      this._unequiping.delete(key);
+      return;
+    }
 
     await item.update({ "system.equippedSlot": null });
     await actor.update({ [`system.gearSlots.${slotId}.itemId`]: null });
@@ -56,5 +75,7 @@ export class GearManager {
         game.tm.GridRenderer.renderGrid(gridContainer, grid);
       }
     }
+
+    setTimeout(() => this._unequiping.delete(key), 100);
   }
 }

@@ -3,7 +3,7 @@ export class GridPickup {
 
   static start(actor, item, fromGrid = true, origin = null, event = null) {
     if (this.pickupData) this.cancel();
-    console.log("[GridPickup] ✅ Pickup iniciado:", item.name);
+    console.log("[GridPickup] 🔘 Pickup iniciado:", item.name);
 
     const meta = actor.system.gridInventory?.items?.find(i => i.id === item.id);
     const rotated = meta?.rotated ?? false;
