@@ -1,6 +1,6 @@
 export class GridAutoSort {
   static sort(actor) {
-    const items = actor.items.filter(i => i.system.grid);
+    const items = actor.items.filter(i => i.system.grid && !i.system.equippedSlot);
     const sorted = [...items].sort((a, b) => {
   const aw = a.system.grid.w ?? 1;
   const ah = a.system.grid.h ?? 1;

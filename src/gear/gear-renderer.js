@@ -4,11 +4,7 @@ import { GearManager } from "./gear-manager.js";
 
 export class GearRenderer {
   static render(container, actor) {
-    if (!actor.system?.gearSlots) return;
-    if (!container) {
-      console.warn("[GearRenderer] ⚠️ Container #gear-slots não encontrado.");
-      return;
-    }
+    if (!actor.system?.gearSlots || !container) return;
 
     container.innerHTML = "";
 
@@ -51,19 +47,35 @@ export class GearRenderer {
       if (slotData.itemId) {
         const item = actor.items.get(slotData.itemId);
         if (item) {
+          const iw = item.system.grid?.w ?? 1;
+          const ih = item.system.grid?.h ?? 1;
+          const slotW = size.w;
+          const slotH = size.h;
+
           const img = document.createElement("img");
           img.src = item.img;
           img.style.position = "absolute";
-          img.style.width = "100%";
-          img.style.height = "100%";
-          img.style.objectFit = "cover";
+          img.style.objectFit = "contain";
           img.style.zIndex = "1";
+
+          if (iw > slotW || ih > slotH) {
+            // Redimensiona para caber
+            img.style.width = "100%";
+            img.style.height = "100%";
+          } else {
+            // Usa o tamanho real e centraliza
+            img.style.width = `${iw * GearConstants.SLOT_WIDTH}px`;
+            img.style.height = `${ih * GearConstants.SLOT_HEIGHT}px`;
+            img.style.left = "50%";
+            img.style.top = "50%";
+            img.style.transform = "translate(-50%, -50%)";
+          }
+
           baseSlot.appendChild(img);
         }
       }
 
-      const slot = baseSlot.cloneNode(true); // remove qualquer listener antigo
-
+      const slot = baseSlot.cloneNode(true);
       slot.addEventListener("mousedown", async (e) => {
         e.preventDefault();
         const pickup = game.tm.GridPickup.pickupData;
@@ -133,12 +145,6 @@ export class GearRenderer {
 
       wrapper.appendChild(slot);
     }
-
-    if (!this._renderedActors) this._renderedActors = new Set();
-    this._renderedActors.add(actor.id);
-    setTimeout(() => {
-      this._renderedActors.delete(actor.id);
-    }, 100);
 
     container.appendChild(wrapper);
   }

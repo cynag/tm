@@ -2,6 +2,11 @@ export class GridPickup {
   static pickupData = null;
 
   static start(actor, item, fromGrid = true, origin = null, event = null) {
+    // Impede pickup de item equipado
+if (item.system?.equippedSlot) {
+  ui.notifications.warn("Este item está equipado e não pode ser movido.");
+  return;
+}
     if (this.pickupData) this.cancel();
     console.log("[GridPickup] 🔘 Pickup iniciado:", item.name);
 

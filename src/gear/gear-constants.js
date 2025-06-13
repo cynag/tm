@@ -45,9 +45,9 @@ export const GearConstants = {
     slot_hands:    { x: 0,  y: 9, w: 3, h: 3 },
     slot_ring1:    { x: 6,  y: 0, w: 1, h: 1 },
     slot_ring2:    { x: 6,  y: 1, w: 1, h: 1 },
-    slot_back:     { x: 6,  y: 2, w: 3, h: 4 },
+    slot_back:     { x: 6,  y: 2, w: 3, h: 3 },
     slot_waist:    { x: 6,  y: 6, w: 3, h: 1 },
-    slot_weapon1:  { x: 9,  y: 0, w: 5, h: 4 },
-    slot_weapon2:  { x: 9,  y: 4, w: 5, h: 4 }
+    slot_weapon1:  { x: 9,  y: 0, w: 3, h: 4 }, // ✅ 4x5 = 200x250
+    slot_weapon2:  { x: 9,  y: 5, w: 3, h: 4 }
   }
 };
