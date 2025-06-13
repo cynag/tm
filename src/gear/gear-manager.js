@@ -1,58 +1,60 @@
 // src/gear/gear-manager.js
-import { GearConstants } from "./gear-constants.js";
-
 export class GearManager {
-  static equipItem(actor, item, slotId) {
-    const slot = actor.system.gearSlots[slotId];
-    if (!slot) return;
-
-    // Remove item anterior (se houver)
-    if (slot.itemId && slot.itemId !== item.id) {
-      this.unequipItem(actor, slotId);
+  static async equipItem(actor, item, slotId) {
+    // 🛑 Já está equipado nesse slot → não faz nada
+    if (actor.system.gearSlots[slotId]?.itemId === item.id) {
+      console.log(`[GearManager] ⚠️ ${item.name} já está equipado em ${slotId}`);
+      return;
     }
 
-    // Atualiza slot
-    actor.system.gearSlots[slotId].itemId = item.id;
-
-    // Atualiza item
-    item.update({
-      "system.equippedSlot": slotId,
-      "system.grid.w": slot.width,
-      "system.grid.h": slot.height
-    });
-
-    // Força rotação nula ao equipar
-    const meta = actor.system.gridInventory?.items?.find(i => i.id === item.id);
-    if (meta) {
-      meta.rotated = false;
-      meta.w = slot.width;
-      meta.h = slot.height;
+    const current = actor.system.gearSlots[slotId]?.itemId;
+    if (current && current !== item.id) {
+      await this.unequipItem(actor, slotId);
     }
+
+    await item.update({ "system.equippedSlot": slotId });
+    await actor.update({ [`system.gearSlots.${slotId}.itemId`]: item.id });
+
+    const meta = actor.system.gridInventory.items.find(i => i.id === item.id);
+    if (meta) meta.rotated = false;
 
     console.log(`[GearManager] ✅ ${item.name} equipado em ${slotId}`);
+
+    const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+    if (app) {
+      const gearContainer = app.element.find("#gear-slots")[0];
+      if (gearContainer) game.tm.GearRenderer.render(gearContainer, actor);
+
+      const gridContainer = app.element.find("#grid-inventory")[0];
+      if (gridContainer) {
+        const grid = game.tm.GridUtils.createVirtualGrid(actor);
+        game.tm.GridRenderer.renderGrid(gridContainer, grid);
+      }
+    }
   }
 
-  static unequipItem(actor, slotId) {
-    const slot = actor.system.gearSlots[slotId];
-    if (!slot || !slot.itemId) return;
+  static async unequipItem(actor, slotId) {
+    const current = actor.system.gearSlots[slotId]?.itemId;
+    if (!current) return;
 
-    const item = actor.items.get(slot.itemId);
-    if (item) {
-      item.update({ "system.equippedSlot": null });
-      console.log(`[GearManager] ❌ ${item.name} desequipado de ${slotId}`);
+    const item = actor.items.get(current);
+    if (!item) return;
+
+    await item.update({ "system.equippedSlot": null });
+    await actor.update({ [`system.gearSlots.${slotId}.itemId`]: null });
+
+    console.log(`[GearManager] ❌ ${item.name} desequipado de ${slotId}`);
+
+    const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+    if (app) {
+      const gearContainer = app.element.find("#gear-slots")[0];
+      if (gearContainer) game.tm.GearRenderer.render(gearContainer, actor);
+
+      const gridContainer = app.element.find("#grid-inventory")[0];
+      if (gridContainer) {
+        const grid = game.tm.GridUtils.createVirtualGrid(actor);
+        game.tm.GridRenderer.renderGrid(gridContainer, grid);
+      }
     }
-
-    actor.system.gearSlots[slotId].itemId = null;
-  }
-
-  static swapItem(actor, newItem, slotId) {
-    const slot = actor.system.gearSlots[slotId];
-    if (!slot) return;
-
-    if (slot.itemId && slot.itemId !== newItem.id) {
-      this.unequipItem(actor, slotId);
-    }
-
-    this.equipItem(actor, newItem, slotId);
   }
 }

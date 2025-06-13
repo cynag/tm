@@ -1,7 +1,6 @@
 import { GridUtils } from "../grid/grid-utils.js";
 import { GridRenderer } from "../grid/grid-renderer.js";
 import { GridAutoPosition } from "../grid/grid-auto-position.js";
-import { GearRenderer } from "../gear/gear-renderer.js"; // ✅ novo
 
 export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
   constructor(...args) {
@@ -41,16 +40,25 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
       game.tm.GridAutoSort.sort(this.actor);
     });
 
-    const container = html.find("#grid-inventory")[0];
-    if (container) {
-      const grid = game.tm.GridUtils.createVirtualGrid(this.actor);
-      game.tm.GridRenderer.renderGrid(container, grid);
-    }
-
     const gearContainer = html.find("#gear-slots")[0];
     if (gearContainer) {
       game.tm.GearRenderer.render(gearContainer, this.actor);
     }
+
+    const gridContainer = html.find("#grid-inventory")[0];
+    if (gridContainer) {
+      const grid = game.tm.GridUtils.createVirtualGrid(this.actor);
+      game.tm.GridRenderer.renderGrid(gridContainer, grid);
+    }
+  }
+
+  async render(force, options) {
+    const rendered = await super.render(force, options);
+    const gearContainer = this.element.find("#gear-slots")[0];
+    if (gearContainer) {
+      game.tm.GearRenderer.render(gearContainer, this.actor);
+    }
+    return rendered;
   }
 
   async close(...args) {

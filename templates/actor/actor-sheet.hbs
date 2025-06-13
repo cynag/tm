@@ -3,7 +3,6 @@
   <!-- ============================= -->
   <!-- HEADER (nome + imagem) -->
   <!-- ============================= -->
-
   <header class="sheet-header">
     <div style="display: flex; align-items: center; gap: 10px;">
       <img src="{{actor.img}}" data-edit="img" width="64" height="64" style="flex-shrink: 0;" />
@@ -16,50 +15,22 @@
   <!-- ============================= -->
   <!-- BODY PRINCIPAL -->
   <!-- ============================= -->
-
   <section class="sheet-body" style="padding: 10px; display: flex; flex-direction: column; gap: 20px;">
 
-    <!-- ============================= -->
-    <!-- BLOCO: PONTOS VITAIS -->
-    <!-- ============================= -->
-
-    <div>
-      <h2>Pontos Vitais</h2>
-      <div style="display: flex; gap: 20px;">
-        <div>
-          <label>HP:</label>
-          <input type="number" name="system.hp_value.value" value="{{system.hp_value.value}}" style="width: 50px;" />
-          /
-          <input type="number" name="system.hp_value.max" value="{{system.hp_value.max}}" style="width: 50px;" />
-        </div>
-        <div>
-          <label>AP:</label>
-          <input type="number" name="system.ap_value.value" value="{{system.ap_value.value}}" style="width: 50px;" />
-          /
-          <input type="number" name="system.ap_value.max" value="{{system.ap_value.max}}" style="width: 50px;" />
-        </div>
-      </div>
+    <!-- Botão de Auto-Sort -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
+      <button type="button" class="auto-sort-btn" title="Organizar Inventário">
+        <i class="fas fa-arrows-rotate"></i> Auto-Sort
+      </button>
     </div>
 
+    <!-- BLOCO: SLOTS DE EQUIPAMENTO -->
+    <section id="gear-slots" class="gear-slots-container" style="margin-bottom: 20px;">
+      <!-- Renderizado dinamicamente via GearRenderer -->
+    </section>
+
+    <!-- BLOCO: INVENTÁRIO GRID -->
+    <section id="grid-inventory" class="grid-container"></section>
+
   </section>
-
-  <!-- Botão de Auto-Sort -->
-  <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
-    <button type="button" class="auto-sort-btn" title="Organizar Inventário">
-      <i class="fas fa-arrows-rotate"></i> Auto-Sort
-    </button>
-  </div>
-
-  <!-- ============================= -->
-  <!-- BLOCO: SLOTS DE EQUIPAMENTO -->
-  <!-- ============================= -->
-  <section id="gear-slots" style="margin-bottom: 20px;">
-    <!-- Renderizado dinamicamente via GearRenderer -->
-  </section>
-
-  <!-- ============================= -->
-  <!-- BLOCO: INVENTÁRIO GRID -->
-  <!-- ============================= -->
-  <section id="grid-inventory" class="grid-container"></section>
-
 </form>
