@@ -1,4 +1,7 @@
 import { GridPickup } from "./grid-pickup.js";
+import { GearUtils } from "../gear/gear-utils.js";
+import { GearManager } from "../gear/gear-manager.js";
+import { GearRenderer } from "../gear/gear-renderer.js";
 
 export class GridRenderer {
   static renderGrid(container, gridData) {
@@ -83,9 +86,36 @@ export class GridRenderer {
     wrapper.appendChild(grid);
 container.appendChild(wrapper);
 
-requestAnimationFrame(() => {
-  game.tm.GridOverlay.create(container);
-});
+// Integração com gear-slot durante pickup
+const pickup = game.tm.GridPickup.pickupData;
+if (pickup) {
+  const gearContainer = container.closest(".app")?.querySelector(".gear-wrapper");
+  if (gearContainer) {
+    gearContainer.querySelectorAll(".gear-slot").forEach(slotEl => {
+      slotEl.addEventListener("mousedown", async (e) => {
+        e.preventDefault();
+        const slotId = slotEl.dataset.slotId;
+        const actor = game.actors.get(pickup.actorId);
+        const item = actor.items.get(pickup.itemId);
+        if (!actor || !item) return;
+
+        const valid = game.tm.GearUtils.isValidForSlot(item, slotId);
+        if (!valid) {
+          ui.notifications.warn("Este item não pode ser equipado nesse slot.");
+          return;
+        }
+
+        game.tm.GearManager.equipItem(actor, item, slotId);
+        game.tm.GridPickup.pickupData = null;
+        game.tm.GridPickup._removePreview();
+        game.tm.GridPickup._removeOverlay();
+        game.tm.GridPickup._removeListeners();
+        game.tm.GridInventory.refresh(Object.values(ui.windows).find(w => w.actor?.id === actor.id));
+        game.tm.GearRenderer.render(gearContainer, actor);
+      });
+    });
+  }
+}
 
 
     // ✅ Espera o grid estar no DOM antes de criar overlay

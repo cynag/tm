@@ -23,8 +23,12 @@
       "actor": {}
     },
     "Item": {
-      "object": {}
-    }
+  "object": {},
+  "armor": {},
+  "weapon": {},
+  "accessory": {}
+}
+
   },
   "packs": [],
   "languages": [],
