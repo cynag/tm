@@ -2,6 +2,7 @@ import { GridPickup } from "./grid-pickup.js";
 import { GearUtils } from "../gear/gear-utils.js";
 import { GearManager } from "../gear/gear-manager.js";
 import { GearRenderer } from "../gear/gear-renderer.js";
+import { ItemTooltip } from "../ui/item-tooltip.js";
 
 export class GridRenderer {
   static renderGrid(container, gridData) {
@@ -37,6 +38,14 @@ export class GridRenderer {
 
           const img = document.createElement("div");
           img.classList.add("grid-item-image");
+
+          img.addEventListener("mouseenter", (e) => {
+  ItemTooltip.show(item, e);
+});
+img.addEventListener("mouseleave", () => {
+  ItemTooltip.hide();
+});
+
           img.style.backgroundImage = `url(${item.img})`;
           img.style.backgroundSize = "cover";
           img.style.backgroundRepeat = "no-repeat";
@@ -72,6 +81,8 @@ export class GridRenderer {
   game.tm.GridPositioner.removeItem(actor, item.id);
   game.tm.GridInventory.refresh(app);
   game.tm.GridPickup.start(actor, item, true, origin, e);
+   if (game.tm.ItemTooltip) game.tm.ItemTooltip.hide();
+  
 });
 
 

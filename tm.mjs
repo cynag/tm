@@ -22,13 +22,15 @@ import { GridAutoPosition } from "./src/grid/grid-auto-position.js";
 import { GridDelete } from "./src/grid/grid-delete.js";
 import { GridAutoSort } from "./src/grid/grid-auto-sort.js";
 
-// GEAR SYSTEM (Isolado)
 import { GearSlots } from "./src/gear/gear-slots.js";
 import { GearManager } from "./src/gear/gear-manager.js";
 import { GearUtils } from "./src/gear/gear-utils.js";
 import { GearRenderer } from "./src/gear/gear-renderer.js";
 import { GearConstants } from "./src/gear/gear-constants.js";
 import { GearOverlay } from "./src/gear/gear-overlay.js";
+
+import { ItemTooltip } from "./src/ui/item-tooltip.js";
+
 
 // === INIT ===
 
@@ -73,7 +75,9 @@ Hooks.once("ready", () => {
     GearUtils,
     GearRenderer,
     GearConstants,
-    GearOverlay
+    GearOverlay,
+
+    ItemTooltip,
   };
 
   console.log("Terras Malditas | Sistema pronto");

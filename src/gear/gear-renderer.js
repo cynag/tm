@@ -1,6 +1,7 @@
 // src/gear/gear-renderer.js
 import { GearConstants } from "./gear-constants.js";
 import { GearManager } from "./gear-manager.js";
+import { ItemTooltip } from "../ui/item-tooltip.js";
 
 export class GearRenderer {
   static render(container, actor) {
@@ -9,21 +10,20 @@ export class GearRenderer {
     container.innerHTML = "";
 
     // Limpa overlays visuais antigos
-const slotsOld = container.querySelectorAll(".gear-slot");
-slotsOld.forEach(slot => slot.removeAttribute("data-gear-overlay"));
+    const slotsOld = container.querySelectorAll(".gear-slot");
+    slotsOld.forEach(slot => slot.removeAttribute("data-gear-overlay"));
 
     const wrapper = document.createElement("div");
-    // Cria overlay visual
-const overlay = document.createElement("div");
-overlay.id = "gear-overlay";
-overlay.style.position = "absolute";
-overlay.style.top = "0";
-overlay.style.left = "0";
-overlay.style.right = "0";
-overlay.style.bottom = "0";
-overlay.style.pointerEvents = "none";
-overlay.style.zIndex = "999";
-wrapper.appendChild(overlay);
+    const overlay = document.createElement("div");
+    overlay.id = "gear-overlay";
+    overlay.style.position = "absolute";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.right = "0";
+    overlay.style.bottom = "0";
+    overlay.style.pointerEvents = "none";
+    overlay.style.zIndex = "999";
+    wrapper.appendChild(overlay);
 
     wrapper.classList.add("gear-wrapper");
     wrapper.style.position = "relative";
@@ -39,14 +39,14 @@ wrapper.appendChild(overlay);
 
       const baseSlot = document.createElement("div");
       const overlayBox = document.createElement("div");
-overlayBox.classList.add("gear-slot-overlay");
-overlayBox.style.position = "absolute";
-overlayBox.style.top = "0";
-overlayBox.style.left = "0";
-overlayBox.style.right = "0";
-overlayBox.style.bottom = "0";
-overlayBox.style.pointerEvents = "none";
-baseSlot.appendChild(overlayBox);
+      overlayBox.classList.add("gear-slot-overlay");
+      overlayBox.style.position = "absolute";
+      overlayBox.style.top = "0";
+      overlayBox.style.left = "0";
+      overlayBox.style.right = "0";
+      overlayBox.style.bottom = "0";
+      overlayBox.style.pointerEvents = "none";
+      baseSlot.appendChild(overlayBox);
 
       baseSlot.classList.add("gear-slot");
       baseSlot.dataset.slotId = slotId;
@@ -80,6 +80,19 @@ baseSlot.appendChild(overlayBox);
 
           const img = document.createElement("img");
           img.src = item.img;
+
+          img.style.pointerEvents = "auto";
+          img.style.zIndex = "10";
+
+
+          // ✅ Tooltip bind
+          img.addEventListener("mouseenter", (e) => {
+            if (game.tm.ItemTooltip) game.tm.ItemTooltip.show(item, e);
+          });
+          img.addEventListener("mouseleave", () => {
+            if (game.tm.ItemTooltip) game.tm.ItemTooltip.hide();
+          });
+
           img.style.position = "absolute";
           img.style.objectFit = "contain";
           img.style.zIndex = "1";
@@ -99,7 +112,10 @@ baseSlot.appendChild(overlayBox);
         }
       }
 
-      const slot = baseSlot.cloneNode(true);
+      const slot = baseSlot;
+      label.style.pointerEvents = "none";
+overlayBox.style.pointerEvents = "none";
+
       slot.addEventListener("mousedown", async (e) => {
         e.preventDefault();
         const pickup = game.tm.GridPickup.pickupData;
@@ -113,7 +129,6 @@ baseSlot.appendChild(overlayBox);
 
           const valid = game.tm.GearUtils.isValidForSlot(item, slotId);
           if (!valid) return;
-
 
           const currentId = actor.system.gearSlots[slotId]?.itemId;
           const currentItem = currentId ? actor.items.get(currentId) : null;
@@ -154,7 +169,6 @@ baseSlot.appendChild(overlayBox);
 
           const sheet = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
           if (sheet?.render) sheet.render(true);
-
           return;
         }
 
@@ -175,7 +189,6 @@ baseSlot.appendChild(overlayBox);
 
           const sheet = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
           if (sheet?.render) sheet.render(true);
-
           return;
         }
 

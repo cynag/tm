@@ -64,6 +64,7 @@ if (item.system?.equippedSlot) {
     };
 
     waitForGridReady();
+    if (game.tm.ItemTooltip) game.tm.ItemTooltip.hide();
   }
 
   static cancel() {
