@@ -28,6 +28,7 @@ import { GearManager } from "./src/gear/gear-manager.js";
 import { GearUtils } from "./src/gear/gear-utils.js";
 import { GearRenderer } from "./src/gear/gear-renderer.js";
 import { GearConstants } from "./src/gear/gear-constants.js";
+import { GearOverlay } from "./src/gear/gear-overlay.js";
 
 // === INIT ===
 
@@ -71,7 +72,8 @@ Hooks.once("ready", () => {
     GearManager,
     GearUtils,
     GearRenderer,
-    GearConstants
+    GearConstants,
+    GearOverlay
   };
 
   console.log("Terras Malditas | Sistema pronto");

@@ -8,7 +8,23 @@ export class GearRenderer {
 
     container.innerHTML = "";
 
+    // Limpa overlays visuais antigos
+const slotsOld = container.querySelectorAll(".gear-slot");
+slotsOld.forEach(slot => slot.removeAttribute("data-gear-overlay"));
+
     const wrapper = document.createElement("div");
+    // Cria overlay visual
+const overlay = document.createElement("div");
+overlay.id = "gear-overlay";
+overlay.style.position = "absolute";
+overlay.style.top = "0";
+overlay.style.left = "0";
+overlay.style.right = "0";
+overlay.style.bottom = "0";
+overlay.style.pointerEvents = "none";
+overlay.style.zIndex = "999";
+wrapper.appendChild(overlay);
+
     wrapper.classList.add("gear-wrapper");
     wrapper.style.position = "relative";
     wrapper.style.width = "500px";
@@ -22,6 +38,16 @@ export class GearRenderer {
       if (!pos || !size) continue;
 
       const baseSlot = document.createElement("div");
+      const overlayBox = document.createElement("div");
+overlayBox.classList.add("gear-slot-overlay");
+overlayBox.style.position = "absolute";
+overlayBox.style.top = "0";
+overlayBox.style.left = "0";
+overlayBox.style.right = "0";
+overlayBox.style.bottom = "0";
+overlayBox.style.pointerEvents = "none";
+baseSlot.appendChild(overlayBox);
+
       baseSlot.classList.add("gear-slot");
       baseSlot.dataset.slotId = slotId;
       baseSlot.style.position = "absolute";
@@ -86,10 +112,8 @@ export class GearRenderer {
           if (!item) return;
 
           const valid = game.tm.GearUtils.isValidForSlot(item, slotId);
-          if (!valid) {
-            ui.notifications.warn("Este item não pode ser equipado nesse slot.");
-            return;
-          }
+          if (!valid) return;
+
 
           const currentId = actor.system.gearSlots[slotId]?.itemId;
           const currentItem = currentId ? actor.items.get(currentId) : null;

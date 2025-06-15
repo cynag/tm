@@ -100,10 +100,8 @@ if (pickup) {
         if (!actor || !item) return;
 
         const valid = game.tm.GearUtils.isValidForSlot(item, slotId);
-        if (!valid) {
-          ui.notifications.warn("Este item não pode ser equipado nesse slot.");
-          return;
-        }
+        if (!valid) return;
+
 
         game.tm.GearManager.equipItem(actor, item, slotId);
         game.tm.GridPickup.pickupData = null;

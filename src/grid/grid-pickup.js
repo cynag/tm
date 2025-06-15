@@ -139,6 +139,8 @@ for (let ry of fallbackTries) {
   this.pickupData = null;
   this._removePreview();
   this._removeOverlay();
+  if (game.tm.GearOverlay) game.tm.GearOverlay.clear();
+
   this._removeListeners();
   game.tm.GridDelete.disable();
 
@@ -161,50 +163,58 @@ if (container) container.innerHTML = ""; // força reset visual
 
 
   static _activatePreview() {
-    const pickup = this.pickupData;
-    const actor = game.actors.get(pickup.actorId);
+  const pickup = this.pickupData;
+  const actor = game.actors.get(pickup.actorId);
 
-    game.tm.GridPreview.create(pickup);
+  game.tm.GridPreview.create(pickup);
 
-    const move = (e) => {
-      if (!e || typeof e.clientX !== "number") return;
+  const move = (e) => {
+    if (!e || typeof e.clientX !== "number") return;
 
-      const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
-      const container = app?.element.find("#grid-inventory")[0];
-      const gridEl = container?.querySelector(".grid");
+    // 🔁 Atualiza posição do mouse no pickup
+    this.pickupData.mousePos = { x: e.clientX, y: e.clientY };
 
-      let snap = false;
-      if (gridEl) {
-        const bounds = gridEl.getBoundingClientRect();
-        if (
-          e.clientX >= bounds.left &&
-          e.clientX <= bounds.right &&
-          e.clientY >= bounds.top &&
-          e.clientY <= bounds.bottom
-        ) {
-          snap = true;
-          const relX = e.clientX - bounds.left;
-          const relY = e.clientY - bounds.top;
-          const grid = game.tm.GridUtils.createVirtualGrid(actor);
-          game.tm.GridOverlay.update(actor, grid, relX, relY);
-          //console.log("[GridPickup] 🟩 Snap + overlay update");
-        } else {
-          game.tm.GridOverlay.clear();
-        }
+    const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+    const container = app?.element.find("#grid-inventory")[0];
+    const gridEl = container?.querySelector(".grid");
+
+    let snap = false;
+    if (gridEl) {
+      const bounds = gridEl.getBoundingClientRect();
+      if (
+        e.clientX >= bounds.left &&
+        e.clientX <= bounds.right &&
+        e.clientY >= bounds.top &&
+        e.clientY <= bounds.bottom
+      ) {
+        snap = true;
+        const relX = e.clientX - bounds.left;
+        const relY = e.clientY - bounds.top;
+        const grid = game.tm.GridUtils.createVirtualGrid(actor);
+        game.tm.GridOverlay.update(actor, grid, relX, relY);
+      } else {
+        game.tm.GridOverlay.clear();
       }
+    }
 
-      game.tm.GridPreview.update(e.clientX, e.clientY, snap);
-    };
+    // 🔁 Overlay de equipamento (hover real)
+    if (game.tm.GearOverlay) {
+      game.tm.GearOverlay.update(actor, this.pickupData);
+    }
 
-    window.addEventListener("mousemove", move, { passive: true });
-    this._ghostMoveHandler = move;
+    game.tm.GridPreview.update(e.clientX, e.clientY, snap);
+  };
 
-    // força render inicial
-    setTimeout(() => {
-      const { x, y } = pickup.mousePos;
-      document.dispatchEvent(new MouseEvent("mousemove", { clientX: x, clientY: y }));
-    }, 50);
-  }
+  window.addEventListener("mousemove", move, { passive: true });
+  this._ghostMoveHandler = move;
+
+  // força render inicial
+  setTimeout(() => {
+    const { x, y } = pickup.mousePos;
+    document.dispatchEvent(new MouseEvent("mousemove", { clientX: x, clientY: y }));
+  }, 50);
+}
+
 
   static _removePreview() {
     game.tm.GridPreview.remove();

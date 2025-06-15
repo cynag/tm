@@ -128,3 +128,15 @@
   z-index: 1;
   pointer-events: none;
 }
+
+/* OVERLAYS DE SLOT DE EQUIPAMENTO */
+.gear-slot-overlay[data-gear-overlay="valid"] {
+  background-color: rgba(0, 255, 0, 0.25);
+}
+.gear-slot-overlay[data-gear-overlay="invalid"] {
+  background-color: rgba(255, 0, 0, 0.25);
+}
+.gear-slot-overlay[data-gear-overlay="swap"] {
+  background-color: rgba(255, 165, 0, 0.25);
+}
+
