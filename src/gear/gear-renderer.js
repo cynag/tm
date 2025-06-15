@@ -11,8 +11,8 @@ export class GearRenderer {
     const wrapper = document.createElement("div");
     wrapper.classList.add("gear-wrapper");
     wrapper.style.position = "relative";
-    wrapper.style.width = "800px";
-    wrapper.style.height = "600px";
+    wrapper.style.width = "500px";
+    wrapper.style.height = "250px";
     wrapper.style.background = "#111";
 
     for (const [slotId] of Object.entries(actor.system.gearSlots)) {

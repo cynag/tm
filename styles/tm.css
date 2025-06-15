@@ -93,17 +93,19 @@
   justify-content: center;
   align-items: center;
   padding: 10px 0;
-  min-height: 300px;
+  min-height: unset;
+  width: 100%;
 }
 
 .gear-wrapper {
   position: relative;
   width: 800px;
-  height: 600px;
+  height: auto; /* ✅ altura dinâmica */
   background: #1a1a1a;
   border: 1px solid #333;
   box-shadow: 0 0 8px #000 inset;
 }
+
 
 .gear-slot {
   position: absolute;

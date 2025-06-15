@@ -20,34 +20,35 @@ export const GearConstants = {
   },
 
   GEAR_SLOT_POSITIONS: {
-    slot_head:     { x: 0,  y: 0 },
-    slot_neck:     { x: 3,  y: 0 },
-    slot_shoulder: { x: 0,  y: 3 },
-    slot_torso:    { x: 3,  y: 3 },
-    slot_legs:     { x: 3,  y: 7 },
-    slot_foots:    { x: 0,  y: 6 },
-    slot_hands:    { x: 0,  y: 9 },
-    slot_ring1:    { x: 6,  y: 0 },
-    slot_ring2:    { x: 6,  y: 1 },
-    slot_back:     { x: 6,  y: 2 },
-    slot_waist:    { x: 6,  y: 6 },
-    slot_weapon1:  { x: 9,  y: 0 },
-    slot_weapon2:  { x: 9,  y: 4 }
-  },
+  slot_ring1:    { x: 0, y: 0 },
+  slot_ring2:    { x: 0, y: 1 },
+  slot_neck:     { x: 1, y: 0 },
+  slot_shoulder: { x: 2, y: 0 },
+  slot_head:     { x: 4, y: 0 },
+  slot_back:     { x: 6, y: 0 },
+  slot_hands:    { x: 8, y: 0 },
+  slot_weapon1:  { x: 0, y: 2 },
+  slot_legs:     { x: 2, y: 2 },
+  slot_torso:    { x: 4, y: 2 },
+  slot_waist:    { x: 6, y: 2 },
+  slot_foots:    { x: 6, y: 3 },
+  slot_weapon2:  { x: 8, y: 2 }
+},
 
-  SLOT_LAYOUT: {
-    slot_head:     { x: 0,  y: 0, w: 3, h: 3 },
-    slot_neck:     { x: 3,  y: 0, w: 1, h: 2 },
-    slot_shoulder: { x: 0,  y: 3, w: 3, h: 3 },
-    slot_torso:    { x: 3,  y: 3, w: 3, h: 4 },
-    slot_legs:     { x: 3,  y: 7, w: 3, h: 4 },
-    slot_foots:    { x: 0,  y: 6, w: 3, h: 3 },
-    slot_hands:    { x: 0,  y: 9, w: 3, h: 3 },
-    slot_ring1:    { x: 6,  y: 0, w: 1, h: 1 },
-    slot_ring2:    { x: 6,  y: 1, w: 1, h: 1 },
-    slot_back:     { x: 6,  y: 2, w: 3, h: 3 },
-    slot_waist:    { x: 6,  y: 6, w: 3, h: 1 },
-    slot_weapon1:  { x: 9,  y: 0, w: 3, h: 4 }, // ✅ 4x5 = 200x250
-    slot_weapon2:  { x: 9,  y: 5, w: 3, h: 4 }
-  }
+SLOT_LAYOUT: {
+  slot_ring1:    { x: 0, y: 0, w: 1, h: 1 },
+  slot_ring2:    { x: 0, y: 1, w: 1, h: 1 },
+  slot_neck:     { x: 1, y: 0, w: 1, h: 2 },
+  slot_shoulder: { x: 2, y: 0, w: 2, h: 2 },
+  slot_head:     { x: 4, y: 0, w: 2, h: 2 },
+  slot_back:     { x: 6, y: 0, w: 2, h: 2 },
+  slot_hands:    { x: 8, y: 0, w: 2, h: 2 },
+  slot_weapon1:  { x: 0, y: 2, w: 2, h: 3 },
+  slot_legs:     { x: 2, y: 2, w: 2, h: 3 },
+  slot_torso:    { x: 4, y: 2, w: 2, h: 3 },
+  slot_waist:    { x: 6, y: 2, w: 2, h: 1 },
+  slot_foots:    { x: 6, y: 3, w: 2, h: 2 },
+  slot_weapon2:  { x: 8, y: 2, w: 2, h: 3 }
+}
+
 };
