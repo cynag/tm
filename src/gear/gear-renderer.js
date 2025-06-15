@@ -59,11 +59,9 @@ export class GearRenderer {
           img.style.zIndex = "1";
 
           if (iw > slotW || ih > slotH) {
-            // Redimensiona para caber
             img.style.width = "100%";
             img.style.height = "100%";
           } else {
-            // Usa o tamanho real e centraliza
             img.style.width = `${iw * GearConstants.SLOT_WIDTH}px`;
             img.style.height = `${ih * GearConstants.SLOT_HEIGHT}px`;
             img.style.left = "50%";
@@ -93,24 +91,52 @@ export class GearRenderer {
             return;
           }
 
-          await game.tm.GearManager.equipItem(actor, item, slotId);
-          game.tm.GridPickup.pickupData = null;
-          game.tm.GridPickup._removePreview();
-          game.tm.GridPickup._removeOverlay();
-          game.tm.GridPickup._removeListeners();
+          const currentId = actor.system.gearSlots[slotId]?.itemId;
+          const currentItem = currentId ? actor.items.get(currentId) : null;
+
+          if (currentItem && currentItem.id !== item.id) {
+            console.debug(`[Swap] Slot ${slotId} ocupado por ${currentItem.name}, iniciando swap`);
+            await game.tm.GearManager.unequipItem(actor, slotId);
+            await game.tm.GearManager.equipItem(actor, item, slotId);
+
+            game.tm.GridPickup.pickupData = null;
+            game.tm.GridPickup._removePreview();
+            game.tm.GridPickup._removeOverlay();
+            game.tm.GridPickup._removeListeners();
+            game.tm.GridDelete.disable();
+
+            game.tm.GridPickup.start(actor, currentItem, false, null, e);
+            await currentItem.update({ "system.equippedSlot": null });
+
+            const imgs = gridContainer?.querySelectorAll(".grid-item-image");
+            imgs?.forEach(el => {
+              const bg = el.style.backgroundImage;
+              if (bg.includes(currentItem.img)) el.remove();
+            });
+
+          } else {
+            await game.tm.GearManager.equipItem(actor, item, slotId);
+            game.tm.GridPickup.pickupData = null;
+            game.tm.GridPickup._removePreview();
+            game.tm.GridPickup._removeOverlay();
+            game.tm.GridPickup._removeListeners();
+          }
 
           if (gearContainer) game.tm.GearRenderer.render(gearContainer, actor);
           if (gridContainer) {
             const grid = game.tm.GridUtils.createVirtualGrid(actor);
             game.tm.GridRenderer.renderGrid(gridContainer, grid);
           }
+
+          const sheet = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+          if (sheet?.render) sheet.render(true);
+
           return;
         }
 
         if (e.button === 0 && !pickup) {
           const current = actor.system.gearSlots[slotId]?.itemId;
           if (!current) return;
-
           const item = actor.items.get(current);
           if (!item) return;
 
@@ -122,13 +148,16 @@ export class GearRenderer {
             const grid = game.tm.GridUtils.createVirtualGrid(actor);
             game.tm.GridRenderer.renderGrid(gridContainer, grid);
           }
+
+          const sheet = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+          if (sheet?.render) sheet.render(true);
+
           return;
         }
 
         if (e.button === 2) {
           const current = actor.system.gearSlots[slotId]?.itemId;
           if (!current) return;
-
           const item = actor.items.get(current);
           if (!item) return;
 
@@ -140,6 +169,9 @@ export class GearRenderer {
             const grid = game.tm.GridUtils.createVirtualGrid(actor);
             game.tm.GridRenderer.renderGrid(gridContainer, grid);
           }
+
+          const sheet = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+          if (sheet?.render) sheet.render(true);
         }
       });
 

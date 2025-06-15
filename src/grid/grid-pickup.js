@@ -69,10 +69,22 @@ if (item.system?.equippedSlot) {
   static cancel() {
   if (!this.pickupData) return;
   console.log("[GridPickup] ❌ Pickup cancelado");
-
   const { actorId, itemId, origin, w, h, rotated } = this.pickupData;
-  const actor = game.actors.get(actorId);
-  const item = actor?.items.get(itemId);
+const actor = game.actors.get(actorId);
+const item = actor?.items.get(itemId);
+if (!actor || !item) return;
+
+// 🛑 Se o item está equipado, apenas cancela o visual — não reposiciona no grid
+if (item.system?.equippedSlot) {
+  console.debug("[GridPickup] ⛔ Item está equipado, cancelamento visual apenas");
+  this.pickupData = null;
+  this._removePreview();
+  this._removeOverlay();
+  this._removeListeners();
+  game.tm.GridDelete.disable();
+  return;
+}
+
   if (!actor || !item) return;
 
   const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
