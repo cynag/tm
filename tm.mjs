@@ -6,6 +6,7 @@ import { TMActorSheet } from "./src/actor/actor-sheet.js";
 
 import { ConsumableSheet } from "./src/item/consumable-sheet.js";
 import { GearSheet } from "./src/item/gear-sheet.js";
+import { CardSheet } from "./src/item/card-sheet.js";
 
 import { GridInventory } from "./src/grid/grid-inventory.js";
 import { GridUtils } from "./src/grid/grid-utils.js";
@@ -45,6 +46,7 @@ Hooks.once("init", function () {
   foundry.documents.collections.Actors.registerSheet("tm", TMActorSheet, { makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", ConsumableSheet, { types: ["consumable"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", GearSheet, {types: ["gear"],makeDefault: true});
+  foundry.documents.collections.Items.registerSheet("tm", CardSheet, { types: ["card"], makeDefault: true });
 
   GridInventory.init();
 });

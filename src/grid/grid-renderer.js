@@ -32,9 +32,14 @@ export class GridRenderer {
         grid.appendChild(div);
 
         if (cell.origin && actor && cell.itemId) {
-          const item = actor.items.get(cell.itemId);
-          const meta = actor.system.gridInventory.items.find(i => i.id === item.id);
-          if (!item || !meta) continue;
+  const item = actor.items.get(cell.itemId);
+
+  // 🛑 Ignora itens não físicos
+  if (!item || item.type === "card") continue;
+
+  const meta = actor.system.gridInventory.items.find(i => i.id === item.id);
+  if (!meta) continue;
+
 
           const img = document.createElement("div");
           img.classList.add("grid-item-image");

@@ -50,6 +50,14 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
       const grid = game.tm.GridUtils.createVirtualGrid(this.actor);
       game.tm.GridRenderer.renderGrid(gridContainer, grid);
     }
+    html.find(".item-delete").on("click", async (ev) => {
+  const li = ev.currentTarget.closest("[data-item-id]");
+  const itemId = li?.dataset.itemId;
+  if (itemId) {
+    await this.actor.deleteEmbeddedDocuments("Item", [itemId]);
+  }
+});
+
   }
 
   async render(force, options) {
@@ -69,19 +77,29 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   async _onDrop(event) {
-    event.preventDefault();
-    event.stopPropagation();
+  event.preventDefault();
+  event.stopPropagation();
 
-    const data = JSON.parse(event.dataTransfer.getData("text/plain"));
-    if (data.type !== "Item") return;
+  const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+  if (data.type !== "Item") return;
 
-    let itemData = await Item.implementation.fromDropData(data);
-    if (itemData instanceof Item) itemData = itemData.toObject();
+  let itemData = await Item.implementation.fromDropData(data);
+  if (itemData instanceof Item) itemData = itemData.toObject();
 
-    const created = await this.actor.createEmbeddedDocuments("Item", [itemData]);
-    const newItem = created[0];
-    if (!newItem) return;
-
-    game.tm.GridAutoPosition.placeNewItem(this.actor, newItem);
+  // 🔒 Bloqueia carta duplicada
+  if (itemData.type === "card") {
+    const exists = this.actor.items.find(i => i.type === "card" && i.name === itemData.name);
+    if (exists) {
+      ui.notifications.warn(`Você já possui a carta "${itemData.name}".`);
+      return;
+    }
   }
+
+  const created = await this.actor.createEmbeddedDocuments("Item", [itemData]);
+  const newItem = created[0];
+  if (!newItem) return;
+
+  game.tm.GridAutoPosition.placeNewItem(this.actor, newItem);
+}
+
 }

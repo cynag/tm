@@ -24,7 +24,8 @@
   },
   "Item": {
     "gear": {},
-    "consumable": {}
+    "consumable": {},
+    "card": {}
   }
 },
   "packs": [],

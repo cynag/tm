@@ -1,5 +1,10 @@
 export class GridPositioner {
   static placeItem(actor, item, x, y, rotated = false) {
+    if (item.type === "card") {
+  console.warn("[GridPositioner] ⛔ Item do tipo 'card' ignorado no posicionamento.");
+  return;
+}
+
     const rawW = item?.system?.grid?.w ?? 1;
     const rawH = item?.system?.grid?.h ?? 1;
 

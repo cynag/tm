@@ -1,0 +1,32 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <header class="sheet-header">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="{{item.img}}" data-edit="img" width="64" height="64" />
+      <h1 class="charname" style="flex: 1;">
+        <input name="name" type="text" value="{{item.name}}" placeholder="Card Name" />
+      </h1>
+    </div>
+  </header>
+
+  <section class="sheet-body" style="padding: 10px; display: flex; flex-direction: column; gap: 10px;">
+    <label>+2 Bonus:</label>
+    <select name="system.card_bonus_2">
+      {{#each attrs as |attr|}}
+        <option value="{{attr}}" {{#if (eq attr ../item.system.card_bonus_2)}}selected{{/if}}>{{attr}}</option>
+      {{/each}}
+    </select>
+
+    <label>+1 Bonus:</label>
+    <select name="system.card_bonus_1">
+      {{#each attrs as |attr|}}
+        <option value="{{attr}}" {{#if (eq attr ../item.system.card_bonus_1)}}selected{{/if}}>{{attr}}</option>
+      {{/each}}
+    </select>
+
+    <label>Bonus HP:</label>
+    <input type="number" name="system.card_bonus_hp" value="{{item.system.card_bonus_hp}}" />
+
+    <label>Required Level:</label>
+    <input type="number" name="system.card_level" value="{{item.system.card_level}}" />
+  </section>
+</form>

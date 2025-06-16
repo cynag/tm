@@ -27,8 +27,86 @@
 
     <!-- ABA: DATA -->
     <div class="tab" data-group="primary" data-tab="data">
-      <!-- futuro -->
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px;">
+
+    <!-- Vitais -->
+    <label>HP</label>
+    <input type="number" name="system.player_hp" value="{{actor.system.player_hp}}" />
+
+    <label>PA</label>
+    <input type="number" name="system.player_pa" value="{{actor.system.player_pa}}" />
+
+    <label>Level</label>
+    <input type="number" name="system.player_level" value="{{actor.system.player_level}}" />
+
+    <!-- Principais -->
+    <label>Letality</label>
+    <input type="number" name="system.player_letality" value="{{actor.system.player_letality}}" />
+
+    <label>Dexterity</label>
+    <input type="number" name="system.player_dexterity" value="{{actor.system.player_dexterity}}" />
+
+    <label>Impulse</label>
+    <input type="number" name="system.player_impulse" value="{{actor.system.player_impulse}}" />
+
+    <label>Arcana</label>
+    <input type="number" name="system.player_arcana" value="{{actor.system.player_arcana}}" />
+
+    <label>Erudition</label>
+    <input type="number" name="system.player_erudition" value="{{actor.system.player_erudition}}" />
+
+    <label>Virtue</label>
+    <input type="number" name="system.player_virtue" value="{{actor.system.player_virtue}}" />
+
+    <!-- Secundários -->
+    <label>Reflex</label>
+    <input type="number" name="system.player_reflex" value="{{actor.system.player_reflex}}" />
+
+    <label>Wisdom</label>
+    <input type="number" name="system.player_wisdom" value="{{actor.system.player_wisdom}}" />
+
+    <label>Maneuver</label>
+    <input type="number" name="system.player_maneuver" value="{{actor.system.player_maneuver}}" />
+
+    <label>Phys. Resist</label>
+    <input type="number" name="system.player_resistance_phys" value="{{actor.system.player_resistance_phys}}" />
+
+    <label>Mental Resist</label>
+    <input type="number" name="system.player_resistance_mental" value="{{actor.system.player_resistance_mental}}" />
+
+    <label>Protection</label>
+    <input type="number" name="system.player_protection" value="{{actor.system.player_protection}}" />
+
+    <label>Initiative</label>
+    <input type="number" name="system.player_initiative" value="{{actor.system.player_initiative}}" />
+
+    <label>Movement</label>
+    <input type="number" name="system.player_movement" value="{{actor.system.player_movement}}" />
+
+<hr />
+<h2>Destiny Card</h2>
+
+{{#each actor.items as |item|}}
+  {{#if (eq item.type "card")}}
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+      <img src="{{item.img}}" width="64" height="64" style="flex-shrink: 0;" />
+      <div style="flex: 1;">
+        <strong>{{item.name}}</strong><br />
+        <span>+2 {{item.system.card_bonus_2}}</span><br />
+        <span>+1 {{item.system.card_bonus_1}}</span><br />
+        <span>+{{item.system.card_bonus_hp}} HP</span><br />
+        <span>Required Level: {{item.system.card_level}}</span>
+      </div>
+      <a class="item-control item-delete" title="Remove Card" data-item-id="{{item._id}}">
+        <i class="fas fa-trash"></i>
+      </a>
     </div>
+  {{/if}}
+{{/each}}
+
+  </div>
+</div>
+
 
     <!-- ABA: INVENTORY -->
     <div class="tab" data-group="primary" data-tab="inventory">
