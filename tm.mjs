@@ -3,11 +3,9 @@
 import { TMActor } from "./src/actor/actor.js";
 import { TMObject } from "./src/item/item.js";
 import { TMActorSheet } from "./src/actor/actor-sheet.js";
-import { TMObjectSheet } from "./src/item/object-sheet.js";
 
-import { ArmorSheet } from "./src/item/armor-sheet.js";
-import { WeaponSheet } from "./src/item/weapon-sheet.js";
-import { AccessorySheet } from "./src/item/accessory-sheet.js";
+import { ConsumableSheet } from "./src/item/consumable-sheet.js";
+import { GearSheet } from "./src/item/gear-sheet.js";
 
 import { GridInventory } from "./src/grid/grid-inventory.js";
 import { GridUtils } from "./src/grid/grid-utils.js";
@@ -31,7 +29,6 @@ import { GearOverlay } from "./src/gear/gear-overlay.js";
 
 import { ItemTooltip } from "./src/ui/item-tooltip.js";
 
-import { ConsumableSheet } from "./src/item/consumable-sheet.js";
 
 
 // === INIT ===
@@ -46,11 +43,8 @@ Hooks.once("init", function () {
   foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
 
   foundry.documents.collections.Actors.registerSheet("tm", TMActorSheet, { makeDefault: true });
-  foundry.documents.collections.Items.registerSheet("tm", TMObjectSheet, { types: ["object"], makeDefault: true });
-  foundry.documents.collections.Items.registerSheet("tm", ArmorSheet, { types: ["armor"], makeDefault: true });
-  foundry.documents.collections.Items.registerSheet("tm", WeaponSheet, { types: ["weapon"], makeDefault: true });
-  foundry.documents.collections.Items.registerSheet("tm", AccessorySheet, { types: ["accessory"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", ConsumableSheet, { types: ["consumable"], makeDefault: true });
+  foundry.documents.collections.Items.registerSheet("tm", GearSheet, {types: ["gear"],makeDefault: true});
 
   GridInventory.init();
 });
@@ -80,9 +74,7 @@ Hooks.once("ready", () => {
     GearConstants,
     GearOverlay,
 
-    ItemTooltip,
-
-    ConsumableSheet
+    ItemTooltip
   };
 
   console.log("Terras Malditas | Sistema pronto");

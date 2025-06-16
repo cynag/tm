@@ -23,9 +23,7 @@
     "actor": {}
   },
   "Item": {
-    "armor": {},
-    "weapon": {},
-    "accessory": {},
+    "gear": {},
     "consumable": {}
   }
 },
