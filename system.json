@@ -19,17 +19,16 @@
     "tm.mjs"
   ],
   "documentTypes": {
-    "Actor": {
-      "actor": {}
-    },
-    "Item": {
-  "object": {},
-  "armor": {},
-  "weapon": {},
-  "accessory": {}
-}
-
+  "Actor": {
+    "actor": {}
   },
+  "Item": {
+    "armor": {},
+    "weapon": {},
+    "accessory": {},
+    "consumable": {}
+  }
+},
   "packs": [],
   "languages": [],
   "styles": [

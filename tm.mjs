@@ -31,6 +31,8 @@ import { GearOverlay } from "./src/gear/gear-overlay.js";
 
 import { ItemTooltip } from "./src/ui/item-tooltip.js";
 
+import { ConsumableSheet } from "./src/item/consumable-sheet.js";
+
 
 // === INIT ===
 
@@ -48,6 +50,7 @@ Hooks.once("init", function () {
   foundry.documents.collections.Items.registerSheet("tm", ArmorSheet, { types: ["armor"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", WeaponSheet, { types: ["weapon"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", AccessorySheet, { types: ["accessory"], makeDefault: true });
+  foundry.documents.collections.Items.registerSheet("tm", ConsumableSheet, { types: ["consumable"], makeDefault: true });
 
   GridInventory.init();
 });
@@ -78,6 +81,8 @@ Hooks.once("ready", () => {
     GearOverlay,
 
     ItemTooltip,
+
+    ConsumableSheet
   };
 
   console.log("Terras Malditas | Sistema pronto");
