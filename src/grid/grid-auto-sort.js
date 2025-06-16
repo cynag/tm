@@ -1,14 +1,18 @@
 export class GridAutoSort {
   static sort(actor) {
-    const items = actor.items.filter(i => i.system.grid && !i.system.equippedSlot);
-    const sorted = [...items].sort((a, b) => {
-  const aw = a.system.grid.w ?? 1;
-  const ah = a.system.grid.h ?? 1;
-  const bw = b.system.grid.w ?? 1;
-  const bh = b.system.grid.h ?? 1;
-  return (bw * bh) - (aw * ah); // maior área primeiro
-});
+    const items = actor.items.filter(i =>
+      i.system.grid &&
+      !i.system.equippedSlot &&
+      !["card", "race"].includes(i.type) // ⛔ ignora tipos não físicos
+    );
 
+    const sorted = [...items].sort((a, b) => {
+      const aw = a.system.grid.w ?? 1;
+      const ah = a.system.grid.h ?? 1;
+      const bw = b.system.grid.w ?? 1;
+      const bh = b.system.grid.h ?? 1;
+      return (bw * bh) - (aw * ah); // maior área primeiro
+    });
 
     const placed = [];
     const grid = game.tm.GridUtils.createEmptyGrid();
@@ -45,7 +49,6 @@ export class GridAutoSort {
       }
 
       if (pos) {
-        // Marca no grid virtual
         for (let dx = 0; dx < (rotated ? rawH : rawW); dx++) {
           for (let dy = 0; dy < (rotated ? rawW : rawH); dy++) {
             const cx = pos.x + dx;

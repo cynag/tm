@@ -47,6 +47,9 @@ export class TMObject extends Item {
         if (!Number.isInteger(data.stack_value)) data.stack_value = 10;
       }
     }
+ // =============================
+    // CARD
+    // =============================
     if (this.type === "card") {
   const attrs = ["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"];
 
@@ -56,5 +59,28 @@ export class TMObject extends Item {
   if (!Number.isInteger(data.card_level)) data.card_level = 1;
 }
 
+ // =============================
+    // RACE
+    // =============================
+
+if (this.type === "race") {
+  if (!["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"].includes(data.race_buff_1)) data.race_buff_1 = "letality";
+  if (!["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"].includes(data.race_buff_2)) data.race_buff_2 = "dexterity";
+  if (!Number.isInteger(data.race_movement)) data.race_movement = 4;
+  if (typeof data.race_maestry !== "string") data.race_maestry = "";
+}
+
   }
+  async _preCreate(data, options, user) {
+  if (this.type === "race") {
+    const actor = this.parent;
+    const existing = actor.items.find(i => i.type === "race");
+    if (existing) {
+      console.log(`[Raça] Substituindo "${existing.name}" por "${this.name}"`);
+      await existing.delete();
+    }
+  }
+  return super._preCreate(data, options, user);
+}
+
 }

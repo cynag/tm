@@ -70,24 +70,47 @@ const cards = this.items.filter(i => i.type === "card" && !seen.has(i.name) && s
         }
       }
     }
+
+    s.player_chronicle ??= "";
+
+    const race = this.items.find(i => i.type === "race");
+if (race) {
+  const r = race.system;
+  s[`player_${r.race_buff_1}`] += 1;
+  s[`player_${r.race_buff_2}`] += 1;
+  s.player_movement = r.race_movement;
+}
+
   }
 // Previne múltiplas cartas com o mesmo nome
 async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
   if (embeddedName !== "Item") return true;
 
-  const existing = this.items.filter(i => i.type === "card").map(i => i.name);
-
-  // Se for array (vários items)
   const items = Array.isArray(data) ? data : [data];
+
+  // Checa por carta duplicada
+  const existingCards = this.items.filter(i => i.type === "card").map(i => i.name);
   for (let item of items) {
-    if (item.type === "card" && existing.includes(item.name)) {
+    if (item.type === "card" && existingCards.includes(item.name)) {
       ui.notifications.warn(`Você já possui a carta "${item.name}".`);
       return false;
     }
   }
 
+  // Remove raça anterior se for adicionar nova
+  for (let item of items) {
+    if (item.type === "race") {
+      const currentRace = this.items.find(i => i.type === "race");
+      if (currentRace) {
+        await currentRace.delete();
+        console.log(`[Raça] Substituída: ${currentRace.name} removida.`);
+      }
+    }
+  }
+
   return true;
 }
+
 
   
 }

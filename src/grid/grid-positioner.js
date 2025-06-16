@@ -1,7 +1,10 @@
 export class GridPositioner {
   static placeItem(actor, item, x, y, rotated = false) {
-    if (item.type === "card") {
-  console.warn("[GridPositioner] ⛔ Item do tipo 'card' ignorado no posicionamento.");
+    if (["card", "race"].includes(item.type)) {
+  console.warn(`[GridPositioner] ⛔ Ignorado tipo não físico: ${item.type}`);
+  const current = actor.system.gridInventory?.items ?? [];
+  const updated = current.filter(i => i.id !== item.id);
+  actor.update({ "system.gridInventory.items": updated });
   return;
 }
 

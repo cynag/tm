@@ -6,6 +6,7 @@ export class GridAutoPosition {
    * 3. Se nenhum couber, cancela e avisa
    */
   static placeNewItem(actor, item) {
+
     const rawW = item.system.grid?.w ?? 1;
     const rawH = item.system.grid?.h ?? 1;
 

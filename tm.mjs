@@ -7,6 +7,7 @@ import { TMActorSheet } from "./src/actor/actor-sheet.js";
 import { ConsumableSheet } from "./src/item/consumable-sheet.js";
 import { GearSheet } from "./src/item/gear-sheet.js";
 import { CardSheet } from "./src/item/card-sheet.js";
+import { RaceSheet } from "./src/item/race-sheet.js";
 
 import { GridInventory } from "./src/grid/grid-inventory.js";
 import { GridUtils } from "./src/grid/grid-utils.js";
@@ -47,8 +48,37 @@ Hooks.once("init", function () {
   foundry.documents.collections.Items.registerSheet("tm", ConsumableSheet, { types: ["consumable"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", GearSheet, {types: ["gear"],makeDefault: true});
   foundry.documents.collections.Items.registerSheet("tm", CardSheet, { types: ["card"], makeDefault: true });
+  foundry.documents.collections.Items.registerSheet("tm", RaceSheet, { types: ["race"], makeDefault: true });
+
 
   GridInventory.init();
+
+// ✅ Helpers Handlebars Registrados
+Handlebars.registerHelper("eq", function(a, b) {
+  return a === b;
+});
+
+Handlebars.registerHelper("neq", function(a, b) {
+  return a !== b;
+});
+
+Handlebars.registerHelper("and", function(a, b) {
+  return a && b;
+});
+
+Handlebars.registerHelper("or", function(a, b) {
+  return a || b;
+});
+
+Handlebars.registerHelper("not", function(a) {
+  return !a;
+});
+
+Handlebars.registerHelper("array", function(...args) {
+  return args.slice(0, -1);
+});
+
+
 });
 
 // === READY ===

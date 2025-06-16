@@ -25,7 +25,8 @@
   "Item": {
     "gear": {},
     "consumable": {},
-    "card": {}
+    "card": {},
+    "race":{}
   }
 },
   "packs": [],

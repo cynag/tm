@@ -11,7 +11,7 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["tm", "sheet", "actor"],
-      width: 600,
+      width: 730,
       height: "auto",
       resizable: true,
       tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "attributes" }]
