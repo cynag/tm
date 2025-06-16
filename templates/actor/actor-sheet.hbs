@@ -1,140 +1,120 @@
 <form class="{{cssClass}}" autocomplete="off">
-<style>
-  .sheet-body {
-    min-height: 500px;
-  }
-</style>
-  <!-- HEADER -->
-  <header class="sheet-header">
+
+  <style>
+    .sheet-body {
+      min-height: 500px;
+      display: flex;
+      flex-direction: row;
+    }
+    .sidebar-fixed {
+      width: 200px;
+      flex-shrink: 0;
+      background: #1a1a1a;
+      color: white;
+      padding: 10px;
+    }
+    .header-fixed {
+      position: sticky;
+      top: 0;
+      background: #2b2b2b;
+      z-index: 10;
+      padding: 10px;
+      color: white;
+      border-bottom: 1px solid #444;
+    }
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+    }
+  </style>
+
+  <!-- HEADER FIXO -->
+  <header class="sheet-header header-fixed">
     <div style="display: flex; align-items: center; gap: 10px;">
       <img src="{{actor.img}}" data-edit="img" width="64" height="64" />
       <h1 class="charname" style="flex: 1;">
         <input name="name" type="text" value="{{actor.name}}" placeholder="Character Name" />
       </h1>
     </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+      <div>PV: {{actor.system.player_hp}}</div>
+      <div>PA: {{actor.system.player_pa}}</div>
+      <div>XP: 0</div>
+      <div>REF: {{actor.system.player_reflex}}</div>
+      <div>SAB: {{actor.system.player_wisdom}}</div>
+      <div>PM: {{actor.system.player_maneuver}}</div>
+      <div>RF: {{actor.system.player_resistance_phys}}</div>
+      <div>RM: {{actor.system.player_resistance_mental}}</div>
+    </div>
   </header>
 
-  <!-- ABA TABS -->
-  <nav class="sheet-tabs tabs" data-group="primary" style="margin: 10px 0;">
-    <a class="item" data-tab="data">Data</a>
-    <a class="item" data-tab="inventory">Inventory</a>
-    <a class="item" data-tab="actions">Actions</a>
-    <a class="item" data-tab="domains">Domains</a>
-  </nav>
-
-  <!-- BODY TABS -->
   <section class="sheet-body">
 
-    <!-- ABA: DATA -->
-    <div class="tab" data-group="primary" data-tab="data">
-  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px;">
+    <!-- LATERAL FIXA -->
+    <aside class="sidebar-fixed">
+      <div>Letalidade: {{actor.system.player_letality}}</div>
+      <div>Destreza: {{actor.system.player_dexterity}}</div>
+      <div>Ímpeto: {{actor.system.player_impulse}}</div>
+      <div>Arcana: {{actor.system.player_arcana}}</div>
+      <div>Erudição: {{actor.system.player_erudition}}</div>
+      <div>Virtude: {{actor.system.player_virtue}}</div>
+      <div>Proteção: {{actor.system.player_protection}}</div>
+      <div>Iniciativa: {{actor.system.player_initiative}}</div>
+      <div>Movimento: {{actor.system.player_movement}}</div>
+    </aside>
 
-    <!-- Vitais -->
-    <label>HP</label>
-    <input type="number" name="system.player_hp" value="{{actor.system.player_hp}}" />
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="main-content">
+      <!-- ABA TABS -->
+      <nav class="sheet-tabs tabs" data-group="primary" style="margin: 10px 0;">
+        <a class="item" data-tab="data">Dados</a>
+        <a class="item" data-tab="inventory">Inventário</a>
+        <a class="item" data-tab="actions">Ações</a>
+        <a class="item" data-tab="domains">Domínios</a>
+      </nav>
 
-    <label>PA</label>
-    <input type="number" name="system.player_pa" value="{{actor.system.player_pa}}" />
-
-    <label>Level</label>
-    <input type="number" name="system.player_level" value="{{actor.system.player_level}}" />
-
-    <!-- Principais -->
-    <label>Letality</label>
-    <input type="number" name="system.player_letality" value="{{actor.system.player_letality}}" />
-
-    <label>Dexterity</label>
-    <input type="number" name="system.player_dexterity" value="{{actor.system.player_dexterity}}" />
-
-    <label>Impulse</label>
-    <input type="number" name="system.player_impulse" value="{{actor.system.player_impulse}}" />
-
-    <label>Arcana</label>
-    <input type="number" name="system.player_arcana" value="{{actor.system.player_arcana}}" />
-
-    <label>Erudition</label>
-    <input type="number" name="system.player_erudition" value="{{actor.system.player_erudition}}" />
-
-    <label>Virtue</label>
-    <input type="number" name="system.player_virtue" value="{{actor.system.player_virtue}}" />
-
-    <!-- Secundários -->
-    <label>Reflex</label>
-    <input type="number" name="system.player_reflex" value="{{actor.system.player_reflex}}" />
-
-    <label>Wisdom</label>
-    <input type="number" name="system.player_wisdom" value="{{actor.system.player_wisdom}}" />
-
-    <label>Maneuver</label>
-    <input type="number" name="system.player_maneuver" value="{{actor.system.player_maneuver}}" />
-
-    <label>Phys. Resist</label>
-    <input type="number" name="system.player_resistance_phys" value="{{actor.system.player_resistance_phys}}" />
-
-    <label>Mental Resist</label>
-    <input type="number" name="system.player_resistance_mental" value="{{actor.system.player_resistance_mental}}" />
-
-    <label>Protection</label>
-    <input type="number" name="system.player_protection" value="{{actor.system.player_protection}}" />
-
-    <label>Initiative</label>
-    <input type="number" name="system.player_initiative" value="{{actor.system.player_initiative}}" />
-
-    <label>Movement</label>
-    <input type="number" name="system.player_movement" value="{{actor.system.player_movement}}" />
-
-<hr />
-<h2>Destiny Card</h2>
-
-{{#each actor.items as |item|}}
-  {{#if (eq item.type "card")}}
-    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-      <img src="{{item.img}}" width="64" height="64" style="flex-shrink: 0;" />
-      <div style="flex: 1;">
-        <strong>{{item.name}}</strong><br />
-        <span>+2 {{item.system.card_bonus_2}}</span><br />
-        <span>+1 {{item.system.card_bonus_1}}</span><br />
-        <span>+{{item.system.card_bonus_hp}} HP</span><br />
-        <span>Required Level: {{item.system.card_level}}</span>
-      </div>
-      <a class="item-control item-delete" title="Remove Card" data-item-id="{{item._id}}">
-        <i class="fas fa-trash"></i>
-      </a>
-    </div>
-  {{/if}}
-{{/each}}
-
-  </div>
-</div>
-
-
-    <!-- ABA: INVENTORY -->
-    <div class="tab" data-group="primary" data-tab="inventory">
-      <!-- BOTÃO AUTO-SORT -->
-      <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
-        <button type="button" class="auto-sort-btn" title="Organize Inventory">
-          <i class="fas fa-arrows-rotate"></i> Auto-Sort
-        </button>
+      <!-- TABS -->
+      <div class="tab" data-group="primary" data-tab="data">
+        <div style="padding: 10px;">
+          <hr />
+          <h2>Destiny Card</h2>
+          {{#each actor.items as |item|}}
+            {{#if (eq item.type "card")}}
+              <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                <img src="{{item.img}}" width="64" height="64" style="flex-shrink: 0;" />
+                <div style="flex: 1;">
+                  <strong>{{item.name}}</strong><br />
+                  <span>+2 {{item.system.card_bonus_2}}</span><br />
+                  <span>+1 {{item.system.card_bonus_1}}</span><br />
+                  <span>+{{item.system.card_bonus_hp}} HP</span><br />
+                  <span>Required Level: {{item.system.card_level}}</span>
+                </div>
+                <a class="item-control item-delete" title="Remove Card" data-item-id="{{item._id}}">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            {{/if}}
+          {{/each}}
+        </div>
       </div>
 
-      <!-- SLOTS DE EQUIPAMENTO -->
-      <section id="gear-slots" class="gear-slots-container" style="margin-bottom: 10px; display: flex; justify-content: center;">
-        <!-- gear render -->
-      </section>
+      <div class="tab" data-group="primary" data-tab="inventory">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
+          <button type="button" class="auto-sort-btn" title="Organize Inventory">
+            <i class="fas fa-arrows-rotate"></i> Auto-Sort
+          </button>
+        </div>
+        <section id="gear-slots" class="gear-slots-container" style="margin-bottom: 10px; display: flex; justify-content: center;"></section>
+        <section id="grid-inventory" class="grid-container"></section>
+      </div>
 
-      <!-- INVENTÁRIO GRID -->
-      <section id="grid-inventory" class="grid-container"></section>
+      <div class="tab" data-group="primary" data-tab="actions">
+        <!-- futuro -->
+      </div>
+
+      <div class="tab" data-group="primary" data-tab="domains">
+        <!-- futuro -->
+      </div>
     </div>
-
-    <!-- ABA: ACTIONS -->
-    <div class="tab" data-group="primary" data-tab="actions">
-      <!-- futuro -->
-    </div>
-
-    <!-- ABA: DOMAINS -->
-    <div class="tab" data-group="primary" data-tab="domains">
-      <!-- futuro -->
-    </div>
-
   </section>
 </form>
