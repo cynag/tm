@@ -25,10 +25,31 @@ export class ItemTooltip {
       tooltip.style.fontSize = "12px";
       tooltip.style.boxShadow = "0 0 8px rgba(0,0,0,0.5)";
 
+const rarity = item.system.rarity ?? "common";
+const colorMap = {
+  common: "#ccc",
+  uncommon: "#4da6ff",  // azul
+  rare: "#6fcf97",      // verde
+  epic: "#ffa94d"       // laranja
+};
+const nameColor = colorMap[rarity] || "#ccc";
+
+
       tooltip.innerHTML = `
-        <strong>${item.name}</strong><br>
-        <small>${item.type}</small>
-      `;
+<div style="font-weight: bold; font-size: 14px; margin-bottom: 4px; color: ${nameColor};">
+  ${item.name}
+</div>
+  <div style="font-size: 11px; color: #aaa; margin-bottom: 8px;">
+    ${item.system.subtype ?? item.type}
+  </div>
+  <div style="font-size: 12px; color: #ccc; margin-bottom: 8px;">
+    ${item.system.description ?? ""}
+  </div>
+  <div style="font-size: 12px; color: #ffd700; display: flex; align-items: center; gap: 4px;">
+    <i class="fas fa-coins"></i> ${item.system.value ?? 0}
+  </div>
+`;
+
 
       document.body.appendChild(tooltip);
       this.tooltipEl = tooltip;

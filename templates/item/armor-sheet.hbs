@@ -16,16 +16,41 @@
   <!-- BODY -->
   <!-- ============================= -->
   <section class="sheet-body" style="padding: 10px; display: flex; flex-direction: column; gap: 20px;">
+<!-- BLOCO: RARIDADE -->
+<div>
+  <label>Rarity:</label>
+  <select name="system.rarity">
+    <option value="common" {{#if (eq item.system.rarity "common")}}selected{{/if}}>Common</option>
+    <option value="uncommon" {{#if (eq item.system.rarity "uncommon")}}selected{{/if}}>Uncommon</option>
+    <option value="rare" {{#if (eq item.system.rarity "rare")}}selected{{/if}}>Rare</option>
+    <option value="epic" {{#if (eq item.system.rarity "epic")}}selected{{/if}}>Epic</option>
+  </select>
+</div>
 
-    <!-- BLOCO: SUBTIPO -->
-    <div>
-      <h2>Subtype</h2>
-      <select name="system.subtype" style="width: 150px;">
-        {{#each subtypes as |s|}}
-          <option value="{{s}}" {{#if (eq ../item.system.subtype s)}}selected{{/if}}>{{s}}</option>
-        {{/each}}
-      </select>
-    </div>
+    <!-- BLOCO: SUBTIPO (se aplicável) -->
+{{#if subtypes}}
+  <div>
+    <label>Subtype:</label>
+    <select name="system.subtype">
+      {{#each subtypes as |s|}}
+        <option value="{{s}}" {{#if (eq ../item.system.subtype s)}}selected{{/if}}>{{s}}</option>
+      {{/each}}
+    </select>
+  </div>
+{{/if}}
+
+<!-- BLOCO: VALOR -->
+<div>
+  <label>Value:</label>
+  <input type="number" name="system.value" value="{{item.system.value}}" min="0" />
+</div>
+
+<!-- BLOCO: DESCRIÇÃO -->
+<div>
+  <label>Description:</label>
+  <textarea name="system.description" rows="4">{{item.system.description}}</textarea>
+</div>
+
 
     <!-- BLOCO: GRID SIZE -->
     <div>
