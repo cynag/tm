@@ -10,7 +10,7 @@ export class ConsumableSheet extends foundry.appv1.sheets.ItemSheet {
 
   async getData(options = {}) {
     const context = await super.getData(options);
-    context.categories = ["alchemical", "drug", "tool", "medicinal", "ammo", "scroll", "provision", "resource"];
+    context.categories = ["alchemical", "drug", "tool", "medicinal", "ammo", "scroll", "provision", "resource", "artefact"];
     context.subtypes = {
       provision: ["alcohol", "animal", "beverage", "meat", "grain", "spice", "fruit", "fungus", "meal", "seed", "vegetable"],
       ammo: ["arrow", "bolt", "slug"],

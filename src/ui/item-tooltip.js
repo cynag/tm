@@ -25,26 +25,30 @@ export class ItemTooltip {
       tooltip.style.fontSize = "12px";
       tooltip.style.boxShadow = "0 0 8px rgba(0,0,0,0.5)";
 
+const type = item.system.category || item.system.gear_type || item.type;
+const subtype = item.system.subtype ?? "";
+const typeLine = subtype ? `${type}, ${subtype}` : type;
 const rarity = item.system.rarity ?? "common";
 const colorMap = {
   common: "#ccc",
-  uncommon: "#4da6ff",  // azul
-  rare: "#6fcf97",      // verde
-  epic: "#ffa94d"       // laranja
+  uncommon: "#4da6ff",
+  rare: "#6fcf97",
+  epic: "#ffa94d"
 };
 const nameColor = colorMap[rarity] || "#ccc";
 
 
       tooltip.innerHTML = `
-<div style="font-weight: bold; font-size: 14px; margin-bottom: 4px; color: ${nameColor};">
-  ${item.name}
-</div>
+  <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px; color: ${nameColor};">
+    ${item.name}
+  </div>
   <div style="font-size: 11px; color: #aaa; margin-bottom: 8px;">
-    ${item.system.subtype ?? item.type}
+    ${typeLine}
   </div>
-  <div style="font-size: 12px; color: #ccc; margin-bottom: 8px;">
-    ${item.system.description ?? ""}
-  </div>
+  <div style="font-size: 12px; color: #ccc; margin-bottom: 8px; text-align: justify;">
+  ${item.system.description ?? ""}
+</div>
+
   <div style="font-size: 12px; color: #ffd700; display: flex; align-items: center; gap: 4px;">
     <i class="fas fa-coins"></i> ${item.system.value ?? 0}
   </div>

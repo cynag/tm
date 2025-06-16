@@ -31,7 +31,9 @@ export class TMObject extends Item {
     // CONSUMABLE
     // =============================
     if (this.type === "consumable") {
-      const validCategories = ["alchemical", "drug", "tool", "medicinal", "ammo", "scroll", "provision", "resource"];
+      const validCategories = [
+      "alchemical", "drug", "tool", "medicinal", "ammo",
+      "scroll", "provision", "resource", "artefact"];
       if (!validCategories.includes(data.category)) data.category = "resource";
       if (typeof data.subtype !== "string") data.subtype = "";
 
