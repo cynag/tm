@@ -1,38 +1,62 @@
 <form class="{{cssClass}}" autocomplete="off">
-
-  <!-- ============================= -->
-  <!-- HEADER (nome + imagem) -->
-  <!-- ============================= -->
+<style>
+  .sheet-body {
+    min-height: 500px;
+  }
+</style>
+  <!-- HEADER -->
   <header class="sheet-header">
     <div style="display: flex; align-items: center; gap: 10px;">
-      <img src="{{actor.img}}" data-edit="img" width="64" height="64" style="flex-shrink: 0;" />
+      <img src="{{actor.img}}" data-edit="img" width="64" height="64" />
       <h1 class="charname" style="flex: 1;">
-        <input name="name" type="text" value="{{actor.name}}" placeholder="Nome do Personagem" />
+        <input name="name" type="text" value="{{actor.name}}" placeholder="Character Name" />
       </h1>
     </div>
   </header>
 
-  <!-- ============================= -->
-  <!-- BODY PRINCIPAL -->
-  <!-- ============================= -->
-  <section class="sheet-body" style="padding: 10px; display: flex; flex-direction: column; gap: 20px;">
+  <!-- ABA TABS -->
+  <nav class="sheet-tabs tabs" data-group="primary" style="margin: 10px 0;">
+    <a class="item" data-tab="data">Data</a>
+    <a class="item" data-tab="inventory">Inventory</a>
+    <a class="item" data-tab="actions">Actions</a>
+    <a class="item" data-tab="domains">Domains</a>
+  </nav>
 
-    <!-- Botão de Auto-Sort -->
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
-      <button type="button" class="auto-sort-btn" title="Organizar Inventário">
-        <i class="fas fa-arrows-rotate"></i> Auto-Sort
-      </button>
+  <!-- BODY TABS -->
+  <section class="sheet-body">
+
+    <!-- ABA: DATA -->
+    <div class="tab" data-group="primary" data-tab="data">
+      <!-- futuro -->
     </div>
 
-    <!-- BLOCO: SLOTS DE EQUIPAMENTO -->
-<section id="gear-slots" class="gear-slots-container" style="margin-bottom: 10px; min-height: unset; display: flex; justify-content: center;">
+    <!-- ABA: INVENTORY -->
+    <div class="tab" data-group="primary" data-tab="inventory">
+      <!-- BOTÃO AUTO-SORT -->
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
+        <button type="button" class="auto-sort-btn" title="Organize Inventory">
+          <i class="fas fa-arrows-rotate"></i> Auto-Sort
+        </button>
+      </div>
 
+      <!-- SLOTS DE EQUIPAMENTO -->
+      <section id="gear-slots" class="gear-slots-container" style="margin-bottom: 10px; display: flex; justify-content: center;">
+        <!-- gear render -->
+      </section>
 
-      <!-- Renderizado dinamicamente via GearRenderer -->
-    </section>
+      <!-- INVENTÁRIO GRID -->
+      <section id="grid-inventory" class="grid-container"></section>
+    </div>
 
-    <!-- BLOCO: INVENTÁRIO GRID -->
-    <section id="grid-inventory" class="grid-container"></section>
+    <!-- ABA: ACTIONS -->
+    <div class="tab" data-group="primary" data-tab="actions">
+      <!-- futuro -->
+    </div>
+
+    <!-- ABA: DOMAINS -->
+    <div class="tab" data-group="primary" data-tab="domains">
+      <!-- futuro -->
+    </div>
 
   </section>
 </form>
