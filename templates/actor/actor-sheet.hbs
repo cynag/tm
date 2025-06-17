@@ -72,42 +72,75 @@
       </nav>
 
       <div class="tab" data-group="primary" data-tab="data">
-        <div style="padding: 10px;">
-          <h2>Chronicle</h2>
-          <textarea name="system.player_chronicle" style="width: 100%; height: 120px; text-align: justify;">{{actor.system.player_chronicle}}</textarea>
+  <section style="padding: 10px; display: flex; flex-direction: column; gap: 20px;">
 
-          <hr />
-          <div style="display: flex; gap: 20px;">
-            <!-- RAÇA -->
-            <table style="flex: 1; text-align: left; border-collapse: collapse; background: white;">
-              <tr>
-                <th style="padding: 4px; border: 1px solid #000;">Raça</th>
-                <td style="padding: 4px; border: 1px solid #000;">
-                  {{#each actor.items as |item|}}
-                    {{#if (eq item.type "race")}}
-                      <em>{{item.name}}</em>
-                    {{/if}}
-                  {{/each}}
-                </td>
-              </tr>
-            </table>
+    <!-- Crônica -->
+    <div class="tm-block">
+      <h2>Crônica</h2>
+      <textarea name="system.player_chronicle" style="width: 100%; height: 100px;">{{actor.system.player_chronicle}}</textarea>
+    </div>
 
-            <!-- ORIGEM -->
-            <table style="flex: 1; text-align: left; border-collapse: collapse; background: white;">
-              <tr>
-                <th style="padding: 4px; border: 1px solid #000;">Origem</th>
-                <td style="padding: 4px; border: 1px solid #000;">
-                  {{#each actor.items as |item|}}
-                    {{#if (eq item.type "origin")}}
-                      <em>{{item.name}}</em>
-                    {{/if}}
-                  {{/each}}
-                </td>
-              </tr>
-            </table>
-          </div>
+    <!-- Raça e Origem -->
+    <div style="display: flex; gap: 10px;">
+      <div style="flex: 1;">
+        <label style="font-weight: bold;">Raça</label>
+        <div class="tm-subbox">
+          {{#each actor.items as |item|}}
+            {{#if (eq item.type "race")}}<em>{{item.name}}</em>{{/if}}
+          {{/each}}
         </div>
       </div>
+      <div style="flex: 1;">
+        <label style="font-weight: bold;">Origem</label>
+        <div class="tm-subbox">
+          {{#each actor.items as |item|}}
+            {{#if (eq item.type "origin")}}<em>{{item.name}}</em>{{/if}}
+          {{/each}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Traços e Idiomas -->
+    <div style="display: flex; gap: 10px;">
+      <div style="flex: 1;">
+        <label style="font-weight: bold;">Traços</label>
+        <div class="tm-subbox">
+          <ul class="tm-list">
+            {{#each actor.items as |item|}}
+              {{#if (eq item.type "trait")}}
+                <li>
+                  {{item.name}}
+                  <button type="button" class="tm-delete-btn item-delete" data-item-id="{{item._id}}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </li>
+              {{/if}}
+            {{/each}}
+          </ul>
+        </div>
+      </div>
+      <div style="flex: 1;">
+        <label style="font-weight: bold;">Idiomas</label>
+        <div class="tm-subbox">
+          <ul class="tm-list">
+            {{#each actor.items as |item|}}
+              {{#if (eq item.type "language")}}
+                <li>
+                  {{item.name}}
+                  <button type="button" class="tm-delete-btn item-delete" data-item-id="{{item._id}}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </li>
+              {{/if}}
+            {{/each}}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
 
       <div class="tab" data-group="primary" data-tab="inventory">
         <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">

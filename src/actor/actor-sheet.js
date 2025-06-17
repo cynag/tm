@@ -95,9 +95,19 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
   }
 
-  const created = await this.actor.createEmbeddedDocuments("Item", [itemData]);
-  const newItem = created[0];
-  if (!newItem) return;
+ // Impede duplicatas de traits e languages
+const dup = this.actor.items.find(i => 
+  ["trait", "language"].includes(itemData.type) && i.name === itemData.name
+);
+if (dup) {
+  ui.notifications.warn(`Você já possui ${itemData.name}.`);
+  return;
+}
+
+const created = await this.actor.createEmbeddedDocuments("Item", [itemData]);
+const newItem = created[0];
+if (!newItem) return;
+
 
   game.tm.GridAutoPosition.placeNewItem(this.actor, newItem);
 }
