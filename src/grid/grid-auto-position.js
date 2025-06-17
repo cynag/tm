@@ -6,6 +6,10 @@ export class GridAutoPosition {
    * 3. Se nenhum couber, cancela e avisa
    */
   static placeNewItem(actor, item) {
+    if (["card", "race", "origin"].includes(item.type)) {
+  console.warn(`[GridAutoPosition] ⛔ Ignorado tipo não físico: ${item.type}`);
+  return;
+}
 
     const rawW = item.system.grid?.w ?? 1;
     const rawH = item.system.grid?.h ?? 1;

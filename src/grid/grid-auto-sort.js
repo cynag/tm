@@ -3,7 +3,8 @@ export class GridAutoSort {
     const items = actor.items.filter(i =>
       i.system.grid &&
       !i.system.equippedSlot &&
-      !["card", "race"].includes(i.type) // ⛔ ignora tipos não físicos
+      !["card", "race", "origin"].includes(i.type)
+
     );
 
     const sorted = [...items].sort((a, b) => {
