@@ -1,11 +1,11 @@
 const { ItemSheet } = foundry.appv1.sheets;
 
-export class RaceSheet extends ItemSheet {
+export class OriginSheet extends ItemSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["tm", "sheet", "item"],
-      template: "systems/tm/templates/item/race-sheet.hbs",
-      width: 300,
+      template: "systems/tm/templates/item/origin-sheet.hbs",
+      width: 400,
       height: 300
     });
   }

@@ -80,6 +80,15 @@ if (this.type === "race") {
       await existing.delete();
     }
   }
+  if (this.type === "origin") {
+  const actor = this.parent;
+  const existing = actor.items.find(i => i.type === "origin");
+  if (existing) {
+    console.log(`[Origem] Substituindo "${existing.name}" por "${this.name}"`);
+    await existing.delete();
+  }
+}
+
   return super._preCreate(data, options, user);
 }
 

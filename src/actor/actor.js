@@ -80,6 +80,18 @@ if (race) {
   s[`player_${r.race_buff_2}`] += 1;
   s.player_movement = r.race_movement;
 }
+// ORIGEM: executa o script do item origin
+const origin = this.items.find(i => i.type === "origin");
+if (origin?.system?.origin_effect_script) {
+  try {
+    const fn = new Function("actor", origin.system.origin_effect_script);
+    fn(this);
+    console.log(`[ORIGIN] Script da origem "${origin.name}" executado com sucesso.`);
+  } catch (err) {
+    console.warn(`[ORIGIN] Erro ao executar script da origem "${origin.name}":`, err);
+  }
+}
+
 
   }
 // Previne múltiplas cartas com o mesmo nome
@@ -87,29 +99,38 @@ async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
   if (embeddedName !== "Item") return true;
 
   const items = Array.isArray(data) ? data : [data];
+  const incoming = await Promise.all(items.map(i => {
+    if (i.type) return i;
+    return Item.implementation.fromDropData(i).then(d => d.toObject());
+  }));
 
-  // Checa por carta duplicada
   const existingCards = this.items.filter(i => i.type === "card").map(i => i.name);
-  for (let item of items) {
-    if (item.type === "card" && existingCards.includes(item.name)) {
-      ui.notifications.warn(`Você já possui a carta "${item.name}".`);
+
+  for (let item of incoming) {
+    const type = item.type;
+    const name = item.name;
+
+    if (type === "card" && existingCards.includes(name)) {
+      ui.notifications.warn(`Você já possui a carta "${name}".`);
       return false;
     }
-  }
 
-  // Remove raça anterior se for adicionar nova
-  for (let item of items) {
-    if (item.type === "race") {
-      const currentRace = this.items.find(i => i.type === "race");
-      if (currentRace) {
-        await currentRace.delete();
-        console.log(`[Raça] Substituída: ${currentRace.name} removida.`);
-      }
+    if (type === "race") {
+      const existing = this.items.find(i => i.type === "race");
+      if (existing) await existing.delete();
+    }
+
+    if (type === "origin") {
+      const existing = this.items.find(i => i.type === "origin");
+      if (existing) await existing.delete();
     }
   }
 
   return true;
 }
+
+
+
 
 
   

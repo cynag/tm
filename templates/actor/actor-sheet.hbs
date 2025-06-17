@@ -40,10 +40,8 @@
       <div>PV: {{actor.system.player_hp}}</div>
       <div>PA: {{actor.system.player_pa}}</div>
       <div>XP: 0</div>
-
       <label>Nível:</label>
       <input type="number" name="system.player_level" value="{{actor.system.player_level}}" style="width: 50px; color: white; font-weight: bold; background: transparent; border: 1px solid #555; padding: 2px;" />
-
       <div>REF: {{actor.system.player_reflex}}</div>
       <div>SAB: {{actor.system.player_wisdom}}</div>
       <div>PM: {{actor.system.player_maneuver}}</div>
@@ -53,8 +51,6 @@
   </header>
 
   <section class="sheet-body">
-
-    <!-- LATERAL FIXA -->
     <aside class="sidebar-fixed">
       <div>Letalidade: {{actor.system.player_letality}}</div>
       <div>Destreza: {{actor.system.player_dexterity}}</div>
@@ -67,9 +63,7 @@
       <div>Movimento: {{actor.system.player_movement}}</div>
     </aside>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <div class="main-content">
-      <!-- ABA TABS -->
       <nav class="sheet-tabs tabs" data-group="primary" style="margin: 10px 0;">
         <a class="item" data-tab="data">Dados</a>
         <a class="item" data-tab="inventory">Inventário</a>
@@ -77,32 +71,44 @@
         <a class="item" data-tab="domains">Domínios</a>
       </nav>
 
-      <!-- ABA: DADOS -->
       <div class="tab" data-group="primary" data-tab="data">
         <div style="padding: 10px;">
           <h2>Chronicle</h2>
-          <textarea name="system.player_chronicle" style="width: 100%; height: 120px; text-align: justify;">
-{{actor.system.player_chronicle}}
-</textarea>
+          <textarea name="system.player_chronicle" style="width: 100%; height: 120px; text-align: justify;">{{actor.system.player_chronicle}}</textarea>
 
           <hr />
-          <h2>Raça</h2>
-          <table style="width: 100%; text-align: left;">
-            <tr>
-              <th style="width: 20%;">Raça</th>
-              <td>
-                {{#each actor.items as |item|}}
-                  {{#if (eq item.type "race")}}
-                    {{item.name}}
-                  {{/if}}
-                {{/each}}
-              </td>
-            </tr>
-          </table>
+          <div style="display: flex; gap: 20px;">
+            <!-- RAÇA -->
+            <table style="flex: 1; text-align: left; border-collapse: collapse; background: white;">
+              <tr>
+                <th style="padding: 4px; border: 1px solid #000;">Raça</th>
+                <td style="padding: 4px; border: 1px solid #000;">
+                  {{#each actor.items as |item|}}
+                    {{#if (eq item.type "race")}}
+                      <em>{{item.name}}</em>
+                    {{/if}}
+                  {{/each}}
+                </td>
+              </tr>
+            </table>
+
+            <!-- ORIGEM -->
+            <table style="flex: 1; text-align: left; border-collapse: collapse; background: white;">
+              <tr>
+                <th style="padding: 4px; border: 1px solid #000;">Origem</th>
+                <td style="padding: 4px; border: 1px solid #000;">
+                  {{#each actor.items as |item|}}
+                    {{#if (eq item.type "origin")}}
+                      <em>{{item.name}}</em>
+                    {{/if}}
+                  {{/each}}
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- ABA: INVENTÁRIO -->
       <div class="tab" data-group="primary" data-tab="inventory">
         <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
           <button type="button" class="auto-sort-btn" title="Organize Inventory">
@@ -113,16 +119,13 @@
         <section id="grid-inventory" class="grid-container"></section>
       </div>
 
-      <!-- ABA: AÇÕES -->
       <div class="tab" data-group="primary" data-tab="actions">
         <!-- futuro -->
       </div>
 
-      <!-- ABA: DOMÍNIOS -->
       <div class="tab" data-group="primary" data-tab="domains">
         <!-- futuro -->
       </div>
-
     </div>
   </section>
 </form>

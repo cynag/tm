@@ -26,7 +26,8 @@
     "gear": {},
     "consumable": {},
     "card": {},
-    "race":{}
+    "race":{},
+    "origin":{}
   }
 },
   "packs": [],
