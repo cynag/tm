@@ -72,24 +72,29 @@ if (this.type === "race") {
 
   }
   async _preCreate(data, options, user) {
+  const actor = this.parent;
+  if (!actor) return super._preCreate(data, options, user);
+
   if (this.type === "race") {
-    const actor = this.parent;
     const existing = actor.items.find(i => i.type === "race");
     if (existing) {
       console.log(`[Raça] Substituindo "${existing.name}" por "${this.name}"`);
       await existing.delete();
     }
   }
+
   if (this.type === "origin") {
-  const actor = this.parent;
-  const existing = actor.items.find(i => i.type === "origin");
-  if (existing) {
-    console.log(`[Origem] Substituindo "${existing.name}" por "${this.name}"`);
-    await existing.delete();
+    const existing = actor.items.find(i => i.type === "origin");
+    if (existing) {
+      console.log(`[Origem] Substituindo "${existing.name}" por "${this.name}"`);
+      await existing.delete();
+    }
   }
-}
 
   return super._preCreate(data, options, user);
 }
 
 }
+
+
+

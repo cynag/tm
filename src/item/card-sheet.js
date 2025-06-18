@@ -1,13 +1,20 @@
-const { ItemSheet } = foundry.appv1.sheets;
-
 export class CardSheet extends ItemSheet {
-  get template() {
-    return "systems/tm/templates/item/card-sheet.hbs";
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      classes: ["tm", "sheet", "item", "card"],
+      width: 500,
+      height: 400,
+      resizable: false,
+      template: "systems/tm/templates/item/card-sheet.hbs",
+    });
   }
 
-  getData() {
-    const data = super.getData();
-    data.attrs = ["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"];
+  async getData(options) {
+    const data = await super.getData(options);
     return data;
+  }
+
+  activateListeners(html) {
+    super.activateListeners(html);
   }
 }

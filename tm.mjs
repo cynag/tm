@@ -9,6 +9,8 @@ import { GearSheet } from "./src/item/gear-sheet.js";
 import { CardSheet } from "./src/item/card-sheet.js";
 import { RaceSheet } from "./src/item/race-sheet.js";
 import { OriginSheet } from "./src/item/origin-sheet.js";
+import { LanguageSheet } from "./src/item/language-sheet.js";
+import { TraitSheet } from "./src/item/trait-sheet.js";
 
 
 import { GridInventory } from "./src/grid/grid-inventory.js";
@@ -52,7 +54,8 @@ Hooks.once("init", function () {
   foundry.documents.collections.Items.registerSheet("tm", CardSheet, { types: ["card"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", RaceSheet, { types: ["race"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", OriginSheet, { types: ["origin"], makeDefault: true });
-
+  foundry.documents.collections.Items.registerSheet("tm", TraitSheet, { types: ["trait"], makeDefault: true });
+  foundry.documents.collections.Items.registerSheet("tm", LanguageSheet, { types: ["language"], makeDefault: true });
 
   GridInventory.init();
 

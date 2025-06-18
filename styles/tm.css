@@ -176,3 +176,86 @@
   background: #444;
   border-color: #aaa;
 }
+/* ==========================
+   🧱 Estrutura Principal
+   ========================== */
+
+.sheet-body {
+  height: 100%;
+}
+
+.window-content {
+  height: 100% !important;
+  overflow: hidden;
+}
+
+.main-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+
+
+/* ==========================
+   🎚️ Barra Lateral
+   ========================== */
+
+.sidebar-fixed {
+  width: 200px;
+  flex-shrink: 0;
+  background: #1a1a1a;
+  color: white;
+  padding: 10px;
+}
+
+/* ==========================
+   🧢 Cabeçalho Fixo
+   ========================== */
+
+.header-fixed {
+  position: sticky;
+  top: 0;
+  background: #2b2b2b;
+  z-index: 10;
+  padding: 10px;
+  color: white;
+  border-bottom: 1px solid #444;
+}
+
+/* ==========================
+   🗂️ Tabs Laterais
+   ========================== */
+
+.side-tabs-panel {
+  position: absolute;
+  top: 130px;
+  right: -42px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 100;
+}
+
+.tab-button {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 6px;
+  width: 40px;
+  background: #2b2b2b;
+  color: white;
+  border: 1px solid #555;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ==========================
+   📁 Tabs Internas
+   ========================== */
+
+.tab {
+  display: none;
+}
+
+.tab.active {
+  display: block;
+}

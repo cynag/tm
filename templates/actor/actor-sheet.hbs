@@ -1,17 +1,12 @@
 <form class="{{cssClass}}" autocomplete="off">
 
+  <!-- 🧼 Estilos da Ficha -->
   <style>
-    .main-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  min-height: 700px; /* ✅ impede altura mínima quebrada */
-}
-
     .sheet-body {
-      min-height: 500px;
       display: flex;
       flex-direction: row;
+      flex: 1;
+      min-height: 0;
     }
 
     .sidebar-fixed {
@@ -61,7 +56,7 @@
     }
   </style>
 
-  <!-- Abas laterais flutuantes -->
+  <!-- 📌 Abas Laterais -->
   <div class="side-tabs-panel">
     <button type="button" class="tab-button" data-tab="attributes">ATB</button>
     <button type="button" class="tab-button" data-tab="skills">HAB</button>
@@ -73,7 +68,7 @@
     <button type="button" class="tab-button" data-tab="biography">BIO</button>
   </div>
 
-  <!-- HEADER -->
+  <!-- 🧠 Header do Personagem -->
   <header class="sheet-header header-fixed">
     <div style="display: flex; align-items: center; gap: 10px;">
       <img src="{{actor.img}}" data-edit="img" width="64" height="64" />
@@ -85,6 +80,7 @@
         <input type="number" name="system.player_level" value="{{actor.system.player_level}}" style="width: 50px; color: white; font-weight: bold; background: transparent; border: 1px solid #555; padding: 2px;" />
       </div>
     </div>
+
     <div style="margin-top: 5px;">
       <strong>Raça:</strong>
       {{#each actor.items as |item|}}
@@ -98,8 +94,10 @@
     </div>
   </header>
 
+  <!-- 🔻 Corpo Principal -->
   <section class="sheet-body">
-    <!-- Coluna lateral fixa -->
+
+    <!-- 🎚️ Coluna Lateral de Atributos -->
     <aside class="sidebar-fixed">
       <div>Letalidade: {{actor.system.player_letality}}</div>
       <div>Destreza: {{actor.system.player_dexterity}}</div>
@@ -119,25 +117,22 @@
       <div>RM: {{actor.system.player_resistance_mental}}</div>
     </aside>
 
-    <!-- Conteúdo central -->
+    <!-- 📂 Área das Abas -->
     <div class="main-content sheet-tabs" data-group="main-tabs">
-      <!-- Cada aba individual -->
-      <div class="tab" data-group="main-tabs" data-tab="attributes">
-        <!-- Conteúdo de Atributos -->
-      </div>
 
-      <div class="tab" data-group="main-tabs" data-tab="skills">
-        <!-- Conteúdo de Habilidades (idiomas etc.) -->
-      </div>
+      <!-- 🧬 Atributos -->
+      <div class="tab" data-group="main-tabs" data-tab="attributes"></div>
 
-      <div class="tab" data-group="main-tabs" data-tab="actions">
-        <!-- Conteúdo de Ações -->
-      </div>
+      <!-- 🗣️ Habilidades -->
+      <div class="tab" data-group="main-tabs" data-tab="skills"></div>
 
-      <div class="tab" data-group="main-tabs" data-tab="conditions">
-        <!-- Conteúdo de Condições (traços, efeitos etc.) -->
-      </div>
+      <!-- ⚔️ Ações -->
+      <div class="tab" data-group="main-tabs" data-tab="actions"></div>
 
+      <!-- 💢 Condições -->
+      <div class="tab" data-group="main-tabs" data-tab="conditions"></div>
+
+      <!-- 🎒 Inventário -->
       <div class="tab" data-group="main-tabs" data-tab="inventory">
         <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
           <button type="button" class="auto-sort-btn" title="Organizar Inventário">
@@ -148,18 +143,18 @@
         <section id="grid-inventory" class="grid-container"></section>
       </div>
 
-      <div class="tab" data-group="main-tabs" data-tab="domains">
-        <!-- Conteúdo de Domínios -->
-      </div>
+      <!-- 🔮 Domínios -->
+      <div class="tab" data-group="main-tabs" data-tab="domains"></div>
 
-      <div class="tab" data-group="main-tabs" data-tab="cards">
-        <!-- Conteúdo de Cartas do Destino -->
-      </div>
+      <!-- 🎴 Cartas -->
+      <div class="tab" data-group="main-tabs" data-tab="cards"></div>
 
+      <!-- 📖 Biografia -->
       <div class="tab" data-group="main-tabs" data-tab="biography">
         <h2>Crônica</h2>
         <textarea name="system.player_chronicle" style="width: 100%; height: 150px; text-align: justify;">{{actor.system.player_chronicle}}</textarea>
       </div>
+
     </div>
   </section>
 </form>

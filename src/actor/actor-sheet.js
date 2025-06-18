@@ -1,3 +1,4 @@
+// actor-sheet.js
 import { GridUtils } from "../grid/grid-utils.js";
 import { GridRenderer } from "../grid/grid-renderer.js";
 import { GridAutoPosition } from "../grid/grid-auto-position.js";
@@ -6,18 +7,19 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
   constructor(...args) {
     super(...args);
     this._onDropBound = this._onDrop.bind(this);
+    this._isRendering = false;
+    this._activeTab = "attributes";
   }
 
   static get defaultOptions() {
   return foundry.utils.mergeObject(super.defaultOptions, {
     classes: ["tm", "sheet", "actor"],
-    width: 730,
-    height: "auto",
-    resizable: true,
+    width: 750,
+    height: 750,
+    resizable: false,
     tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".main-content", initial: "attributes" }]
   });
 }
-
 
   get template() {
     return `systems/tm/templates/actor/actor-sheet.hbs`;
@@ -27,138 +29,78 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
     return await super.getData();
   }
 
+  async render(force, options) {
+    if (this._isRendering) return;
+    this._isRendering = true;
+
+    const rendered = await super.render(force, options);
+
+    requestAnimationFrame(() => {
+      const html = this.element;
+      const tabId = this._activeTab;
+
+      // 🧩 Tabs
+      const tabs = html.find(".tab");
+      const activeTab = html.find(`.tab[data-tab="${tabId}"]`);
+      const allButtons = html.find(".tab-button");
+
+      tabs.hide();
+      activeTab.show();
+      allButtons.removeClass("active");
+      allButtons.filter(`[data-tab="${tabId}"]`).addClass("active");
+
+      // 🧱 Inventário e Equipamento
+      const gear = html.find("#gear-slots")[0];
+      const grid = html.find("#grid-inventory")[0];
+
+      if (gear) game.tm.GearRenderer.render(gear, this.actor);
+      if (grid) {
+        const vGrid = GridUtils.createVirtualGrid(this.actor);
+        GridRenderer.renderGrid(grid, vGrid);
+      }
+
+      // 📏 Corrige overflow
+      const wrapper = html.closest(".app");
+      const winContent = wrapper?.find(".window-content")[0];
+      if (winContent) winContent.style.overflow = "hidden";
+
+      this._isRendering = false;
+    });
+
+    return rendered;
+    
+  }
+
   activateListeners(html) {
-  super.activateListeners(html);
+    super.activateListeners(html);
 
-  // Drag & Drop grid
-  if (!this._gridListenersBound) {
-    html[0].removeEventListener("drop", this._onDropBound);
-    html[0].addEventListener("drop", this._onDropBound);
-    this._gridListenersBound = true;
+    // 🖱️ Drag & Drop
+    if (!this._gridListenersBound) {
+      html[0].removeEventListener("drop", this._onDropBound);
+      html[0].addEventListener("drop", this._onDropBound);
+      this._gridListenersBound = true;
+    }
+
+    // 🧽 Auto-sort
+    html.find(".auto-sort-btn").on("click", () => {
+      console.log("[AutoSort] 🔁 Auto-sort iniciado");
+      game.tm.GridAutoSort.sort(this.actor);
+    });
+
+    // 🗑️ Deletar item
+    html.find(".item-delete").on("click", async (ev) => {
+      const li = ev.currentTarget.closest("[data-item-id]");
+      const itemId = li?.dataset.itemId;
+      if (itemId) await this.actor.deleteEmbeddedDocuments("Item", [itemId]);
+    });
+
+    // 🧭 Tabs laterais
+    html.find(".tab-button").on("click", (ev) => {
+      const tabId = ev.currentTarget.dataset.tab;
+      this._activeTab = tabId;
+      this.render(false, {});
+    });
   }
-
-  // Auto-sort inventário
-  html.find(".auto-sort-btn").on("click", () => {
-    console.log("[AutoSort] 🔁 Auto-sort iniciado");
-    game.tm.GridAutoSort.sort(this.actor);
-  });
-
-  // Render gear slots
-  const gearContainer = html.find("#gear-slots")[0];
-  if (gearContainer) {
-    game.tm.GearRenderer.render(gearContainer, this.actor);
-  }
-
-  // Render grid
-  const gridContainer = html.find("#grid-inventory")[0];
-  if (gridContainer) {
-    const grid = game.tm.GridUtils.createVirtualGrid(this.actor);
-    game.tm.GridRenderer.renderGrid(gridContainer, grid);
-  }
-
-  // Deletar item (ícone de lixeira)
-  html.find(".item-delete").on("click", async (ev) => {
-    const li = ev.currentTarget.closest("[data-item-id]");
-    const itemId = li?.dataset.itemId;
-    if (itemId) {
-      await this.actor.deleteEmbeddedDocuments("Item", [itemId]);
-    }
-  });
-
-  // Tabs laterais customizadas
-  html.find(".tab-button").on("click", (event) => {
-  const btn = event.currentTarget;
-  const tabId = btn.dataset.tab;
-
-  this._activeTab = tabId; // ✅ salva a aba ativa
-
-  html.find(".tab").hide();
-  html.find(`.tab[data-tab="${tabId}"]`).show();
-
-  html.find(".tab-button").removeClass("active");
-  btn.classList.add("active");
-});
-
-}
-
-async render(force, options) {
-  if (!this._activeTab) this._activeTab = "inventory"; // ou a aba padrão que quiser
-
-  console.log("[TMActorSheet] 🌀 render iniciado");
-  const rendered = await super.render(force, options);
-  console.log("[TMActorSheet] ✅ super.render concluído");
-
-
-  /////////////////////////////
-requestAnimationFrame(() => {
-  requestAnimationFrame(() => {
-    console.log("[TMActorSheet] 🕓 requestAnimationFrame disparado");
-
-    const html = this.element;
-    const tabId = this._activeTab ?? "attributes";
-
-    // Tabs
-    const tabs = html.find(".tab");
-    const activeTab = html.find(`.tab[data-tab="${tabId}"]`);
-    const allButtons = html.find(".tab-button");
-    const activeButton = html.find(`.tab-button[data-tab="${tabId}"]`);
-
-    console.log("[TMActorSheet] 🔎 Tabs totais:", tabs.length);
-    console.log("[TMActorSheet] 🔎 Tab ativa encontrada?", !!activeTab.length);
-    console.log("[TMActorSheet] 🔘 Botões totais:", allButtons.length);
-    console.log("[TMActorSheet] 🔘 Botão ativo encontrado?", !!activeButton.length);
-
-    tabs.hide();
-    activeTab.show();
-    allButtons.removeClass("active");
-    if (activeButton.length) activeButton.addClass("active");
-
-    // Overflow fixo
-    const appWrapper = html.closest(".app");
-    const winContent = appWrapper?.find(".window-content")[0];
-    if (winContent) {
-      console.log("[TMActorSheet] 📦 window-content encontrado, aplicando overflow:hidden");
-      winContent.style.overflow = "hidden";
-    } else {
-      console.warn("[TMActorSheet] ❗ window-content NÃO encontrado");
-    }
-
-    // 🔁 Força re-render do inventário
-    const gearContainer = html.find("#gear-slots")[0];
-    if (gearContainer) {
-      console.log("[TMActorSheet] 🔁 Re-render gear slots");
-      game.tm.GearRenderer.render(gearContainer, this.actor);
-    }
-
-    const gridContainer = html.find("#grid-inventory")[0];
-    if (gridContainer) {
-      console.log("[TMActorSheet] 🔁 Re-render grid inventory");
-      const grid = game.tm.GridUtils.createVirtualGrid(this.actor);
-      game.tm.GridRenderer.renderGrid(gridContainer, grid);
-    }
-
-    // Altura final
-    if (!this._positionApplied) {
-  this.setPosition({ width: 730, height: "auto" });
-  this._positionApplied = true;
-}
-
-    console.log("[TMActorSheet] 📐 this.setPosition(height: auto) aplicado");
-  });
-});
-
-
-
-
-
-
-/////////////////////////////
-
-  return rendered;
-}
-
-
-
 
   async close(...args) {
     if (game.tm?.GridPickup?.pickupData?.actorId === this.actor.id) {
@@ -168,29 +110,28 @@ requestAnimationFrame(() => {
   }
 
   async _onDrop(event) {
-  event.preventDefault();
-  event.stopPropagation();
+    event.preventDefault();
+    event.stopPropagation();
 
-  const data = JSON.parse(event.dataTransfer.getData("text/plain"));
-  if (data.type !== "Item") return;
+    const data = JSON.parse(event.dataTransfer.getData("text/plain"));
+    if (data.type !== "Item") return;
 
-  let itemData = await Item.implementation.fromDropData(data);
-  if (itemData instanceof Item) itemData = itemData.toObject();
+    let itemData = await Item.implementation.fromDropData(data);
+    if (itemData instanceof Item) itemData = itemData.toObject();
 
-  // 🔒 Bloqueia carta duplicada
-  if (itemData.type === "card") {
-    const exists = this.actor.items.find(i => i.type === "card" && i.name === itemData.name);
-    if (exists) {
-      ui.notifications.warn(`Você já possui a carta "${itemData.name}".`);
-      return;
+    // ❌ Duplicata de carta
+    if (itemData.type === "card") {
+      const exists = this.actor.items.find(i => i.type === "card" && i.name === itemData.name);
+      if (exists) {
+        ui.notifications.warn(`Você já possui a carta "${itemData.name}".`);
+        return;
+      }
     }
+
+    const created = await this.actor.createEmbeddedDocuments("Item", [itemData]);
+    const newItem = created[0];
+    if (!newItem) return;
+
+    game.tm.GridAutoPosition.placeNewItem(this.actor, newItem);
   }
-
-  const created = await this.actor.createEmbeddedDocuments("Item", [itemData]);
-  const newItem = created[0];
-  if (!newItem) return;
-
-  game.tm.GridAutoPosition.placeNewItem(this.actor, newItem);
-}
-
 }
