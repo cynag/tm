@@ -1,14 +1,42 @@
 <form class="item-sheet" autocomplete="off">
   <header class="sheet-header">
+    <div style="text-align: center; margin-bottom: 10px;">
+  <img src="{{item.img}}" data-edit="img" width="64" height="64" style="cursor: pointer; border: 2px solid #555;" />
+</div>
+
     <h1>
-      <input name="name" type="text" value="{{item.name}}" placeholder="Nome do Traço"/>
+      <input name="name" type="text" value="{{item.name}}" placeholder="Trait Name"/>
     </h1>
   </header>
 
-  <section class="sheet-body">
+  <section class="sheet-body" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 4px;">
+
     <div class="form-group">
-      <label>Script de Efeito</label>
-      <textarea name="system.trait_effect_script" rows="10" style="width: 100%;">{{item.system.trait_effect_script}}</textarea>
+      <label>Effect Script</label>
+      <textarea name="system.trait_effect_script" rows="5" style="width: 100%;">{{item.system.trait_effect_script}}</textarea>
     </div>
+
+    <div class="form-group">
+      <button type="button" class="trait-tag-add">
+        <i class="fas fa-plus"></i> Add Tag
+      </button>
+    </div>
+
+    {{#each item.system.tags}}
+    <div class="trait-tag-entry" data-tag-index="{{@index}}" style="border: 1px solid #555; padding: 6px; margin-bottom: 6px;">
+      <div class="form-group">
+        <label>Tag Name</label>
+        <input type="text" name="tag_name" value="{{this.tag_name}}" style="width: 100%;" />
+      </div>
+      <div class="form-group">
+        <label>Tag Description</label>
+        <textarea name="tag_description" rows="2" style="width: 100%;">{{this.tag_description}}</textarea>
+      </div>
+      <button type="button" class="trait-tag-remove" style="margin-top: 5px;">
+        <i class="fas fa-times"></i> Remove
+      </button>
+    </div>
+    {{/each}}
+
   </section>
 </form>

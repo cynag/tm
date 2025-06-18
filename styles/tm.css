@@ -259,3 +259,114 @@
 .tab.active {
   display: block;
 }
+
+/* ==========================
+   📁 LANGUAGE
+   ========================== */
+
+.language-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.language-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1px solid #555;
+  border-radius: 3px;
+}
+
+.language-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.1em;
+  flex-grow: 1;
+}
+
+.language-name {
+  font-weight: bold;
+  font-size: 1em;
+  color:white;
+}
+
+.language-level {
+  font-size: 0.8em;
+  background: #333;
+  color: #ccc;
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.language-remove {
+  background: none;
+  border: none;
+  color: #c88;
+  font-size: 1em;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+}
+.trait-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  padding: 4px 6px;
+  border: 1px solid #444;
+  background: #1f1f1f;
+}
+
+.trait-icon {
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+
+.trait-info {
+  flex: 1;
+}
+
+.trait-name {
+  font-weight: bold;
+  color: white;
+  margin-bottom: 2px;
+}
+
+.trait-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.trait-tag {
+  font-size: 0.8em;
+  background: #333;
+  color: #ccc;
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.trait-remove {
+  background: none;
+  border: none;
+  color: #c88;
+  font-size: 1em;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+}

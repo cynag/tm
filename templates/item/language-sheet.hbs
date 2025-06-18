@@ -1,11 +1,16 @@
 <form class="item-sheet" autocomplete="off">
   <header class="sheet-header">
     <h1>
-      <input name="name" type="text" value="{{item.name}}" placeholder="Nome do Idioma"/>
+      <input name="name" type="text" value="{{item.name}}" placeholder="Language Name" />
     </h1>
   </header>
 
-  <section class="sheet-body">
-    <p>Este item representa um idioma conhecido pelo personagem. Nenhum outro campo é necessário.</p>
-  </section>
+  <div class="form-group">
+    <label for="system.language_level">Language Level</label>
+    <select name="system.language_level">
+      <option value="rudimentary" {{#if (eq system.language_level "rudimentary")}}selected{{/if}}>rudimentary</option>
+      <option value="intermediate" {{#if (eq system.language_level "intermediate")}}selected{{/if}}>intermediate</option>
+      <option value="fluent" {{#if (eq system.language_level "fluent")}}selected{{/if}}>fluent</option>
+    </select>
+  </div>
 </form>

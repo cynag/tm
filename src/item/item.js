@@ -59,9 +59,9 @@ export class TMObject extends Item {
   if (!Number.isInteger(data.card_level)) data.card_level = 1;
 }
 
- // =============================
-    // RACE
-    // =============================
+// =============================
+// RACE
+// =============================
 
 if (this.type === "race") {
   if (!["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"].includes(data.race_buff_1)) data.race_buff_1 = "letality";
@@ -69,6 +69,25 @@ if (this.type === "race") {
   if (!Number.isInteger(data.race_movement)) data.race_movement = 4;
   if (typeof data.race_maestry !== "string") data.race_maestry = "";
 }
+// =============================
+// LANGUAGE
+// =============================
+if (this.type === "language") {
+  const levels = ["rudimentary", "intermediate", "fluent"];
+  const data = this.system;
+  if (!levels.includes(data.language_level)) data.language_level = "rudimentary";
+}
+// =============================
+// TRAIT
+// =============================
+if (this.type === "trait") {
+  if (!Array.isArray(this.system.tags)) {
+    this.system.tags = [];
+  }
+}
+
+
+
 
   }
   async _preCreate(data, options, user) {

@@ -124,7 +124,55 @@
       <div class="tab" data-group="main-tabs" data-tab="attributes"></div>
 
       <!-- 🗣️ Habilidades -->
-      <div class="tab" data-group="main-tabs" data-tab="skills"></div>
+<div class="tab" data-group="main-tabs" data-tab="skills">
+      <!-- 🗣️ linguagens -->
+  <h2 class="section-title">Languages</h2>
+  <div class="language-list">
+    {{#each actor.items as |item|}}
+      {{#if (eq item.type "language")}}
+        <div class="language-row" data-item-id="{{item._id}}">
+          <img class="language-icon" src="{{item.img}}" width="40" height="40" />
+          <div class="language-info">
+            <div class="language-name">{{item.name}}</div>
+            <div class="language-level">{{item.system.language_level}}</div>
+          </div>
+          <button type="button" class="item-delete language-remove" title="Remove Language">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+      <!-- 🧬 Traços -->
+<h2 class="section-title">Traços</h2>
+<div class="trait-list">
+  {{#each actor.items as |item|}}
+    {{#if (eq item.type "trait")}}
+      <div class="trait-row" data-item-id="{{item._id}}">
+        <img class="trait-icon" src="{{item.img}}" width="40" height="40" />
+        <div class="trait-info">
+          <div class="trait-name">{{item.name}}</div>
+          <div class="trait-tags">
+            {{#each item.system.tags as |tag|}}
+              <span class="trait-tag" {{#if tag.tag_description}}data-tooltip="{{tag.tag_description}}"{{/if}}>
+                {{tag.tag_name}}
+              </span>
+            {{/each}}
+          </div>
+        </div>
+        <button type="button" class="item-delete trait-remove" title="Remover Traço">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    {{/if}}
+  {{/each}}
+</div>
+
+</div>
+
+
+
+
 
       <!-- ⚔️ Ações -->
       <div class="tab" data-group="main-tabs" data-tab="actions"></div>
