@@ -6,12 +6,13 @@ export class GearOverlay {
     if (!item) return;
 
     const slotEl = document.elementFromPoint(pickup.mousePos.x, pickup.mousePos.y);
-    if (!slotEl?.classList?.contains("gear-slot")) {
+    const baseSlotEl = slotEl?.closest(".gear-slot");
+    if (!baseSlotEl) {
       this.clear();
       return;
     }
 
-    const slotId = slotEl.dataset.slotId;
+    const slotId = baseSlotEl.dataset.slotId;
     if (!slotId || slotId === this.lastSlotId) return;
     this.lastSlotId = slotId;
 
@@ -20,7 +21,7 @@ export class GearOverlay {
 
     this.clear();
 
-    const overlayEl = slotEl.querySelector(".gear-slot-overlay");
+    const overlayEl = baseSlotEl.querySelector(".gear-slot-overlay");
     if (!overlayEl) return;
 
     if (valid && !currentId) {

@@ -36,7 +36,6 @@ export class TMActor extends Actor {
     s.player_arcana     = s.base_arcana;
     s.player_erudition  = s.base_erudition;
     s.player_virtue     = s.base_virtue;
-    s.player_hp         = s.base_hp;
 
     // Atributos secundários
     if (!Number.isInteger(s.player_reflex)) s.player_reflex = 0;
@@ -47,14 +46,16 @@ export class TMActor extends Actor {
     if (!Number.isInteger(s.player_protection)) s.player_protection = 0;
     if (!Number.isInteger(s.player_initiative)) s.player_initiative = 0;
     if (!Number.isInteger(s.player_movement)) s.player_movement = 0;
+    if (!Number.isInteger(s.player_knowledge)) s.player_knowledge = 0;
+
+    
 
     // Vitais
-    if (!Number.isInteger(s.player_pa)) s.player_pa = 0;
     if (!Number.isInteger(s.player_level)) s.player_level = 1;
 
     // Aplica efeitos das cartas do destino
     const seen = new Set();
-const cards = this.items.filter(i => i.type === "card" && !seen.has(i.name) && seen.add(i.name));
+      const cards = this.items.filter(i => i.type === "card" && !seen.has(i.name) && seen.add(i.name));
 
     for (let card of cards) {
       const d = card.system;
@@ -74,15 +75,15 @@ const cards = this.items.filter(i => i.type === "card" && !seen.has(i.name) && s
     s.player_chronicle ??= "";
 
     const race = this.items.find(i => i.type === "race");
-if (race) {
+    if (race) {
   const r = race.system;
   s[`player_${r.race_buff_1}`] += 1;
   s[`player_${r.race_buff_2}`] += 1;
   s.player_movement = r.race_movement;
-}
-// ORIGEM: executa o script do item origin
-const origin = this.items.find(i => i.type === "origin");
-if (origin?.system?.origin_effect_script) {
+    }
+    // ORIGEM: executa o script do item origin
+    const origin = this.items.find(i => i.type === "origin");
+    if (origin?.system?.origin_effect_script) {
   try {
     const fn = new Function("actor", origin.system.origin_effect_script);
     fn(this);
@@ -90,7 +91,47 @@ if (origin?.system?.origin_effect_script) {
   } catch (err) {
     console.warn(`[ORIGIN] Erro ao executar script da origem "${origin.name}":`, err);
   }
+    }   
+    if (!Number.isInteger(s.player_hp)) s.player_hp = 10;
+    if (!Number.isInteger(s.player_hp_max)) s.player_hp_max = 10;
+    if (!Number.isInteger(s.player_pa)) s.player_pa = 8;
+    if (!Number.isInteger(s.player_pa_max)) s.player_pa_max = 8;
+    s.player_hp = Math.min(s.player_hp, s.player_hp_max);
+    s.player_pa = Math.min(s.player_pa, s.player_pa_max);
+
+// =============================
+// RESISTÊNCIAS
+// =============================
+const defaultResistances = {
+  slashing: 0,
+  piercing: 0,
+  bludgeoning: 0,
+  fire: 0,
+  cold: 0,
+  electricity: 0,
+  acid: 0,
+  poison: 0,
+  radiant: 0,
+  necrotic: 0,
+  psychic: 0,
+  chaotic: 0
+};
+
+s.resistances ??= {};
+
+const resistList = [
+  "slashing", "piercing", "bludgeoning",
+  "fire", "cold", "electricity", "acid",
+  "poison", "radiant", "necrotic", "psychic", "chaotic"
+];
+
+for (let res of resistList) {
+  if (!Number.isInteger(s.resistances[res])) s.resistances[res] = 0;
 }
+
+s.resistances = foundry.utils.mergeObject(defaultResistances, s.resistances || {}, { inplace: false });
+
+
 
 
   }

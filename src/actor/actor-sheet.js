@@ -100,6 +100,15 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
       this._activeTab = tabId;
       this.render(false, {});
     });
+
+    html.find(".resource-btn").on("click", async (ev) => {
+  const btn = ev.currentTarget;
+  const path = btn.dataset.target;
+  const step = parseInt(btn.dataset.step);
+  const current = foundry.utils.getProperty(this.actor.system, path.split(".").slice(1).join("."));
+  await this.actor.update({ [path]: current + step });
+});
+
   }
 
   async close(...args) {

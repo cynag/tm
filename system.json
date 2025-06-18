@@ -18,6 +18,7 @@
   "esmodules": [
     "tm.mjs"
   ],
+  
   "documentTypes": {
   "Actor": {
     "actor": {}
@@ -33,7 +34,14 @@
   }
 },
   "packs": [],
-  "languages": [],
+  "languages": [
+  {
+    "lang": "pt-BR",
+    "name": "Português (Brasil)",
+    "path": "lang/pt-BR.json"
+  }
+],
+
   "styles": [
     "styles/tm.css"
   ],

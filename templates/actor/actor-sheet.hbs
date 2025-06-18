@@ -57,152 +57,245 @@
   </style>
 
   <!-- 📌 Abas Laterais -->
-  <div class="side-tabs-panel">
-    <button type="button" class="tab-button" data-tab="attributes">ATB</button>
-    <button type="button" class="tab-button" data-tab="skills">HAB</button>
-    <button type="button" class="tab-button" data-tab="actions">AÇÕ</button>
-    <button type="button" class="tab-button" data-tab="conditions">CON</button>
-    <button type="button" class="tab-button" data-tab="inventory">INV</button>
-    <button type="button" class="tab-button" data-tab="domains">DOM</button>
-    <button type="button" class="tab-button" data-tab="cards">CAR</button>
-    <button type="button" class="tab-button" data-tab="biography">BIO</button>
-  </div>
+<div class="side-tabs-panel">
+  <button type="button" class="tab-button" data-tab="attributes">{{localize "TM.TabAttributes"}}</button>
+  <button type="button" class="tab-button" data-tab="skills">{{localize "TM.TabSkills"}}</button>
+  <button type="button" class="tab-button" data-tab="actions">{{localize "TM.TabActions"}}</button>
+  <button type="button" class="tab-button" data-tab="conditions">{{localize "TM.TabConditions"}}</button>
+  <button type="button" class="tab-button" data-tab="inventory">{{localize "TM.TabInventory"}}</button>
+  <button type="button" class="tab-button" data-tab="domains">{{localize "TM.TabDomains"}}</button>
+  <button type="button" class="tab-button" data-tab="cards">{{localize "TM.TabCards"}}</button>
+  <button type="button" class="tab-button" data-tab="biography">{{localize "TM.TabBiography"}}</button>
+</div>
 
   <!-- 🧠 Header do Personagem -->
-  <header class="sheet-header header-fixed">
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <img src="{{actor.img}}" data-edit="img" width="64" height="64" />
-      <h1 class="charname" style="flex: 1;">
-        <input name="name" type="text" value="{{actor.name}}" placeholder="Nome do Personagem" />
-      </h1>
-      <div>
-        <label>Nível:</label>
-        <input type="number" name="system.player_level" value="{{actor.system.player_level}}" style="width: 50px; color: white; font-weight: bold; background: transparent; border: 1px solid #555; padding: 2px;" />
-      </div>
+<header class="sheet-header header-fixed">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <img src="{{actor.img}}" data-edit="img" width="64" height="64" />
+    <h1 class="charname" style="flex: 1;">
+      <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'TM.PlaceholderCharacterName'}}" />
+    </h1>
+    <div>
+      <label>{{localize "TM.LabelLevel"}}:</label>
+      <input type="number" name="system.player_level" value="{{actor.system.player_level}}" style="width: 50px; color: white; font-weight: bold; background: transparent; border: 1px solid #555; padding: 2px;" />
     </div>
+  </div>
 
-    <div style="margin-top: 5px;">
-      <strong>Raça:</strong>
-      {{#each actor.items as |item|}}
-        {{#if (eq item.type "race")}}<em>{{item.name}}</em>{{/if}}
-      {{/each}}
-      &nbsp;&nbsp;&nbsp;
-      <strong>Origem:</strong>
-      {{#each actor.items as |item|}}
-        {{#if (eq item.type "origin")}}<em>{{item.name}}</em>{{/if}}
-      {{/each}}
-    </div>
-  </header>
-
-  <!-- 🔻 Corpo Principal -->
-  <section class="sheet-body">
-
-    <!-- 🎚️ Coluna Lateral de Atributos -->
-    <aside class="sidebar-fixed">
-      <div>Letalidade: {{actor.system.player_letality}}</div>
-      <div>Destreza: {{actor.system.player_dexterity}}</div>
-      <div>Ímpeto: {{actor.system.player_impulse}}</div>
-      <div>Arcana: {{actor.system.player_arcana}}</div>
-      <div>Erudição: {{actor.system.player_erudition}}</div>
-      <div>Virtude: {{actor.system.player_virtue}}</div>
-      <div>Proteção: {{actor.system.player_protection}}</div>
-      <div>Iniciativa: {{actor.system.player_initiative}}</div>
-      <div>Movimento: {{actor.system.player_movement}}</div>
-      <div>PA: {{actor.system.player_pa}}</div>
-      <div>PV: {{actor.system.player_hp}}</div>
-      <div>REF: {{actor.system.player_reflex}}</div>
-      <div>SAB: {{actor.system.player_wisdom}}</div>
-      <div>PM: {{actor.system.player_maneuver}}</div>
-      <div>RF: {{actor.system.player_resistance_phys}}</div>
-      <div>RM: {{actor.system.player_resistance_mental}}</div>
-    </aside>
-
-    <!-- 📂 Área das Abas -->
-    <div class="main-content sheet-tabs" data-group="main-tabs">
-
-      <!-- 🧬 Atributos -->
-      <div class="tab" data-group="main-tabs" data-tab="attributes"></div>
-
-      <!-- 🗣️ Habilidades -->
-<div class="tab" data-group="main-tabs" data-tab="skills">
-      <!-- 🗣️ linguagens -->
-  <h2 class="section-title">Languages</h2>
-  <div class="language-list">
+  <div style="margin-top: 5px;">
+    <strong>{{localize "TM.LabelRace"}}:</strong>
     {{#each actor.items as |item|}}
-      {{#if (eq item.type "language")}}
-        <div class="language-row" data-item-id="{{item._id}}">
-          <img class="language-icon" src="{{item.img}}" width="40" height="40" />
-          <div class="language-info">
-            <div class="language-name">{{item.name}}</div>
-            <div class="language-level">{{item.system.language_level}}</div>
-          </div>
-          <button type="button" class="item-delete language-remove" title="Remove Language">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      {{/if}}
+      {{#if (eq item.type "race")}}<em>{{item.name}}</em>{{/if}}
+    {{/each}}
+    &nbsp;&nbsp;&nbsp;
+    <strong>{{localize "TM.LabelOrigin"}}:</strong>
+    {{#each actor.items as |item|}}
+      {{#if (eq item.type "origin")}}<em>{{item.name}}</em>{{/if}}
     {{/each}}
   </div>
-      <!-- 🧬 Traços -->
-<h2 class="section-title">Traços</h2>
-<div class="trait-list">
-  {{#each actor.items as |item|}}
-    {{#if (eq item.type "trait")}}
-      <div class="trait-row" data-item-id="{{item._id}}">
-        <img class="trait-icon" src="{{item.img}}" width="40" height="40" />
-        <div class="trait-info">
-          <div class="trait-name">{{item.name}}</div>
-          <div class="trait-tags">
-            {{#each item.system.tags as |tag|}}
-              <span class="trait-tag" {{#if tag.tag_description}}data-tooltip="{{tag.tag_description}}"{{/if}}>
-                {{tag.tag_name}}
-              </span>
-            {{/each}}
+</header>
+
+
+  <!-- 🔻 Corpo Principal -->
+<section class="sheet-body">
+
+  <!-- 🎚️ Coluna Lateral de Atributos -->
+  <aside class="sidebar-fixed">
+    <div>{{localize "TM.AttrLet"}}: {{actor.system.player_letality}}</div>
+    <div>{{localize "TM.AttrDes"}}: {{actor.system.player_dexterity}}</div>
+    <div>{{localize "TM.AttrImp"}}: {{actor.system.player_impulse}}</div>
+    <div>{{localize "TM.AttrArc"}}: {{actor.system.player_arcana}}</div>
+    <div>{{localize "TM.AttrEru"}}: {{actor.system.player_erudition}}</div>
+    <div>{{localize "TM.AttrVir"}}: {{actor.system.player_virtue}}</div>
+    <div>{{localize "TM.Protection"}}: {{actor.system.player_protection}}</div>
+    <div>{{localize "TM.Initiative"}}: {{actor.system.player_initiative}}</div>
+    <div>{{localize "TM.Movement"}}: {{actor.system.player_movement}}</div>
+    <div>{{localize "TM.Reflex"}}: {{actor.system.player_reflex}}</div>
+    <div>{{localize "TM.Knowledge"}}: {{actor.system.player_wisdom}}</div>
+  </aside>
+
+  <!-- 📂 Área das Abas -->
+<div class="main-content sheet-tabs" data-group="main-tabs">
+
+  <!-- ABA 🧬 Atributos -->
+  <div class="tab" data-group="main-tabs" data-tab="attributes">
+    <div class="grid-attribute-layout" style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 20px; grid-template-areas: 'rec attr' 'def extra' 'res res';">
+
+      <!-- RECURSOS -->
+      <div class="attr-resources" style="grid-area: rec;">
+        <h2>{{localize "TM.Resources"}}</h2>
+        <div style="display: flex; gap: 10px;">
+
+          <!-- HP -->
+          <div class="resource-box">
+            <div class="resource-label">{{localize "TM.HP"}}</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="resource-controls">
+                <input type="number" name="system.player_hp" value="{{actor.system.player_hp}}" />
+                <span>/</span>
+                <input type="number" name="system.player_hp_max" value="{{actor.system.player_hp_max}}" />
+              </div>
+              <div class="resource-arrows" style="flex-direction: column;">
+                <button class="resource-btn" data-target="system.player_hp" data-step="1"><i class="fas fa-caret-up"></i></button>
+                <button class="resource-btn" data-target="system.player_hp" data-step="-1"><i class="fas fa-caret-down"></i></button>
+              </div>
+            </div>
           </div>
+
+          <!-- PA -->
+          <div class="resource-box">
+            <div class="resource-label">{{localize "TM.PA"}}</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="resource-controls">
+                <input type="number" name="system.player_pa" value="{{actor.system.player_pa}}" />
+                <span>/</span>
+                <input type="number" name="system.player_pa_max" value="{{actor.system.player_pa_max}}" />
+              </div>
+              <div class="resource-arrows" style="flex-direction: column;">
+                <button class="resource-btn" data-target="system.player_pa" data-step="1"><i class="fas fa-caret-up"></i></button>
+                <button class="resource-btn" data-target="system.player_pa" data-step="-1"><i class="fas fa-caret-down"></i></button>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <button type="button" class="item-delete trait-remove" title="Remover Traço">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    {{/if}}
-  {{/each}}
-</div>
-
-</div>
-
-
-
-
-
-      <!-- ⚔️ Ações -->
-      <div class="tab" data-group="main-tabs" data-tab="actions"></div>
-
-      <!-- 💢 Condições -->
-      <div class="tab" data-group="main-tabs" data-tab="conditions"></div>
-
-      <!-- 🎒 Inventário -->
-      <div class="tab" data-group="main-tabs" data-tab="inventory">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
-          <button type="button" class="auto-sort-btn" title="Organizar Inventário">
-            <i class="fas fa-arrows-rotate"></i> Auto-Sort
-          </button>
-        </div>
-        <section id="gear-slots" class="gear-slots-container" style="margin-bottom: 10px; display: flex; justify-content: center;"></section>
-        <section id="grid-inventory" class="grid-container"></section>
       </div>
 
-      <!-- 🔮 Domínios -->
-      <div class="tab" data-group="main-tabs" data-tab="domains"></div>
+      <!-- DEFESAS -->
+      <div class="attr-defenses" style="grid-area: def;">
+        <h2>{{localize "TM.Defenses"}}</h2>
+        <div class="defense-pair">
+          <div class="defense-item"><label>{{localize "TM.PROT"}}</label><span>{{actor.system.player_protection}}</span></div>
+          <div class="defense-item"><label>{{localize "TM.REF"}}</label><span>{{actor.system.player_reflex}}</span></div>
+        </div>
+        <div class="defense-trio">
+          <div><label>{{localize "TM.PM"}}</label><span>{{actor.system.player_maneuver}}</span></div>
+          <div><label>{{localize "TM.RF"}}</label><span>{{actor.system.player_resistance_phys}}</span></div>
+          <div><label>{{localize "TM.RM"}}</label><span>{{actor.system.player_resistance_mental}}</span></div>
+        </div>
+      </div>
 
-      <!-- 🎴 Cartas -->
-      <div class="tab" data-group="main-tabs" data-tab="cards"></div>
+      <!-- ATRIBUTOS -->
+      <div class="attr-attributes" style="grid-area: attr;">
+        <h2>{{localize "TM.Attributes"}}</h2>
+        <div class="attribute-grid">
+          <div><label>LET</label><span>{{actor.system.player_letality}}</span></div>
+          <div><label>ARC</label><span>{{actor.system.player_arcana}}</span></div>
+          <div><label>DES</label><span>{{actor.system.player_dexterity}}</span></div>
+          <div><label>ERU</label><span>{{actor.system.player_erudition}}</span></div>
+          <div><label>IMP</label><span>{{actor.system.player_impulse}}</span></div>
+          <div><label>VIR</label><span>{{actor.system.player_virtue}}</span></div>
+        </div>
+      </div>
 
-      <!-- 📖 Biografia -->
-      <div class="tab" data-group="main-tabs" data-tab="biography">
-        <h2>Crônica</h2>
-        <textarea name="system.player_chronicle" style="width: 100%; height: 150px; text-align: justify;">{{actor.system.player_chronicle}}</textarea>
+      <!-- EXTRAS -->
+      <div class="attr-extras" style="grid-area: extra;">
+        <h2>{{localize "TM.Extras"}}</h2>
+        <div class="defense-trio">
+          <div><label>SAB</label><span>{{actor.system.player_knowledge}}</span></div>
+          <div><label>INI</label><span>{{actor.system.player_initiative}}</span></div>
+          <div><label>MOV</label><span>{{actor.system.player_movement}}</span></div>
+        </div>
+      </div>
+
+      <!-- RESISTÊNCIAS -->
+      <div class="attr-section attr-resistances" style="grid-area: res;">
+        <h2>{{localize "TM.Resistances"}}</h2>
+        <div class="resistance-grid">
+          {{#each (lookup actor.system "resistances") as |value key|}}
+            <div class="resistance-bar">
+              <label>{{localize (concat "TM.Res." key)}}</label>
+              <div class="bar {{#if (gt value 0)}}positive{{else if (lt value 0)}}negative{{/if}}">
+                <div class="fill" style="width:{{multiply (abs value) 10}}%"></div>
+                <span>{{value}}</span>
+              </div>
+            </div>
+          {{/each}}
+        </div>
       </div>
 
     </div>
-  </section>
+  </div>
+
+  <!-- ABA 🗣️ Habilidades -->
+  <div class="tab" data-group="main-tabs" data-tab="skills">
+    <h2 class="section-title">{{localize "TM.Languages"}}</h2>
+    <div class="language-list">
+      {{#each actor.items as |item|}}
+        {{#if (eq item.type "language")}}
+          <div class="language-row" data-item-id="{{item._id}}">
+            <img class="language-icon" src="{{item.img}}" width="40" height="40" />
+            <div class="language-info">
+              <div class="language-name">{{item.name}}</div>
+              <div class="language-level">{{item.system.language_level}}</div>
+            </div>
+            <button type="button" class="item-delete language-remove" title="{{localize 'TM.RemoveLanguage'}}">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        {{/if}}
+      {{/each}}
+    </div>
+
+    <h2 class="section-title">{{localize "TM.Traits"}}</h2>
+    <div class="trait-list">
+      {{#each actor.items as |item|}}
+        {{#if (eq item.type "trait")}}
+          <div class="trait-row" data-item-id="{{item._id}}">
+            <img class="trait-icon" src="{{item.img}}" width="40" height="40" />
+            <div class="trait-info">
+              <div class="trait-name">{{item.name}}</div>
+              <div class="trait-tags">
+                {{#each item.system.tags as |tag|}}
+                  <span class="trait-tag" {{#if tag.tag_description}}data-tooltip="{{tag.tag_description}}"{{/if}}>
+                    {{tag.tag_name}}
+                  </span>
+                {{/each}}
+              </div>
+            </div>
+            <button type="button" class="item-delete trait-remove" title="{{localize 'TM.RemoveTrait'}}">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        {{/if}}
+      {{/each}}
+    </div>
+  </div>
+
+  <!-- ABA ⚔️ Ações -->
+  <div class="tab" data-group="main-tabs" data-tab="actions"></div>
+
+  <!-- ABA 💢 Condições -->
+<div class="tab" data-group="main-tabs" data-tab="conditions">
+  <!-- Conteúdo futuro para condições -->
+</div>
+
+<!-- ABA 🎒 Inventário -->
+<div class="tab" data-group="main-tabs" data-tab="inventory">
+  <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
+    <button type="button" class="auto-sort-btn" title="{{localize 'TM.SortInventory'}}">
+      <i class="fas fa-arrows-rotate"></i> {{localize "TM.AutoSort"}}
+    </button>
+  </div>
+  <section id="gear-slots" class="gear-slots-container" style="margin-bottom: 10px; display: flex; justify-content: center;"></section>
+  <section id="grid-inventory" class="grid-container"></section>
+</div>
+
+<!-- ABA 🔮 Domínios -->
+<div class="tab" data-group="main-tabs" data-tab="domains">
+  <!-- Conteúdo futuro para domínios -->
+</div>
+
+<!-- ABA 🎴 Cartas -->
+<div class="tab" data-group="main-tabs" data-tab="cards">
+  <!-- Conteúdo futuro para cartas -->
+</div>
+
+<!-- ABA 📖 Biografia -->
+<div class="tab" data-group="main-tabs" data-tab="biography">
+  <h2>{{localize "TM.Chronicle"}}</h2>
+  <textarea name="system.player_chronicle" style="width: 100%; height: 150px; text-align: justify;">{{actor.system.player_chronicle}}</textarea>
+</div>
+
+</div> <!-- fim das sheet-tabs -->
+</section> <!-- fim da sheet-body -->
 </form>

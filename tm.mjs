@@ -36,7 +36,6 @@ import { GearOverlay } from "./src/gear/gear-overlay.js";
 import { ItemTooltip } from "./src/ui/item-tooltip.js";
 
 
-
 // === INIT ===
 
 Hooks.once("init", function () {
@@ -50,7 +49,7 @@ Hooks.once("init", function () {
 
   foundry.documents.collections.Actors.registerSheet("tm", TMActorSheet, { makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", ConsumableSheet, { types: ["consumable"], makeDefault: true });
-  foundry.documents.collections.Items.registerSheet("tm", GearSheet, {types: ["gear"],makeDefault: true});
+  foundry.documents.collections.Items.registerSheet("tm", GearSheet, { types: ["gear"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", CardSheet, { types: ["card"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", RaceSheet, { types: ["race"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", OriginSheet, { types: ["origin"], makeDefault: true });
@@ -59,33 +58,19 @@ Hooks.once("init", function () {
 
   GridInventory.init();
 
-// ✅ Helpers Handlebars Registrados
-Handlebars.registerHelper("eq", function(a, b) {
-  return a === b;
-});
-
-Handlebars.registerHelper("neq", function(a, b) {
-  return a !== b;
-});
-
-Handlebars.registerHelper("and", function(a, b) {
-  return a && b;
-});
-
-Handlebars.registerHelper("or", function(a, b) {
-  return a || b;
-});
-
-Handlebars.registerHelper("not", function(a) {
-  return !a;
-});
-
-Handlebars.registerHelper("array", function(...args) {
-  return args.slice(0, -1);
+  // ✅ Handlebars Helpers
+  Handlebars.registerHelper("eq", (a, b) => a === b);
+  Handlebars.registerHelper("neq", (a, b) => a !== b);
+  Handlebars.registerHelper("and", (a, b) => a && b);
+  Handlebars.registerHelper("or", (a, b) => a || b);
+  Handlebars.registerHelper("not", a => !a);
+  Handlebars.registerHelper("array", (...args) => args.slice(0, -1));
+  Handlebars.registerHelper("abs", value => Math.abs(value));
+  Handlebars.registerHelper("multiply", (a, b) => a * b);
 });
 
 
-});
+
 
 // === READY ===
 
