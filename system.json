@@ -27,9 +27,7 @@
     "consumable": {},
     "card": {},
     "race":{},
-    "origin":{},
-    "trait":{},
-    "language":{}
+    "origin":{}
   }
 },
   "packs": [],

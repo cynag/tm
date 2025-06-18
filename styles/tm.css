@@ -151,58 +151,28 @@
   pointer-events: none;
   max-width: 200px;
 }
-/* === Blocos da ficha: Crônica, Raça, Origem, Traços, Idiomas === */
-.tm-block {
-  border: 1px solid #888;
-  background: white;
-  padding: 8px;
-  border-radius: 4px;
-  margin-bottom: 10px;
-}
-
-.tm-block h2 {
-  font-size: 16px;
-  margin: 0 0 6px 0;
-  color: #222;
-}
-
-/* === Subcampos fixos (Raça / Origem) === */
-.tm-subbox {
-  border: 1px solid #ccc;
-  background: #f3f3f3;
-  padding: 4px;
-  font-size: 13px;
-  border-radius: 2px;
-}
-
-/* === Listas de traços / idiomas === */
-.tm-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 13px;
-}
-
-.tm-list li {
+.side-tabs-panel {
+  position: absolute;
+  top: 130px;
+  right: -42px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2px 0;
-  border-bottom: 1px dashed #ccc;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 100;
 }
 
-.tm-list li:last-child {
-  border-bottom: none;
-}
-
-/* === Botão de deletar item === */
-.tm-delete-btn {
-  background: none;
-  border: none;
+.tab-button {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 6px;
+  width: 40px;
+  background: #2b2b2b;
+  color: white;
+  border: 1px solid #555;
+  font-weight: bold;
   cursor: pointer;
-  color: #a00;
-  font-size: 13px;
 }
-.tm-delete-btn:hover {
-  color: #d00;
+.tab-button.active {
+  background: #444;
+  border-color: #aaa;
 }

@@ -1,11 +1,19 @@
 <form class="{{cssClass}}" autocomplete="off">
 
   <style>
+    .main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  min-height: 700px; /* ✅ impede altura mínima quebrada */
+}
+
     .sheet-body {
       min-height: 500px;
       display: flex;
       flex-direction: row;
     }
+
     .sidebar-fixed {
       width: 200px;
       flex-shrink: 0;
@@ -13,6 +21,7 @@
       color: white;
       padding: 10px;
     }
+
     .header-fixed {
       position: sticky;
       top: 0;
@@ -22,35 +31,75 @@
       color: white;
       border-bottom: 1px solid #444;
     }
+
     .main-content {
       flex: 1;
       overflow-y: auto;
+      padding: 10px;
+    }
+
+    .side-tabs-panel {
+      position: absolute;
+      top: 130px;
+      right: -42px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 100;
+    }
+
+    .tab-button {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      padding: 6px;
+      width: 40px;
+      background: #2b2b2b;
+      color: white;
+      border: 1px solid #555;
+      font-weight: bold;
+      cursor: pointer;
     }
   </style>
 
-  <!-- HEADER FIXO -->
+  <!-- Abas laterais flutuantes -->
+  <div class="side-tabs-panel">
+    <button type="button" class="tab-button" data-tab="attributes">ATB</button>
+    <button type="button" class="tab-button" data-tab="skills">HAB</button>
+    <button type="button" class="tab-button" data-tab="actions">AÇÕ</button>
+    <button type="button" class="tab-button" data-tab="conditions">CON</button>
+    <button type="button" class="tab-button" data-tab="inventory">INV</button>
+    <button type="button" class="tab-button" data-tab="domains">DOM</button>
+    <button type="button" class="tab-button" data-tab="cards">CAR</button>
+    <button type="button" class="tab-button" data-tab="biography">BIO</button>
+  </div>
+
+  <!-- HEADER -->
   <header class="sheet-header header-fixed">
     <div style="display: flex; align-items: center; gap: 10px;">
       <img src="{{actor.img}}" data-edit="img" width="64" height="64" />
       <h1 class="charname" style="flex: 1;">
-        <input name="name" type="text" value="{{actor.name}}" placeholder="Character Name" />
+        <input name="name" type="text" value="{{actor.name}}" placeholder="Nome do Personagem" />
       </h1>
+      <div>
+        <label>Nível:</label>
+        <input type="number" name="system.player_level" value="{{actor.system.player_level}}" style="width: 50px; color: white; font-weight: bold; background: transparent; border: 1px solid #555; padding: 2px;" />
+      </div>
     </div>
-    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
-      <div>PV: {{actor.system.player_hp}}</div>
-      <div>PA: {{actor.system.player_pa}}</div>
-      <div>XP: 0</div>
-      <label>Nível:</label>
-      <input type="number" name="system.player_level" value="{{actor.system.player_level}}" style="width: 50px; color: white; font-weight: bold; background: transparent; border: 1px solid #555; padding: 2px;" />
-      <div>REF: {{actor.system.player_reflex}}</div>
-      <div>SAB: {{actor.system.player_wisdom}}</div>
-      <div>PM: {{actor.system.player_maneuver}}</div>
-      <div>RF: {{actor.system.player_resistance_phys}}</div>
-      <div>RM: {{actor.system.player_resistance_mental}}</div>
+    <div style="margin-top: 5px;">
+      <strong>Raça:</strong>
+      {{#each actor.items as |item|}}
+        {{#if (eq item.type "race")}}<em>{{item.name}}</em>{{/if}}
+      {{/each}}
+      &nbsp;&nbsp;&nbsp;
+      <strong>Origem:</strong>
+      {{#each actor.items as |item|}}
+        {{#if (eq item.type "origin")}}<em>{{item.name}}</em>{{/if}}
+      {{/each}}
     </div>
   </header>
 
   <section class="sheet-body">
+    <!-- Coluna lateral fixa -->
     <aside class="sidebar-fixed">
       <div>Letalidade: {{actor.system.player_letality}}</div>
       <div>Destreza: {{actor.system.player_dexterity}}</div>
@@ -61,90 +110,37 @@
       <div>Proteção: {{actor.system.player_protection}}</div>
       <div>Iniciativa: {{actor.system.player_initiative}}</div>
       <div>Movimento: {{actor.system.player_movement}}</div>
+      <div>PA: {{actor.system.player_pa}}</div>
+      <div>PV: {{actor.system.player_hp}}</div>
+      <div>REF: {{actor.system.player_reflex}}</div>
+      <div>SAB: {{actor.system.player_wisdom}}</div>
+      <div>PM: {{actor.system.player_maneuver}}</div>
+      <div>RF: {{actor.system.player_resistance_phys}}</div>
+      <div>RM: {{actor.system.player_resistance_mental}}</div>
     </aside>
 
-    <div class="main-content">
-      <nav class="sheet-tabs tabs" data-group="primary" style="margin: 10px 0;">
-        <a class="item" data-tab="data">Dados</a>
-        <a class="item" data-tab="inventory">Inventário</a>
-        <a class="item" data-tab="actions">Ações</a>
-        <a class="item" data-tab="domains">Domínios</a>
-      </nav>
-
-      <div class="tab" data-group="primary" data-tab="data">
-  <section style="padding: 10px; display: flex; flex-direction: column; gap: 20px;">
-
-    <!-- Crônica -->
-    <div class="tm-block">
-      <h2>Crônica</h2>
-      <textarea name="system.player_chronicle" style="width: 100%; height: 100px;">{{actor.system.player_chronicle}}</textarea>
-    </div>
-
-    <!-- Raça e Origem -->
-    <div style="display: flex; gap: 10px;">
-      <div style="flex: 1;">
-        <label style="font-weight: bold;">Raça</label>
-        <div class="tm-subbox">
-          {{#each actor.items as |item|}}
-            {{#if (eq item.type "race")}}<em>{{item.name}}</em>{{/if}}
-          {{/each}}
-        </div>
+    <!-- Conteúdo central -->
+    <div class="main-content sheet-tabs" data-group="main-tabs">
+      <!-- Cada aba individual -->
+      <div class="tab" data-group="main-tabs" data-tab="attributes">
+        <!-- Conteúdo de Atributos -->
       </div>
-      <div style="flex: 1;">
-        <label style="font-weight: bold;">Origem</label>
-        <div class="tm-subbox">
-          {{#each actor.items as |item|}}
-            {{#if (eq item.type "origin")}}<em>{{item.name}}</em>{{/if}}
-          {{/each}}
-        </div>
+
+      <div class="tab" data-group="main-tabs" data-tab="skills">
+        <!-- Conteúdo de Habilidades (idiomas etc.) -->
       </div>
-    </div>
 
-    <!-- Traços e Idiomas -->
-    <div style="display: flex; gap: 10px;">
-      <div style="flex: 1;">
-        <label style="font-weight: bold;">Traços</label>
-        <div class="tm-subbox">
-          <ul class="tm-list">
-            {{#each actor.items as |item|}}
-              {{#if (eq item.type "trait")}}
-                <li>
-                  {{item.name}}
-                  <button type="button" class="tm-delete-btn item-delete" data-item-id="{{item._id}}">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </li>
-              {{/if}}
-            {{/each}}
-          </ul>
-        </div>
+      <div class="tab" data-group="main-tabs" data-tab="actions">
+        <!-- Conteúdo de Ações -->
       </div>
-      <div style="flex: 1;">
-        <label style="font-weight: bold;">Idiomas</label>
-        <div class="tm-subbox">
-          <ul class="tm-list">
-            {{#each actor.items as |item|}}
-              {{#if (eq item.type "language")}}
-                <li>
-                  {{item.name}}
-                  <button type="button" class="tm-delete-btn item-delete" data-item-id="{{item._id}}">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </li>
-              {{/if}}
-            {{/each}}
-          </ul>
-        </div>
+
+      <div class="tab" data-group="main-tabs" data-tab="conditions">
+        <!-- Conteúdo de Condições (traços, efeitos etc.) -->
       </div>
-    </div>
 
-  </section>
-</div>
-
-
-      <div class="tab" data-group="primary" data-tab="inventory">
+      <div class="tab" data-group="main-tabs" data-tab="inventory">
         <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
-          <button type="button" class="auto-sort-btn" title="Organize Inventory">
+          <button type="button" class="auto-sort-btn" title="Organizar Inventário">
             <i class="fas fa-arrows-rotate"></i> Auto-Sort
           </button>
         </div>
@@ -152,12 +148,17 @@
         <section id="grid-inventory" class="grid-container"></section>
       </div>
 
-      <div class="tab" data-group="primary" data-tab="actions">
-        <!-- futuro -->
+      <div class="tab" data-group="main-tabs" data-tab="domains">
+        <!-- Conteúdo de Domínios -->
       </div>
 
-      <div class="tab" data-group="primary" data-tab="domains">
-        <!-- futuro -->
+      <div class="tab" data-group="main-tabs" data-tab="cards">
+        <!-- Conteúdo de Cartas do Destino -->
+      </div>
+
+      <div class="tab" data-group="main-tabs" data-tab="biography">
+        <h2>Crônica</h2>
+        <textarea name="system.player_chronicle" style="width: 100%; height: 150px; text-align: justify;">{{actor.system.player_chronicle}}</textarea>
       </div>
     </div>
   </section>

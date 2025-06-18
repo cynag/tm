@@ -91,20 +91,6 @@ if (origin?.system?.origin_effect_script) {
     console.warn(`[ORIGIN] Erro ao executar script da origem "${origin.name}":`, err);
   }
 }
-// TRAITS: executa scripts dos traços
-const traits = this.items.filter(i => i.type === "trait");
-for (let trait of traits) {
-  const script = trait.system?.trait_effect_script;
-  if (script) {
-    try {
-      const fn = new Function("actor", script);
-      fn(this);
-      console.log(`[TRAIT] Script de "${trait.name}" executado.`);
-    } catch (err) {
-      console.warn(`[TRAIT] Erro em "${trait.name}":`, err);
-    }
-  }
-}
 
 
   }
@@ -118,46 +104,30 @@ async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
     return Item.implementation.fromDropData(i).then(d => d.toObject());
   }));
 
-  const existing = this.items;
-
-  const uniqueTypes = ["card", "trait", "language"];
-  const toCreate = [];
+  const existingCards = this.items.filter(i => i.type === "card").map(i => i.name);
 
   for (let item of incoming) {
-    const { type, name } = item;
+    const type = item.type;
+    const name = item.name;
 
-    if (uniqueTypes.includes(type)) {
-      const exists = existing.some(i => i.type === type && i.name === name);
-      if (exists) {
-        ui.notifications.warn(`Você já possui um(a) ${type} chamado "${name}".`);
-        continue; // ❌ ignora
-      }
+    if (type === "card" && existingCards.includes(name)) {
+      ui.notifications.warn(`Você já possui a carta "${name}".`);
+      return false;
     }
 
     if (type === "race") {
-      const existingRace = existing.find(i => i.type === "race");
-      if (existingRace) await existingRace.delete();
+      const existing = this.items.find(i => i.type === "race");
+      if (existing) await existing.delete();
     }
 
     if (type === "origin") {
-      const existingOrigin = existing.find(i => i.type === "origin");
-      if (existingOrigin) await existingOrigin.delete();
+      const existing = this.items.find(i => i.type === "origin");
+      if (existing) await existing.delete();
     }
-
-    toCreate.push(item);
   }
 
-  // 🧼 se nenhum item for válido, bloqueia
-  if (toCreate.length === 0) return false;
-
-  // 🔁 sobrescreve os dados a serem criados
-  options.keepId = true;
-  foundry.utils.setProperty(options, "tmFilteredItems", toCreate);
   return true;
 }
-
-
-
 
 
 
