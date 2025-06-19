@@ -1,0 +1,16 @@
+<div class="card-panel-container">
+  {{#each actor.system.cardSlots as |cards nivel|}}
+
+    <h3 class="card-level-title">Cartas Nível {{nivel}}</h3>
+
+    <div class="card-row">
+      {{#each cards}}
+        <div class="card-display {{#if active}}active{{/if}}" data-card-id="{{id}}" data-card-level="{{../nivel}}">
+          <img src="{{img}}" alt="{{name}}" width="100" height="140" />
+          <div class="card-name">{{name}}</div>
+        </div>
+      {{/each}}
+    </div>
+
+  {{/each}}
+</div>

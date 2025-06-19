@@ -1,5 +1,7 @@
 // === IMPORTS ===
 
+
+
 import { TMActor } from "./src/actor/actor.js";
 import { TMObject } from "./src/item/item.js";
 import { TMActorSheet } from "./src/actor/actor-sheet.js";
@@ -35,10 +37,21 @@ import { GearOverlay } from "./src/gear/gear-overlay.js";
 
 import { ItemTooltip } from "./src/ui/item-tooltip.js";
 
+import { CardPanel } from "./src/cards/card-panel.js";
+import { CardsDB } from "./src/cards/cards-db.js";
+
+
 
 // === INIT ===
 
-Hooks.once("init", function () {
+Hooks.once("init", async function () {
+  const templates = await foundry.applications.handlebars.loadTemplates([
+    "systems/tm/templates/actor/partials/card-panel.hbs"
+  ]);
+  
+  // 🔧 Registra manualmente como partial com nome canônico
+  Handlebars.registerPartial("tm.actor.partials.card-panel", templates[0]);
+
   console.log("Terras Malditas | System initialized");
 
   CONFIG.Actor.documentClass = TMActor;
@@ -70,8 +83,6 @@ Hooks.once("init", function () {
 });
 
 
-
-
 // === READY ===
 
 Hooks.once("ready", () => {
@@ -97,8 +108,21 @@ Hooks.once("ready", () => {
     GearConstants,
     GearOverlay,
 
-    ItemTooltip
+    ItemTooltip,
+
+    CardPanel,
+    CardsDB
   };
 
+  Hooks.on("renderTMActorSheet", (app, html, data) => {
+  const container = html[0].querySelector(".card-panel-container");
+  if (!container) return;
+  game.tm.CardPanel.render(data.actor, container);
+});
+
+
+
   console.log("Terras Malditas | Sistema pronto");
+
+  
 });

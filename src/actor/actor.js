@@ -1,140 +1,124 @@
 export class TMActor extends Actor {
   prepareBaseData() {
-    super.prepareBaseData();
+  super.prepareBaseData();
+  const s = this.system;
 
-    const s = this.system; // ✅ Corrige erro de "s is not defined"
+  // === GEAR SLOTS ===
+  this.system.gearSlots = foundry.utils.mergeObject({
+    slot_head:     { itemId: null, width: 3, height: 3 },
+    slot_neck:     { itemId: null, width: 1, height: 2 },
+    slot_shoulder: { itemId: null, width: 3, height: 3 },
+    slot_torso:    { itemId: null, width: 3, height: 4 },
+    slot_legs:     { itemId: null, width: 3, height: 4 },
+    slot_foots:    { itemId: null, width: 3, height: 3 },
+    slot_hands:    { itemId: null, width: 3, height: 3 },
+    slot_ring1:    { itemId: null, width: 1, height: 1 },
+    slot_ring2:    { itemId: null, width: 1, height: 1 },
+    slot_back:     { itemId: null, width: 3, height: 4 },
+    slot_waist:    { itemId: null, width: 3, height: 1 },
+    slot_weapon1:  { itemId: null, width: 5, height: 4 },
+    slot_weapon2:  { itemId: null, width: 5, height: 4 }
+  }, this.system.gearSlots || {}, { inplace: false });
 
-    this.system.gearSlots = foundry.utils.mergeObject({
-      slot_head:     { itemId: null, width: 3, height: 3 },
-      slot_neck:     { itemId: null, width: 1, height: 2 },
-      slot_shoulder: { itemId: null, width: 3, height: 3 },
-      slot_torso:    { itemId: null, width: 3, height: 4 },
-      slot_legs:     { itemId: null, width: 3, height: 4 },
-      slot_foots:    { itemId: null, width: 3, height: 3 },
-      slot_hands:    { itemId: null, width: 3, height: 3 },
-      slot_ring1:    { itemId: null, width: 1, height: 1 },
-      slot_ring2:    { itemId: null, width: 1, height: 1 },
-      slot_back:     { itemId: null, width: 3, height: 4 },
-      slot_waist:    { itemId: null, width: 3, height: 1 },
-      slot_weapon1:  { itemId: null, width: 5, height: 4 },
-      slot_weapon2:  { itemId: null, width: 5, height: 4 }
-    }, this.system.gearSlots || {}, { inplace: false });
+  // === ATRIBUTOS BASE ===
+  s.base_letality   ??= 0;
+  s.base_dexterity  ??= 0;
+  s.base_impulse    ??= 0;
+  s.base_arcana     ??= 0;
+  s.base_erudition  ??= 0;
+  s.base_virtue     ??= 0;
+  s.base_hp         ??= 0;
 
-    // Atributos principais (base)
-    s.base_letality   ??= 0;
-    s.base_dexterity  ??= 0;
-    s.base_impulse    ??= 0;
-    s.base_arcana     ??= 0;
-    s.base_erudition  ??= 0;
-    s.base_virtue     ??= 0;
-    s.base_hp         ??= 0;
+  // Reset dos valores principais
+  s.player_letality   = s.base_letality;
+  s.player_dexterity  = s.base_dexterity;
+  s.player_impulse    = s.base_impulse;
+  s.player_arcana     = s.base_arcana;
+  s.player_erudition  = s.base_erudition;
+  s.player_virtue     = s.base_virtue;
 
-    // Reset para os valores atuais, antes dos buffs
-    s.player_letality   = s.base_letality;
-    s.player_dexterity  = s.base_dexterity;
-    s.player_impulse    = s.base_impulse;
-    s.player_arcana     = s.base_arcana;
-    s.player_erudition  = s.base_erudition;
-    s.player_virtue     = s.base_virtue;
+  // === SECUNDÁRIOS / INICIAIS ===
+  if (!Number.isInteger(s.player_reflex)) s.player_reflex = 0;
+  if (!Number.isInteger(s.player_wisdom)) s.player_wisdom = 0;
+  if (!Number.isInteger(s.player_maneuver)) s.player_maneuver = 0;
+  if (!Number.isInteger(s.player_resistance_phys)) s.player_resistance_phys = 0;
+  if (!Number.isInteger(s.player_resistance_mental)) s.player_resistance_mental = 0;
+  if (!Number.isInteger(s.player_protection)) s.player_protection = 0;
+  if (!Number.isInteger(s.player_initiative)) s.player_initiative = 0;
+  if (!Number.isInteger(s.player_movement)) s.player_movement = 0;
+  if (!Number.isInteger(s.player_knowledge)) s.player_knowledge = 0;
 
-    // Atributos secundários
-    if (!Number.isInteger(s.player_reflex)) s.player_reflex = 0;
-    if (!Number.isInteger(s.player_wisdom)) s.player_wisdom = 0;
-    if (!Number.isInteger(s.player_maneuver)) s.player_maneuver = 0;
-    if (!Number.isInteger(s.player_resistance_phys)) s.player_resistance_phys = 0;
-    if (!Number.isInteger(s.player_resistance_mental)) s.player_resistance_mental = 0;
-    if (!Number.isInteger(s.player_protection)) s.player_protection = 0;
-    if (!Number.isInteger(s.player_initiative)) s.player_initiative = 0;
-    if (!Number.isInteger(s.player_movement)) s.player_movement = 0;
-    if (!Number.isInteger(s.player_knowledge)) s.player_knowledge = 0;
+  // === VITAIS ===
+  if (!Number.isInteger(s.player_level)) s.player_level = 1;
+  if (!Number.isInteger(s.player_hp)) s.player_hp = 10;
+  if (!Number.isInteger(s.player_hp_max)) s.player_hp_max = 10;
+  if (!Number.isInteger(s.player_pa)) s.player_pa = 8;
+  if (!Number.isInteger(s.player_pa_max)) s.player_pa_max = 8;
+  s.player_hp = Math.min(s.player_hp, s.player_hp_max);
+  s.player_pa = Math.min(s.player_pa, s.player_pa_max);
 
-    
+  // === BUFFS POR CARTAS ESCOLHIDAS NO CARD PANEL ===
+const selected = s.activeCards || {};
+for (const [level, ids] of Object.entries(selected)) {
+  for (const id of ids) {
+    const carta = game.tm.CardsDB[level]?.find(c => c.id === id);
+if (!carta || Number(level) > s.player_level) continue;
 
-    // Vitais
-    if (!Number.isInteger(s.player_level)) s.player_level = 1;
+    if (!carta) continue;
 
-    // Aplica efeitos das cartas do destino
-    const seen = new Set();
-      const cards = this.items.filter(i => i.type === "card" && !seen.has(i.name) && seen.add(i.name));
+    const b1 = carta.buff1;
+const b2 = carta.buff2;
 
-    for (let card of cards) {
-      const d = card.system;
-      if (s.player_level >= d.card_level) {
-        if (["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"].includes(d.card_bonus_2)) {
-          s[`player_${d.card_bonus_2}`] += 2;
-        }
-        if (["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"].includes(d.card_bonus_1)) {
-          s[`player_${d.card_bonus_1}`] += 1;
-        }
-        if (Number.isInteger(d.card_bonus_hp)) {
-          s.player_hp += d.card_bonus_hp;
-        }
-      }
-    }
+const validAttrs = ["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"];
 
-    s.player_chronicle ??= "";
-
-    const race = this.items.find(i => i.type === "race");
-    if (race) {
-  const r = race.system;
-  s[`player_${r.race_buff_1}`] += 1;
-  s[`player_${r.race_buff_2}`] += 1;
-  s.player_movement = r.race_movement;
-    }
-    // ORIGEM: executa o script do item origin
-    const origin = this.items.find(i => i.type === "origin");
-    if (origin?.system?.origin_effect_script) {
-  try {
-    const fn = new Function("actor", origin.system.origin_effect_script);
-    fn(this);
-    console.log(`[ORIGIN] Script da origem "${origin.name}" executado com sucesso.`);
-  } catch (err) {
-    console.warn(`[ORIGIN] Erro ao executar script da origem "${origin.name}":`, err);
+if (validAttrs.includes(b1)) s[`player_${b1}`] += 2;
+if (validAttrs.includes(b2)) s[`player_${b2}`] += 1;
+if (Number.isInteger(carta.hp)) {
+  s.player_hp += carta.hp;
+  s.player_hp_max += carta.hp;
+}
   }
-    }   
-    if (!Number.isInteger(s.player_hp)) s.player_hp = 10;
-    if (!Number.isInteger(s.player_hp_max)) s.player_hp_max = 10;
-    if (!Number.isInteger(s.player_pa)) s.player_pa = 8;
-    if (!Number.isInteger(s.player_pa_max)) s.player_pa_max = 8;
-    s.player_hp = Math.min(s.player_hp, s.player_hp_max);
-    s.player_pa = Math.min(s.player_pa, s.player_pa_max);
-
-// =============================
-// RESISTÊNCIAS
-// =============================
-const defaultResistances = {
-  slashing: 0,
-  piercing: 0,
-  bludgeoning: 0,
-  fire: 0,
-  cold: 0,
-  electricity: 0,
-  acid: 0,
-  poison: 0,
-  radiant: 0,
-  necrotic: 0,
-  psychic: 0,
-  chaotic: 0
-};
-
-s.resistances ??= {};
-
-const resistList = [
-  "slashing", "piercing", "bludgeoning",
-  "fire", "cold", "electricity", "acid",
-  "poison", "radiant", "necrotic", "psychic", "chaotic"
-];
-
-for (let res of resistList) {
-  if (!Number.isInteger(s.resistances[res])) s.resistances[res] = 0;
 }
 
-s.resistances = foundry.utils.mergeObject(defaultResistances, s.resistances || {}, { inplace: false });
 
+  // === CRÔNICA E CORINGAS ===
+  s.player_chronicle ??= "";
 
-
-
+  // === BUFFS POR RAÇA ===
+  const race = this.items.find(i => i.type === "race");
+  if (race) {
+    const r = race.system;
+    s[`player_${r.race_buff_1}`] += 1;
+    s[`player_${r.race_buff_2}`] += 1;
+    s.player_movement = r.race_movement;
   }
+
+  // === ORIGEM: SCRIPT ===
+  const origin = this.items.find(i => i.type === "origin");
+  if (origin?.system?.origin_effect_script) {
+    try {
+      const fn = new Function("actor", origin.system.origin_effect_script);
+      fn(this);
+      console.log(`[ORIGIN] Script da origem "${origin.name}" executado com sucesso.`);
+    } catch (err) {
+      console.warn(`[ORIGIN] Erro ao executar script da origem "${origin.name}":`, err);
+    }
+  }
+
+  // === RESISTÊNCIAS ===
+  const defaultResistances = {
+    slashing: 0, piercing: 0, bludgeoning: 0,
+    fire: 0, cold: 0, electricity: 0, acid: 0,
+    poison: 0, radiant: 0, necrotic: 0, psychic: 0, chaotic: 0
+  };
+  s.resistances ??= {};
+  const resistList = Object.keys(defaultResistances);
+  for (let res of resistList) {
+    if (!Number.isInteger(s.resistances[res])) s.resistances[res] = 0;
+  }
+  s.resistances = foundry.utils.mergeObject(defaultResistances, s.resistances || {}, { inplace: false });
+}
+
 // Previne múltiplas cartas com o mesmo nome
 async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
   if (embeddedName !== "Item") return true;

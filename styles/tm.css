@@ -610,3 +610,39 @@ form.tm.sheet.actor {
 .bar.negative .fill {
   background: red;
 }
+
+
+.card-display.disabled {
+  opacity: 0.3;
+  filter: grayscale(100%);
+  pointer-events: none;
+}
+
+.card-display.active {
+  outline: 3px solid #ffffff;
+  box-shadow: 0 0 8px #fff;
+}
+.card-panel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card-level-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin: 8px 0 4px 0;
+  border-bottom: 1px solid #855c3b;
+  padding-bottom: 2px;
+}
+
+.card-row {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.card-name {
+  font-size: 10px;
+  text-align: center;
+}

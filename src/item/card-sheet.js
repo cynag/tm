@@ -10,9 +10,21 @@ export class CardSheet extends ItemSheet {
   }
 
   async getData(options) {
-    const data = await super.getData(options);
-    return data;
-  }
+  const data = await super.getData(options);
+
+  data.attrs = [
+  { value: "letality", label: "LET" },
+  { value: "dexterity", label: "DES" },
+  { value: "impulse", label: "IMP" },
+  { value: "arcana", label: "ARC" },
+  { value: "erudition", label: "ERU" },
+  { value: "virtue", label: "VIR" }
+];
+
+
+  return data;
+}
+
 
   activateListeners(html) {
     super.activateListeners(html);
