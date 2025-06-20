@@ -68,13 +68,15 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
     });
 
     // Força seleção de raça se ainda não confirmada
-const hasRace = await this.actor.getFlag("tm", "raceConfirmed");
-if (!hasRace) {
-  console.log("[RaceSelector] Exibindo tela de seleção de raça");
-  const { RaceSelector } = await import("../race/race-selector.js");
-  new RaceSelector(this.actor, { readOnly: false }).render(true);
+setTimeout(async () => {
+  const hasRace = await this.actor.getFlag("tm", "raceConfirmed");
+  if (!hasRace) {
+    console.log("[RaceSelector] Exibindo tela de seleção de raça");
+    const { RaceSelector } = await import("../race/race-selector.js");
+    new RaceSelector(this.actor).render(true);
+  }
+}, 10);
 
-}
 
 
     return rendered;
