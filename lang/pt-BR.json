@@ -67,6 +67,11 @@
     "Res.radiant": "Radiante",
     "Res.necrotic": "Necrótico",
     "Res.psychic": "Psíquico",
-    "Res.chaotic": "Caótico"
+    "Res.chaotic": "Caótico",
+
+    "RaceConfirm": "Confirmar Raça",
+    "RaceChange": "Mudar Raça",
+    "RaceAbility": "Habilidade Coringa",
+    "RaceExit": "Sair"
   }
 }

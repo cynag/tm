@@ -1,0 +1,33 @@
+<div class="subrace-selector-overlay">
+  <div class="subrace-selector-container">
+
+    <div class="subrace-cards">
+      {{#each subraces}}
+        <div class="subrace-card {{#if (eq ../selected.id id)}}selected{{/if}}" data-subrace-id="{{id}}">
+          <img src="{{img}}" alt="{{name}}" />
+          <div class="subrace-name">{{name}}</div>
+        </div>
+      {{/each}}
+    </div>
+
+    {{#if selected}}
+      <div class="subrace-preview">
+        <img src="{{selected.img}}" class="subrace-big-img" />
+        <div class="subrace-info">
+          <h2>{{selected.name}}</h2>
+          <p>{{selected.description}}</p>
+          <div class="subrace-bonus">
+            +1 {{selected.buff1}}, +1 {{selected.buff2}}
+          </div>
+          <div class="subrace-ability">
+            <strong>{{localize "TM.RaceAbility"}}:</strong>
+            <p>{{selected.wildPower}}</p>
+          </div>
+          <button class="btn-confirm-subrace">{{localize "TM.RaceConfirm"}}</button>
+        </div>
+      </div>
+    {{/if}}
+
+    <button class="btn-cancel-subrace">{{localize "TM.RaceExit"}}</button>
+  </div>
+</div>

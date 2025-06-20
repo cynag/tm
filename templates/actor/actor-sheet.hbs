@@ -82,10 +82,18 @@
   </div>
 
   <div style="margin-top: 5px;">
+
     <strong>{{localize "TM.LabelRace"}}:</strong>
-    {{#each actor.items as |item|}}
-      {{#if (eq item.type "race")}}<em>{{item.name}}</em>{{/if}}
-    {{/each}}
+<span class="race-display" data-action="show-race" style="cursor: pointer; text-decoration: underline dotted;">
+  {{#if actor.flags.tm.raceData.name}}
+    {{actor.flags.tm.raceData.name}}{{#if actor.flags.tm.subRaceData.name}} ({{actor.flags.tm.subRaceData.name}}){{/if}}
+  {{else}}
+    <em>—</em>
+  {{/if}}
+</span>
+
+
+
     &nbsp;&nbsp;&nbsp;
     <strong>{{localize "TM.LabelOrigin"}}:</strong>
     {{#each actor.items as |item|}}

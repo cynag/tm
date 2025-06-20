@@ -3,7 +3,7 @@ export class GridAutoSort {
     const items = actor.items.filter(i =>
       i.system.grid &&
       !i.system.equippedSlot &&
-      !["race", "origin", "trait", "language"].includes(i.type)
+      !["origin", "trait", "language"].includes(i.type)
 
     );
 

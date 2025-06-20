@@ -61,8 +61,8 @@ export class TMActor extends Actor {
   s.player_pa = Math.min(s.player_pa, s.player_pa_max);
 
   // === BUFFS POR CARTAS ESCOLHIDAS NO CARD PANEL ===
-const selected = s.activeCards || {};
-for (const [level, ids] of Object.entries(selected)) {
+  const selected = s.activeCards || {};
+  for (const [level, ids] of Object.entries(selected)) {
   for (const id of ids) {
     const carta = CardsDB[level]?.find(c => c.id === id);
 if (!carta || Number(level) > s.player_level) continue;
@@ -81,20 +81,11 @@ if (Number.isInteger(carta.hp)) {
   s.player_hp_max += carta.hp;
 }
   }
-}
+  }
 
 
   // === CRÔNICA E CORINGAS ===
   s.player_chronicle ??= "";
-
-  // === BUFFS POR RAÇA ===
-  const race = this.items.find(i => i.type === "race");
-  if (race) {
-    const r = race.system;
-    s[`player_${r.race_buff_1}`] += 1;
-    s[`player_${r.race_buff_2}`] += 1;
-    s.player_movement = r.race_movement;
-  }
 
   // === ORIGEM: SCRIPT ===
   const origin = this.items.find(i => i.type === "origin");
@@ -107,6 +98,26 @@ if (Number.isInteger(carta.hp)) {
       console.warn(`[ORIGIN] Erro ao executar script da origem "${origin.name}":`, err);
     }
   }
+
+  // === BUFFS POR RAÇA (via flag) ===
+const race = this.getFlag("tm", "raceData");
+const subrace = this.getFlag("tm", "subRaceData");
+
+const validAttrs = ["letality", "dexterity", "impulse", "arcana", "erudition", "virtue", "protection"];
+
+if (subrace) {
+  const sb1 = subrace.buff1;
+  const sb2 = subrace.buff2;
+  if (validAttrs.includes(sb1)) s[`player_${sb1}`] += 1;
+  if (validAttrs.includes(sb2)) s[`player_${sb2}`] += 1;
+} else if (race && !race.subraces?.length) {
+  const buff1 = race.buff1;
+  const buff2 = race.buff2;
+  if (validAttrs.includes(buff1)) s[`player_${buff1}`] += 1;
+  if (validAttrs.includes(buff2)) s[`player_${buff2}`] += 1;
+}
+
+
 
   // === RESISTÊNCIAS ===
   const defaultResistances = {
@@ -135,10 +146,6 @@ async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
   for (let item of incoming) {
     const type = item.type;
 
-    if (type === "race") {
-      const existing = this.items.find(i => i.type === "race");
-      if (existing) await existing.delete();
-    }
 
     if (type === "origin") {
       const existing = this.items.find(i => i.type === "origin");

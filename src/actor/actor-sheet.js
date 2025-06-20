@@ -67,6 +67,16 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
       this._isRendering = false;
     });
 
+    // Força seleção de raça se ainda não confirmada
+const hasRace = await this.actor.getFlag("tm", "raceConfirmed");
+if (!hasRace) {
+  console.log("[RaceSelector] Exibindo tela de seleção de raça");
+  const { RaceSelector } = await import("../race/race-selector.js");
+  new RaceSelector(this.actor, { readOnly: false }).render(true);
+
+}
+
+
     return rendered;
     
   }
@@ -108,6 +118,13 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
   const current = foundry.utils.getProperty(this.actor.system, path.split(".").slice(1).join("."));
   await this.actor.update({ [path]: current + step });
 });
+
+  html.find("[data-action='show-race']").on("click", async () => {
+  const { RaceSelector } = await import("../race/race-selector.js");
+  const selector = new RaceSelector(this.actor, { readOnly: false });
+  selector.render(true);
+});
+
 
   }
 

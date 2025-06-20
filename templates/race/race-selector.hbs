@@ -1,0 +1,42 @@
+<div class="race-selector-overlay">
+  <div class="race-selector-container">
+
+    <div class="race-cards">
+      {{#each races}}
+        <div class="race-card {{#if (eq ../selected.id id)}}selected{{/if}}" data-race-id="{{id}}">
+          <img src="{{img}}" alt="{{name}}" />
+          <div class="race-name">{{name}}</div>
+        </div>
+      {{/each}}
+    </div>
+
+    {{#if selected}}
+      <div class="race-preview">
+        <img src="{{selected.img}}" class="race-big-img"/>
+        <div class="race-info">
+          <h2>{{selected.name}}</h2>
+          <p>{{selected.description}}</p>
+
+          {{#unless selected.subraces}}
+  <div class="race-bonus">
+    +1 {{selected.buff1}}, +1 {{selected.buff2}}
+  </div>
+  <div class="race-ability">
+    <strong>{{localize "TM.RaceAbility"}}:</strong>
+    <p>{{selected.wildPower}}</p>
+  </div>
+{{/unless}}
+
+
+          {{#if ../readOnly}}
+            <button class="btn-change">{{localize "TM.RaceChange"}}</button>
+          {{else}}
+            <button class="btn-confirm">{{localize "TM.RaceConfirm"}}</button>
+          {{/if}}
+        </div>
+      </div>
+    {{/if}}
+
+    <button class="btn-cancel">{{localize "TM.RaceExit"}}</button>
+  </div>
+</div>

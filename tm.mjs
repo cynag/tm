@@ -8,11 +8,13 @@ import { TMActorSheet } from "./src/actor/actor-sheet.js";
 
 import { ConsumableSheet } from "./src/item/consumable-sheet.js";
 import { GearSheet } from "./src/item/gear-sheet.js";
-import { RaceSheet } from "./src/item/race-sheet.js";
 import { OriginSheet } from "./src/item/origin-sheet.js";
 import { LanguageSheet } from "./src/item/language-sheet.js";
 import { TraitSheet } from "./src/item/trait-sheet.js";
 
+import { RaceSelector } from "./src/race/race-selector.js";
+import { RaceDB } from "./src/race/race-db.js";
+import { SubRaceSelector } from "./src/race/subrace-selector.js";
 
 import { GridInventory } from "./src/grid/grid-inventory.js";
 import { GridUtils } from "./src/grid/grid-utils.js";
@@ -62,12 +64,13 @@ Hooks.once("init", async function () {
   foundry.documents.collections.Actors.registerSheet("tm", TMActorSheet, { makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", ConsumableSheet, { types: ["consumable"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", GearSheet, { types: ["gear"], makeDefault: true });
-  foundry.documents.collections.Items.registerSheet("tm", RaceSheet, { types: ["race"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", OriginSheet, { types: ["origin"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", TraitSheet, { types: ["trait"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", LanguageSheet, { types: ["language"], makeDefault: true });
 
   GridInventory.init();
+
+  
 
   // ✅ Handlebars Helpers
   Handlebars.registerHelper("eq", (a, b) => a === b);
@@ -109,7 +112,11 @@ Hooks.once("ready", () => {
     ItemTooltip,
 
     CardPanel,
-    CardsDB
+    CardsDB,
+
+    RaceSelector,
+    RaceDB,
+    SubRaceSelector
   };
 
   Hooks.on("renderTMActorSheet", (app, html, data) => {

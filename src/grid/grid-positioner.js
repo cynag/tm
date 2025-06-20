@@ -1,13 +1,6 @@
 export class GridPositioner {
   static placeItem(actor, item, x, y, rotated = false) {
-    if (["race"].includes(item.type)) {
-  console.warn(`[GridPositioner] ⛔ Ignorado tipo não físico: ${item.type}`);
-  const current = actor.system.gridInventory?.items ?? [];
-  const updated = current.filter(i => i.id !== item.id);
-  actor.update({ "system.gridInventory.items": updated });
-  return;
-}
-
+ 
     const rawW = item?.system?.grid?.w ?? 1;
     const rawH = item?.system?.grid?.h ?? 1;
 
@@ -24,6 +17,6 @@ export class GridPositioner {
   static removeItem(actor, itemId) {
     const current = actor.system.gridInventory?.items ?? [];
     const updated = current.filter(i => i.id !== itemId);
-    actor.update({ "system.gridInventory.items": updated });
+    actor.update({ "system.gridInventory.items": updated }); 
   }
 }
