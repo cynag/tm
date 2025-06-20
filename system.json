@@ -26,7 +26,6 @@
   "Item": {
     "gear": {},
     "consumable": {},
-    "card": {},
     "race":{},
     "origin":{},
     "trait":{},

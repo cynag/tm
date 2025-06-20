@@ -128,14 +128,6 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
     let itemData = await Item.implementation.fromDropData(data);
     if (itemData instanceof Item) itemData = itemData.toObject();
 
-    // ❌ Duplicata de carta
-    if (itemData.type === "card") {
-      const exists = this.actor.items.find(i => i.type === "card" && i.name === itemData.name);
-      if (exists) {
-        ui.notifications.warn(`Você já possui a carta "${itemData.name}".`);
-        return;
-      }
-    }
 
     const created = await this.actor.createEmbeddedDocuments("Item", [itemData]);
     const newItem = created[0];

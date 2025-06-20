@@ -1,6 +1,6 @@
 export class GridPositioner {
   static placeItem(actor, item, x, y, rotated = false) {
-    if (["card", "race"].includes(item.type)) {
+    if (["race"].includes(item.type)) {
   console.warn(`[GridPositioner] ⛔ Ignorado tipo não físico: ${item.type}`);
   const current = actor.system.gridInventory?.items ?? [];
   const updated = current.filter(i => i.id !== item.id);

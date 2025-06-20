@@ -47,17 +47,6 @@ export class TMObject extends Item {
         if (!Number.isInteger(data.stack_value)) data.stack_value = 10;
       }
     }
- // =============================
-    // CARD
-    // =============================
-    if (this.type === "card") {
-  const attrs = ["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"];
-
-  if (!attrs.includes(data.card_bonus_2)) data.card_bonus_2 = "letality";
-  if (!attrs.includes(data.card_bonus_1)) data.card_bonus_1 = "dexterity";
-  if (!Number.isInteger(data.card_bonus_hp)) data.card_bonus_hp = 0;
-  if (!Number.isInteger(data.card_level)) data.card_level = 1;
-}
 
 // =============================
 // RACE

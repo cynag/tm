@@ -1,3 +1,6 @@
+import { CardsDB } from "../cards/cards-db.js";
+
+
 export class TMActor extends Actor {
   prepareBaseData() {
   super.prepareBaseData();
@@ -61,7 +64,7 @@ export class TMActor extends Actor {
 const selected = s.activeCards || {};
 for (const [level, ids] of Object.entries(selected)) {
   for (const id of ids) {
-    const carta = game.tm.CardsDB[level]?.find(c => c.id === id);
+    const carta = CardsDB[level]?.find(c => c.id === id);
 if (!carta || Number(level) > s.player_level) continue;
 
     if (!carta) continue;
@@ -119,7 +122,7 @@ if (Number.isInteger(carta.hp)) {
   s.resistances = foundry.utils.mergeObject(defaultResistances, s.resistances || {}, { inplace: false });
 }
 
-// Previne múltiplas cartas com o mesmo nome
+// temporario
 async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
   if (embeddedName !== "Item") return true;
 
@@ -129,16 +132,8 @@ async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
     return Item.implementation.fromDropData(i).then(d => d.toObject());
   }));
 
-  const existingCards = this.items.filter(i => i.type === "card").map(i => i.name);
-
   for (let item of incoming) {
     const type = item.type;
-    const name = item.name;
-
-    if (type === "card" && existingCards.includes(name)) {
-      ui.notifications.warn(`Você já possui a carta "${name}".`);
-      return false;
-    }
 
     if (type === "race") {
       const existing = this.items.find(i => i.type === "race");
