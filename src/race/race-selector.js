@@ -20,12 +20,18 @@ export class RaceSelector extends Application {
   }
 
   getData() {
-    return {
-      races: game.tm?.RaceDB || [],
-      selected: this.selectedRace,
-      readOnly: this.readOnly
-    };
+  const races = game.tm?.RaceDB || [];
+  if (!this.selectedRace && races.length > 0) {
+    this.selectedRace = races[0];
+    console.log("[RaceSelector] Primeira raça ativada automaticamente:", this.selectedRace.name);
   }
+
+  return {
+    races,
+    selected: this.selectedRace,
+    readOnly: this.readOnly
+  };
+}
 
   async _renderOuter(...args) {
     const html = await super._renderOuter(...args);
