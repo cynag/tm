@@ -1,0 +1,44 @@
+<!-- templates/origin/origin-selector.hbs -->
+<div id="origin-selector" class="origin-selector-overlay">
+
+  <div class="origin-selector-container">
+
+    <div class="origin-cards">
+      {{#each origins}}
+        <div class="origin-card {{#if (eq ../selected.id id)}}selected{{/if}}" data-origin-id="{{id}}">
+          <img src="{{img}}" alt="{{name}}" />
+          <div class="origin-name">{{name}}</div>
+        </div>
+      {{/each}}
+    </div>
+
+    {{#if selected}}
+      <div class="origin-preview">
+        <img class="origin-big-img" src="{{selected.img}}" />
+        <div class="origin-info">
+          <h2>{{selected.name}}</h2>
+          <p>{{selected.description}}</p>
+
+          {{#if selected.bonus}}
+            <div class="origin-bonus">{{selected.bonus}}</div>
+          {{/if}}
+
+          {{#if selected.ability}}
+            <div class="origin-ability">
+              <strong>{{localize "TM.SpecialAbility"}}:</strong>
+              <div>{{selected.ability}}</div>
+            </div>
+          {{/if}}
+
+          {{#unless ../readOnly}}
+            <button class="btn-confirm">{{localize "TM.Confirm"}}</button>
+          {{else}}
+            <button class="btn-change">{{localize "TM.Change"}}</button>
+          {{/unless}}
+        </div>
+      </div>
+    {{/if}}
+
+    <button class="btn-cancel">{{localize "TM.Cancel"}}</button>
+  </div>
+</div>

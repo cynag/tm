@@ -6,7 +6,7 @@ export class GridAutoPosition {
    * 3. Se nenhum couber, cancela e avisa
    */
   static placeNewItem(actor, item) {
-    if (["origin", "trait", "language"].includes(item.type)) {
+    if (["trait", "language"].includes(item.type)) {
   console.warn(`[GridAutoPosition] ⛔ Ignorado tipo não físico: ${item.type}`);
   return;
 }

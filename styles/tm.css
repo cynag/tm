@@ -910,3 +910,133 @@ button.btn-cancel-subrace:hover {
   background: #444;
   border-color: #aaa;
 }
+/* === ORIGIN SELECTOR === */
+.origin-selector-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+.origin-selector-container {
+  width: 95%;
+  max-width: 1200px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  color: white;
+}
+
+.origin-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.origin-card {
+  width: 150px;
+  height: 220px;
+  background: #1a1a1a;
+  border: 2px solid #444;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.origin-card:hover {
+  border-color: #888;
+  transform: scale(1.03);
+}
+
+.origin-card.selected {
+  border-color: #4ecdc4;
+  box-shadow: 0 0 10px #4ecdc4aa;
+  transform: scale(1.05);
+}
+
+.origin-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.origin-name {
+  text-align: center;
+  font-weight: bold;
+  padding: 5px;
+  font-size: 1rem;
+}
+
+.origin-preview {
+  display: flex;
+  gap: 2rem;
+  background: #222;
+  padding: 1.5rem;
+  border: 1px solid #555;
+  border-radius: 8px;
+  align-items: flex-start;
+}
+
+.origin-big-img {
+  width: 200px;
+  height: 300px;
+  object-fit: contain;
+  border: 1px solid #888;
+}
+
+.origin-info {
+  flex: 1;
+}
+
+.origin-info h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.6rem;
+}
+
+.origin-info p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.origin-bonus {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  color: #f1c40f;
+}
+
+.origin-ability strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 1rem;
+  color: #c5e1ff;
+}
+
+button.btn-confirm,
+button.btn-cancel {
+  background: #2d2d2d;
+  color: white;
+  border: 1px solid #666;
+  padding: 8px 14px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
+}
+
+button.btn-confirm:hover,
+button.btn-cancel:hover {
+  background: #444;
+  border-color: #aaa;
+}

@@ -35,7 +35,7 @@ export class GridRenderer {
   const item = actor.items.get(cell.itemId);
 
   // 🛑 Ignora itens não físicos
-if (!item || ["card", "race", "origin", "trait", "language"].includes(item.type)) continue;
+if (!item || ["trait", "language"].includes(item.type)) continue;
 
 
 

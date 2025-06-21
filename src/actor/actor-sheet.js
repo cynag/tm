@@ -79,6 +79,9 @@ setTimeout(async () => {
 
 
 
+
+
+
     return rendered;
     
   }
@@ -126,6 +129,16 @@ setTimeout(async () => {
   const selector = new RaceSelector(this.actor, { readOnly: false });
   selector.render(true);
 });
+
+html.find("[data-action='show-origin']").on("click", async () => {
+  const { OriginSelector } = await import("../origin/origin-selector.js");
+  new OriginSelector(this.actor).render(true);
+});
+
+
+
+
+
 
 
   }

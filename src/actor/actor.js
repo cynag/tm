@@ -2,7 +2,8 @@ import { CardsDB } from "../cards/cards-db.js";
 
 
 export class TMActor extends Actor {
-  prepareBaseData() {
+ async prepareBaseData() {
+
   super.prepareBaseData();
   const s = this.system;
 
@@ -87,17 +88,22 @@ if (Number.isInteger(carta.hp)) {
   // === CRÔNICA E CORINGAS ===
   s.player_chronicle ??= "";
 
-  // === ORIGEM: SCRIPT ===
-  const origin = this.items.find(i => i.type === "origin");
-  if (origin?.system?.origin_effect_script) {
-    try {
-      const fn = new Function("actor", origin.system.origin_effect_script);
-      fn(this);
-      console.log(`[ORIGIN] Script da origem "${origin.name}" executado com sucesso.`);
-    } catch (err) {
-      console.warn(`[ORIGIN] Erro ao executar script da origem "${origin.name}":`, err);
+// === ORIGEM (via flag) ===
+const originScript = await this.getFlag("tm", "originScript");
+
+if (originScript) {
+  try {
+    const fn = eval(`(${originScript})`);
+    if (typeof fn === "function") {
+      await fn(this);
+      console.log(`[ORIGIN] Script da origem executado via flag.`);
     }
+  } catch (err) {
+    console.warn(`[ORIGIN] Erro ao executar script da origem via flag:`, err);
   }
+}
+
+
 
   // === BUFFS POR RAÇA (via flag) ===
 const race = this.getFlag("tm", "raceData");

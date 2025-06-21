@@ -96,9 +96,15 @@
 
     &nbsp;&nbsp;&nbsp;
     <strong>{{localize "TM.LabelOrigin"}}:</strong>
-    {{#each actor.items as |item|}}
-      {{#if (eq item.type "origin")}}<em>{{item.name}}</em>{{/if}}
-    {{/each}}
+<span class="origin-display" data-action="show-origin" style="cursor: pointer; text-decoration: underline dotted;">
+  {{#each actor.items as |item|}}
+    {{#if (eq item.type "origin")}}
+      {{item.name}}
+    {{/if}}
+  {{/each}}
+  {{#unless (hasOrigin actor.items)}}<strong style="color: #ff4444;"> ! </strong>{{/unless}}
+</span>
+
   </div>
 </header>
 

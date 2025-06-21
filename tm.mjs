@@ -8,13 +8,15 @@ import { TMActorSheet } from "./src/actor/actor-sheet.js";
 
 import { ConsumableSheet } from "./src/item/consumable-sheet.js";
 import { GearSheet } from "./src/item/gear-sheet.js";
-import { OriginSheet } from "./src/item/origin-sheet.js";
 import { LanguageSheet } from "./src/item/language-sheet.js";
 import { TraitSheet } from "./src/item/trait-sheet.js";
 
 import { RaceSelector } from "./src/race/race-selector.js";
 import { RaceDB } from "./src/race/race-db.js";
 import { SubRaceSelector } from "./src/race/subrace-selector.js";
+import { OriginSelector } from "./src/origin/origin-selector.js";
+import { OriginDB } from "./src/origin/origin-db.js";
+
 
 import { GridInventory } from "./src/grid/grid-inventory.js";
 import { GridUtils } from "./src/grid/grid-utils.js";
@@ -60,12 +62,10 @@ Hooks.once("init", async function () {
 
   foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
   foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
-
   foundry.documents.collections.Actors.registerSheet("tm", TMActorSheet, { makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", ConsumableSheet, { types: ["consumable"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", GearSheet, { types: ["gear"], makeDefault: true });
-  foundry.documents.collections.Items.registerSheet("tm", OriginSheet, { types: ["origin"], makeDefault: true });
-  foundry.documents.collections.Items.registerSheet("tm", TraitSheet, { types: ["trait"], makeDefault: true });
+   foundry.documents.collections.Items.registerSheet("tm", TraitSheet, { types: ["trait"], makeDefault: true });
   foundry.documents.collections.Items.registerSheet("tm", LanguageSheet, { types: ["language"], makeDefault: true });
 
   GridInventory.init();
@@ -81,6 +81,10 @@ Hooks.once("init", async function () {
   Handlebars.registerHelper("array", (...args) => args.slice(0, -1));
   Handlebars.registerHelper("abs", value => Math.abs(value));
   Handlebars.registerHelper("multiply", (a, b) => a * b);
+  Handlebars.registerHelper("hasOrigin", (items) => {
+  return items?.some?.(i => i.type === "origin");
+});
+
 });
 
 
@@ -116,7 +120,10 @@ Hooks.once("ready", () => {
 
     RaceSelector,
     RaceDB,
-    SubRaceSelector
+    SubRaceSelector,
+    OriginSelector,
+    OriginDB
+
   };
 
   Hooks.on("renderTMActorSheet", (app, html, data) => {

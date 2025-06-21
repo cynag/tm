@@ -26,7 +26,6 @@
   "Item": {
     "gear": {},
     "consumable": {},
-    "origin":{},
     "trait":{},
     "language":{}
   }
