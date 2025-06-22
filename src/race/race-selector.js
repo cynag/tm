@@ -23,7 +23,7 @@ export class RaceSelector extends Application {
   const races = game.tm?.RaceDB || [];
   if (!this.selectedRace && races.length > 0) {
     this.selectedRace = races[0];
-    console.log("[RaceSelector] Primeira raça ativada automaticamente:", this.selectedRace.name);
+    //console.log("[RaceSelector] Primeira raça ativada automaticamente:", this.selectedRace.name);
   }
 
   return {
@@ -50,26 +50,34 @@ export class RaceSelector extends Application {
       });
 
       html.find(".btn-confirm").on("click", async () => {
-        if (!this.selectedRace) return;
-        
-        if (this.selectedRace.subraces?.length) {
-  const { SubRaceSelector } = await import("./subrace-selector.js");
-  new SubRaceSelector(this.actor, this.selectedRace, async (subrace) => {
-    await this.actor.setFlag("tm", "raceConfirmed", true);
-    await this.actor.setFlag("tm", "raceData", this.selectedRace);
-    await this.actor.setFlag("tm", "subRaceData", subrace);
-    ui.notifications.info(`Raça "${this.selectedRace.name}" e sub-raça "${subrace.name}" escolhidas.`);
-    this.close(); // ← Fecha o RaceSelector corretamente
-  },this).render(true); // ← passa referência do RaceSelector
-} else {
+  if (!this.selectedRace) return;
+
+  // 🔧 Sempre limpa dados anteriores
+  await this.actor.unsetFlag("tm", "raceData");
+  await this.actor.unsetFlag("tm", "subRaceData");
+
+  if (this.selectedRace.subraces?.length) {
+    const { SubRaceSelector } = await import("./subrace-selector.js");
+
+    new SubRaceSelector(this.actor, this.selectedRace, async (subrace) => {
+  subrace.raceId = this.selectedRace.id;
+
   await this.actor.setFlag("tm", "raceConfirmed", true);
   await this.actor.setFlag("tm", "raceData", this.selectedRace);
-  ui.notifications.info(`Raça "${this.selectedRace.name}" escolhida.`);
+  await this.actor.setFlag("tm", "subRaceData", subrace);
+  
   this.close();
-}
+}, this).render(true);
 
 
-      });
+  } else {
+    await this.actor.setFlag("tm", "raceConfirmed", true);
+    await this.actor.setFlag("tm", "raceData", this.selectedRace);
+    //ui.notifications.info(`Raça "${this.selectedRace.name}" escolhida.`);
+    this.close();
+  }
+});
+
     } else {
       html.find(".btn-change").on("click", () => {
         const selector = new RaceSelector(this.actor, { readOnly: false });

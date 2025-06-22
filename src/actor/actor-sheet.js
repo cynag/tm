@@ -26,8 +26,25 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   async getData() {
-    return await super.getData();
-  }
+  const data = await super.getData();
+
+  const raceData = this.actor.getFlag("tm", "raceData");
+  const subRaceData = this.actor.getFlag("tm", "subRaceData");
+  const originId = this.actor.getFlag("tm", "originId");
+  const origin = game.tm?.OriginDB?.find(o => o.id === originId);
+
+  data.actor.flags.tm = foundry.utils.mergeObject(data.actor.flags.tm ?? {}, {
+    raceData: raceData || null,
+    subRaceData: subRaceData || null,
+    originId: originId || null
+  });
+
+  data.originName = origin?.name || null;
+
+  return data;
+}
+
+
 
   async render(force, options) {
     if (this._isRendering) return;

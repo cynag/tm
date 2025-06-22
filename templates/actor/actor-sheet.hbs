@@ -97,13 +97,13 @@
     &nbsp;&nbsp;&nbsp;
     <strong>{{localize "TM.LabelOrigin"}}:</strong>
 <span class="origin-display" data-action="show-origin" style="cursor: pointer; text-decoration: underline dotted;">
-  {{#each actor.items as |item|}}
-    {{#if (eq item.type "origin")}}
-      {{item.name}}
-    {{/if}}
-  {{/each}}
-  {{#unless (hasOrigin actor.items)}}<strong style="color: #ff4444;"> ! </strong>{{/unless}}
+  {{#if originName}}
+    {{originName}}
+  {{else}}
+    <strong style="color: #ff4444;"> ! </strong>
+  {{/if}}
 </span>
+
 
   </div>
 </header>

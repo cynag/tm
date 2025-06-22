@@ -53,7 +53,27 @@ export const RaceDB = [
     description: "Elfos renegados, que encontraram um novo propósito na sombra de um Deus da Morte.",
     buff1: "arcana",
     buff2: "virtue",
-    wildPower: "under construction"
+    wildPower: "under construction",
+    subraces: [
+    {
+      id: "profano",
+      name: "Profano",
+      img: "systems/tm/styles/assets/races/profano.webp",
+      description: "Sub-raça de Buruk, conhecidos por sua força e resistência excepcionais.",
+      buff1: "letality",
+      buff2: "impulse",
+      wildPower: "Pode usar Investida como reação."
+    },
+    {
+      id: "imaculado",
+      name: "Imaculado",
+      img: "systems/tm/styles/assets/races/imaculado.webp",
+      description: "Sub-raça de Buruk, conhecidos por sua força e resistência excepcionais.",
+      buff1: "letality",
+      buff2: "impulse",
+      wildPower: "Pode usar Investida como reação."
+    },
+  ]
   },
   {
     id: "elfo",
@@ -85,7 +105,7 @@ export const RaceDB = [
     {
       id: "erenio",
       name: "Erênio",
-      img: "systems/tm/styles/assets/races/estepe.webp",
+      img: "systems/tm/styles/assets/races/erenio.webp",
       description: "Sub-raça de Buruk, especialistas em técnicas tribais e caça.",
       buff1: "dexterity",
       buff2: "erudition",
@@ -130,8 +150,8 @@ export const RaceDB = [
     wildPower: "under construction",
       subraces: [
     {
-      id: "prana",
-      name: "de Prana",
+      id: "imperial",
+      name: "Imperial",
       img: "systems/tm/styles/assets/races/prana.webp",
       description: "Sub-raça de Buruk, conhecidos por sua força e resistência excepcionais.",
       buff1: "letality",
@@ -139,8 +159,8 @@ export const RaceDB = [
       wildPower: "Pode usar Investida como reação."
     },
     {
-      id: "estepe",
-      name: "da Estepe",
+      id: "tribal",
+      name: "Tribal",
       img: "systems/tm/styles/assets/races/estepe.webp",
       description: "Sub-raça de Buruk, especialistas em técnicas tribais e caça.",
       buff1: "dexterity",

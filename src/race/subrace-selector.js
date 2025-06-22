@@ -8,12 +8,7 @@ export class SubRaceSelector extends Application {
     this.subraces = race.subraces || [];
     this.selected = this.subraces[0] ?? null; // default: primeira subraça
     this.onConfirm = onConfirm; // ← callback externo opcional
-    console.log("[SubRaceSelector] Instanciado", {
-      actor,
-      race,
-      subraces: this.subraces,
-      selected: this.selected
-    });
+  
   }
 
   static get defaultOptions() {
@@ -33,13 +28,13 @@ export class SubRaceSelector extends Application {
       subraces: this.subraces,
       selected: this.selected
     };
-    console.log("[SubRaceSelector] getData()", data);
+    //console.log("[SubRaceSelector] getData()", data);
     return data;
   }
 
   activateListeners(html) {
     super.activateListeners(html);
-    console.log("[SubRaceSelector] activateListeners");
+    //console.log("[SubRaceSelector] activateListeners");
 
     html.find(".subrace-card").on("click", (ev) => {
       const subraceId = ev.currentTarget.dataset.subraceId;
@@ -51,7 +46,7 @@ export class SubRaceSelector extends Application {
     html.find(".btn-confirm-subrace").on("click", async () => {
       if (!this.selected) return;
       await this.actor.setFlag("tm", "subRaceData", this.selected);
-      ui.notifications.info(`Subraça "${this.selected.name}" escolhida.`);
+      //ui.notifications.info(`Subraça "${this.selected.name}" escolhida.`);
 
       if (typeof this.onConfirm === "function") {
         await this.onConfirm(this.selected);

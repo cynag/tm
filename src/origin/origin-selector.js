@@ -41,20 +41,21 @@ export class OriginSelector extends Application {
       });
 
       html.find(".btn-confirm").on("click", async () => {
-        if (!this.selectedOrigin) return;
+  if (!this.selectedOrigin) return;
 
-        console.log(`[OriginSelector] Origem "${this.selectedOrigin.name}" confirmada.`);
+  console.log(`[OriginSelector] Origem "${this.selectedOrigin.name}" confirmada.`);
 
-        // Limpa flags anteriores
-        await this.actor.unsetFlag("tm", "originId");
-        await this.actor.unsetFlag("tm", "originScript");
+  await this.actor.unsetFlag("tm", "originId");
+  await this.actor.unsetFlag("tm", "originScript");
 
-        // Salva nova origem como flags
-        await this.actor.setFlag("tm", "originId", this.selectedOrigin.id);
-        await this.actor.setFlag("tm", "originScript", this.selectedOrigin.origin_effect_script || "");
+  await this.actor.setFlag("tm", "originId", this.selectedOrigin.id);
+  await this.actor.setFlag("tm", "originScript", this.selectedOrigin.origin_effect_script || "");
 
-        this.close();
-      });
+  await this.actor.setFlag("tm", "originConfirmed", true); // ✅ aqui
+
+  this.close();
+});
+
     }
 
     html.find(".btn-cancel").on("click", () => {
