@@ -227,49 +227,91 @@
   </div>
 
   <!-- ABA 🗣️ Habilidades -->
-  <div class="tab" data-group="main-tabs" data-tab="skills">
-    <h2 class="section-title">{{localize "TM.Languages"}}</h2>
-    <div class="language-list">
-      {{#each actor.items as |item|}}
-        {{#if (eq item.type "language")}}
-          <div class="language-row" data-item-id="{{item._id}}">
-            <img class="language-icon" src="{{item.img}}" width="40" height="40" />
-            <div class="language-info">
-              <div class="language-name">{{item.name}}</div>
-              <div class="language-level">{{item.system.language_level}}</div>
-            </div>
-            <button type="button" class="item-delete language-remove" title="{{localize 'TM.RemoveLanguage'}}">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        {{/if}}
-      {{/each}}
-    </div>
+<div class="tab" data-group="main-tabs" data-tab="skills">
 
-    <h2 class="section-title">{{localize "TM.Traits"}}</h2>
-    <div class="trait-list">
-      {{#each actor.items as |item|}}
-        {{#if (eq item.type "trait")}}
-          <div class="trait-row" data-item-id="{{item._id}}">
-            <img class="trait-icon" src="{{item.img}}" width="40" height="40" />
-            <div class="trait-info">
-              <div class="trait-name">{{item.name}}</div>
-              <div class="trait-tags">
-                {{#each item.system.tags as |tag|}}
-                  <span class="trait-tag" {{#if tag.tag_description}}data-tooltip="{{tag.tag_description}}"{{/if}}>
-                    {{tag.tag_name}}
-                  </span>
-                {{/each}}
-              </div>
-            </div>
-            <button type="button" class="item-delete trait-remove" title="{{localize 'TM.RemoveTrait'}}">
-              <i class="fas fa-times"></i>
-            </button>
+  <!-- Idiomas -->
+  <h2 class="section-title">{{localize "TM.Languages"}}</h2>
+  <div class="language-list">
+    {{#each actor.items as |item|}}
+      {{#if (eq item.type "language")}}
+        <div class="language-row" data-item-id="{{item._id}}">
+          <img class="language-icon" src="{{item.img}}" width="40" height="40" />
+          <div class="language-info">
+            <div class="language-name">{{item.name}}</div>
+            <div class="language-level">{{item.system.language_level}}</div>
           </div>
-        {{/if}}
-      {{/each}}
-    </div>
+          <button type="button" class="item-delete language-remove" title="{{localize 'TM.RemoveLanguage'}}">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      {{/if}}
+    {{/each}}
   </div>
+
+  <!-- Traços -->
+  <h2 class="section-title">{{localize "TM.Traits"}}</h2>
+  <div class="trait-list">
+    {{#each actor.items as |item|}}
+      {{#if (eq item.type "trait")}}
+        <div class="trait-row" data-item-id="{{item._id}}">
+          <img class="trait-icon" src="{{item.img}}" width="40" height="40" />
+          <div class="trait-info">
+            <div class="trait-name">{{item.name}}</div>
+            <div class="trait-tags">
+              {{#each item.system.tags as |tag|}}
+                <span class="trait-tag" {{#if tag.tag_description}}data-tooltip="{{tag.tag_description}}"{{/if}}>
+                  {{tag.tag_name}}
+                </span>
+              {{/each}}
+            </div>
+          </div>
+          <button type="button" class="item-delete trait-remove" title="{{localize 'TM.RemoveTrait'}}">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+
+  <!-- Perícias -->
+  <h2 class="section-title">{{localize "TM.Skills"}}</h2>
+  <div class="skill-list">
+    {{#each actor.items as |item|}}
+      {{#if (eq item.type "skill")}}
+        <div class="skill-row" data-item-id="{{item._id}}">
+          <img class="skill-icon" src="{{item.img}}" width="40" height="40" />
+          <div class="skill-info">
+            <div class="skill-name">{{item.name}}</div>
+            <div class="skill-description">{{item.system.description}}</div>
+          </div>
+          <button type="button" class="item-delete skill-remove" title="{{localize 'TM.RemoveSkill'}}">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+
+  <!-- Conhecimentos -->
+  <h2 class="section-title">{{localize "TM.Knowledges"}}</h2>
+  <div class="knowledge-list">
+    {{#each actor.items as |item|}}
+      {{#if (eq item.type "knowledge")}}
+        <div class="knowledge-row" data-item-id="{{item._id}}">
+          <img class="knowledge-icon" src="{{item.img}}" width="40" height="40" />
+          <div class="knowledge-info">
+            <div class="knowledge-name">{{item.name}}</div>
+            <div class="knowledge-description">{{item.system.description}}</div>
+          </div>
+          <button type="button" class="item-delete knowledge-remove" title="{{localize 'TM.RemoveKnowledge'}}">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+
+</div>
 
   <!-- ABA ⚔️ Ações -->
   <div class="tab" data-group="main-tabs" data-tab="actions"></div>

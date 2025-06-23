@@ -399,6 +399,114 @@ form.tm.sheet.actor {
   line-height: 20px;
   text-align: center;
 }
+
+/* ==========================
+   📁 SKILL (Perícias)
+   ========================== */
+
+.skill-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  padding: 4px 6px;
+  border: 1px solid #444;
+  background: #1f1f1f;
+}
+
+.skill-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+
+.skill-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.skill-name {
+  font-weight: bold;
+  color: white;
+}
+
+.skill-description {
+  font-size: 0.85em;
+  color: #ccc;
+}
+
+/* botão remover */
+.skill-remove {
+  background: none;
+  border: none;
+  color: #c88;
+  font-size: 1em;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+}
+
+
+/* ==========================
+   📁 KNOWLEDGE (Conhecimentos)
+   ========================== */
+
+.knowledge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  padding: 4px 6px;
+  border: 1px solid #444;
+  background: #1f1f1f;
+}
+
+.knowledge-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+
+.knowledge-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.knowledge-name {
+  font-weight: bold;
+  color: white;
+}
+
+.knowledge-description {
+  font-size: 0.85em;
+  color: #ccc;
+}
+
+.knowledge-remove {
+  background: none;
+  border: none;
+  color: #c88;
+  font-size: 1em;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+}
+
+
 /* === TM SYSTEM SHEET STYLES === */
 
 /* Corpo principal com scroll invisível */

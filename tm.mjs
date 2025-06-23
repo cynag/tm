@@ -1,7 +1,5 @@
 // === IMPORTS ===
 
-
-
 import { TMActor } from "./src/actor/actor.js";
 import { TMObject } from "./src/item/item.js";
 import { TMActorSheet } from "./src/actor/actor-sheet.js";
@@ -10,13 +8,14 @@ import { ConsumableSheet } from "./src/item/consumable-sheet.js";
 import { GearSheet } from "./src/item/gear-sheet.js";
 import { LanguageSheet } from "./src/item/language-sheet.js";
 import { TraitSheet } from "./src/item/trait-sheet.js";
+import { SkillSheet } from "./src/item/skill-sheet.js";
+import { KnowledgeSheet } from "./src/item/knowledge-sheet.js";
 
 import { RaceSelector } from "./src/race/race-selector.js";
 import { RaceDB } from "./src/race/race-db.js";
 import { SubRaceSelector } from "./src/race/subrace-selector.js";
 import { OriginSelector } from "./src/origin/origin-selector.js";
 import { OriginDB } from "./src/origin/origin-db.js";
-
 
 import { GridInventory } from "./src/grid/grid-inventory.js";
 import { GridUtils } from "./src/grid/grid-utils.js";
@@ -122,7 +121,9 @@ Hooks.once("ready", () => {
     RaceDB,
     SubRaceSelector,
     OriginSelector,
-    OriginDB
+    OriginDB,
+    SkillSheet,
+    KnowledgeSheet
 
   };
 

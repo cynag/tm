@@ -27,7 +27,9 @@
     "gear": {},
     "consumable": {},
     "trait":{},
-    "language":{}
+    "language":{},
+    "skill":{},
+    "knowledge":{}
   }
 },
   "packs": [],
