@@ -2,14 +2,21 @@
 import { GridUtils } from "../grid/grid-utils.js";
 import { GridRenderer } from "../grid/grid-renderer.js";
 import { GridAutoPosition } from "../grid/grid-auto-position.js";
+import { TalentPanel } from "../talents/talent-panel.js";
+
 
 export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
+  
   constructor(...args) {
     super(...args);
     this._onDropBound = this._onDrop.bind(this);
     this._isRendering = false;
     this._activeTab = "attributes";
-  }
+    this._scrollTop = 0;
+    this._blockScrollSave = false;
+
+
+}
 
   static get defaultOptions() {
   return foundry.utils.mergeObject(super.defaultOptions, {
@@ -23,7 +30,7 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
 
   get template() {
     return `systems/tm/templates/actor/actor-sheet.hbs`;
-  }
+}
 
   async getData() {
   const data = await super.getData();
@@ -44,64 +51,94 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
   return data;
 }
 
+async render(force = false, options = {}) {
+  const el = this.element?.find(".main-content")[0];
+
+  // Salva scroll apenas se já renderizado, não bloqueado e scroll ≠ 0
+  if (!this._blockScrollSave && this.rendered && el && el.scrollTop > 0) {
+    const key = `scroll-${this.actor.id}`;
+    sessionStorage.setItem(key, el.scrollTop);
+    console.log("[TMActorSheet] Scroll salvo:", el.scrollTop);
+  }
+
+  this._blockScrollSave = false;
 
 
-  async render(force, options) {
-    if (this._isRendering) return;
-    this._isRendering = true;
 
-    const rendered = await super.render(force, options);
+  if (this._isRendering) return;
+  this._isRendering = true;
 
-    requestAnimationFrame(() => {
-      const html = this.element;
-      const tabId = this._activeTab;
+  const rendered = await super.render(force, options);
 
-      // 🧩 Tabs
-      const tabs = html.find(".tab");
-      const activeTab = html.find(`.tab[data-tab="${tabId}"]`);
-      const allButtons = html.find(".tab-button");
+  requestAnimationFrame(() => {
+    const html = this.element;
+    const tabId = this._activeTab;
 
-      tabs.hide();
-      activeTab.show();
-      allButtons.removeClass("active");
-      allButtons.filter(`[data-tab="${tabId}"]`).addClass("active");
+    const tabs = html.find(".tab");
+    const activeTab = html.find(`.tab[data-tab="${tabId}"]`);
+    const allButtons = html.find(".tab-button");
 
-      // 🧱 Inventário e Equipamento
-      const gear = html.find("#gear-slots")[0];
-      const grid = html.find("#grid-inventory")[0];
+    tabs.hide();
+    activeTab.show();
+    allButtons.removeClass("active");
+    allButtons.filter(`[data-tab="${tabId}"]`).addClass("active");
 
-      if (gear) game.tm.GearRenderer.render(gear, this.actor);
-      if (grid) {
-        const vGrid = GridUtils.createVirtualGrid(this.actor);
-        GridRenderer.renderGrid(grid, vGrid);
+    const gear = html.find("#gear-slots")[0];
+    const grid = html.find("#grid-inventory")[0];
+
+    if (gear) game.tm.GearRenderer.render(gear, this.actor);
+    if (grid) {
+      const vGrid = GridUtils.createVirtualGrid(this.actor);
+      GridRenderer.renderGrid(grid, vGrid);
+    }
+
+    const wrapper = html.closest(".app");
+    const winContent = wrapper?.find(".window-content")[0];
+    if (winContent) winContent.style.overflow = "hidden";
+
+    const talentPanel = html.find(".tab[data-tab='skills']")[0];
+    if (talentPanel) {
+      game.tm.TalentPanel.render($(talentPanel), this.actor);
+    }
+
+    // 🟨 Retry até restaurar scroll corretamente
+    const key = `scroll-${this.actor.id}`;
+    const scrollValue = parseInt(sessionStorage.getItem(key) || "0");
+    let attempts = 0;
+
+    const tryRestoreScroll = () => {
+      const el = this.element.find(".main-content")[0];
+      if (el) {
+        el.scrollTop = scrollValue;
+        console.log("[TMActorSheet] Scroll restaurado:", scrollValue);
+        if (el.scrollTop === scrollValue || attempts >= 5) return;
       }
+      if (attempts < 5) {
+        attempts++;
+        setTimeout(tryRestoreScroll, 100);
+      }
+    };
 
-      // 📏 Corrige overflow
-      const wrapper = html.closest(".app");
-      const winContent = wrapper?.find(".window-content")[0];
-      if (winContent) winContent.style.overflow = "hidden";
+    tryRestoreScroll();
 
-      this._isRendering = false;
-    });
+    this._isRendering = false;
+  });
 
-    // Força seleção de raça se ainda não confirmada
-setTimeout(async () => {
-  const hasRace = await this.actor.getFlag("tm", "raceConfirmed");
-  if (!hasRace) {
-    console.log("[RaceSelector] Exibindo tela de seleção de raça");
-    const { RaceSelector } = await import("../race/race-selector.js");
-    new RaceSelector(this.actor).render(true);
-  }
-}, 10);
+  setTimeout(async () => {
+    const hasRace = await this.actor.getFlag("tm", "raceConfirmed");
+    if (!hasRace) {
+      console.log("[RaceSelector] Exibindo tela de seleção de raça");
+      const { RaceSelector } = await import("../race/race-selector.js");
+      new RaceSelector(this.actor).render(true);
+    }
+  }, 10);
 
+  return rendered;
+}
 
 
 
 
-
-    return rendered;
-    
-  }
 
   activateListeners(html) {
     super.activateListeners(html);
@@ -152,20 +189,30 @@ html.find("[data-action='show-origin']").on("click", async () => {
   new OriginSelector(this.actor).render(true);
 });
 
-
-
-
-
-
-
+html.find("[data-target='system.base_erudition']").on("change", async () => {
+  // Salva scroll antes de atualizar o ator
+  const el = this.element?.find(".main-content")[0];
+  if (el) {
+    const key = `scroll-${this.actor.id}`;
+    sessionStorage.setItem(key, el.scrollTop);
+    console.log("[TMActorSheet] Scroll pré-update salvo:", el.scrollTop);
   }
+
+  const erud = this.actor.system.base_erudition;
+  const sab = 14 + erud;
+  this._blockScrollSave = true;
+await this.actor.update({ "system.player_knowledge": sab });
+
+  console.log(`[Atualização] Sabedoria recalculada: ${sab}`);
+});
+}
 
   async close(...args) {
     if (game.tm?.GridPickup?.pickupData?.actorId === this.actor.id) {
       game.tm.GridPickup.cancel();
     }
     return super.close(...args);
-  }
+}
 
   async _onDrop(event) {
     event.preventDefault();
@@ -183,5 +230,6 @@ html.find("[data-action='show-origin']").on("click", async () => {
     if (!newItem) return;
 
     game.tm.GridAutoPosition.placeNewItem(this.actor, newItem);
-  }
+}
+
 }

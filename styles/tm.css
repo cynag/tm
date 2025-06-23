@@ -399,22 +399,18 @@ form.tm.sheet.actor {
   line-height: 20px;
   text-align: center;
 }
-
-/* ==========================
-   📁 SKILL (Perícias)
-   ========================== */
-
-.skill-row {
+.talent-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 5px;
-  padding: 4px 6px;
-  border: 1px solid #444;
-  background: #1f1f1f;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  gap: 10px;
 }
 
-.skill-icon {
+.talent-icon {
   width: 40px;
   height: 40px;
   object-fit: cover;
@@ -422,88 +418,62 @@ form.tm.sheet.actor {
   border-radius: 4px;
 }
 
-.skill-info {
-  flex: 1;
+.talent-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  flex-grow: 1;
+  line-height: 1.2;
 }
 
-.skill-name {
+.talent-name {
   font-weight: bold;
   color: white;
-}
-
-.skill-description {
-  font-size: 0.85em;
-  color: #ccc;
-}
-
-/* botão remover */
-.skill-remove {
-  background: none;
-  border: none;
-  color: #c88;
   font-size: 1em;
-  cursor: pointer;
-  padding: 0;
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
-  text-align: center;
 }
 
-
-/* ==========================
-   📁 KNOWLEDGE (Conhecimentos)
-   ========================== */
-
-.knowledge-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 5px;
-  padding: 4px 6px;
-  border: 1px solid #444;
-  background: #1f1f1f;
-}
-
-.knowledge-icon {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border: 1px solid #555;
+.talent-level {
+  font-size: 0.8em;
+  background: #333;
+  color: #ccc;
+  padding: 2px 8px;
   border-radius: 4px;
+  width: fit-content;
+  margin-top: 2px;
 }
 
-.knowledge-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.knowledge-name {
-  font-weight: bold;
-  color: white;
-}
-
-.knowledge-description {
-  font-size: 0.85em;
+.talent-attr,
+.talent-bonus,
+.talent-points {
+  font-size: 0.9em;
+  background: #222;
   color: #ccc;
+  padding: 2px 8px;
+  border-radius: 4px;
+  min-width: 50px;
+  text-align: center;
 }
 
-.knowledge-remove {
-  background: none;
+.talent-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.talent-buttons button {
+  background: #333;
   border: none;
-  color: #c88;
-  font-size: 1em;
-  cursor: pointer;
-  padding: 0;
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
+  color: #ccc;
+  font-weight: bold;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
   text-align: center;
+  cursor: pointer;
+}
+
+.talent-buttons button:hover {
+  background: #555;
+  color: white;
 }
 
 

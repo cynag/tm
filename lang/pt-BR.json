@@ -72,11 +72,6 @@
     "RaceConfirm": "Confirmar Raça",
     "RaceChange": "Mudar Raça",
     "RaceAbility": "Habilidade Coringa",
-    "RaceExit": "Sair",
-
-    "Skills": "Perícias",
-    "RemoveSkill": "Remover Perícia",
-    "Knowledges": "Conhecimentos",
-    "RemoveKnowledge": "Remover Conhecimento"
+    "RaceExit": "Sair"
   }
 }

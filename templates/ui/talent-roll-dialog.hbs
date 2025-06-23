@@ -1,0 +1,34 @@
+<form class="talent-roll-dialog">
+  <div class="row">
+    <label>Dados de Vantagem</label>
+    <div class="stepper" data-field="boons">
+      <button type="button" class="step-down">−</button>
+      <span class="value">{{boons}}</span>
+      <button type="button" class="step-up">+</button>
+    </div>
+
+    <label>Dificuldade</label>
+    <div class="stepper" data-field="difficulty">
+      <button type="button" class="step-down">−</button>
+      <span class="value">{{difficulty}}</span>
+      <button type="button" class="step-up">+</button>
+    </div>
+  </div>
+
+  <div class="bonus-display">Bônus total: <span class="total-bonus">{{totalBonus}}%</span></div>
+
+  <div class="dice-display">{{diceLabel}}</div>
+
+  <div class="checkboxes">
+  <label><input type="checkbox" data-bonus="10" data-field="help" {{#if help}}checked{{/if}}> Auxílio</label>
+  <label><input type="checkbox" data-bonus="10" data-field="knowledge" {{#if knowledge}}checked{{/if}}> Conhecimento</label>
+  <label><input type="checkbox" data-bonus="10" data-field="situation" {{#if situation}}checked{{/if}}> Situação</label>
+  <label><input type="checkbox" data-bonus="5" data-field="tool" {{#if tool}}checked{{/if}}> Ferramenta</label>
+</div>
+
+
+  <div class="footer">
+    <button type="button" class="cancel">Cancelar</button>
+    <button type="button" class="roll">Rolar</button>
+  </div>
+</form>

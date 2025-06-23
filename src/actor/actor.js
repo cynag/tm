@@ -1,5 +1,6 @@
 import { CardsDB } from "../cards/cards-db.js";
-
+import { SkillsDB } from "../talents/skills-db.js";
+import { KnowledgesDB } from "../talents/knowledges-db.js";
 
 export class TMActor extends Actor {
  async prepareBaseData() {
@@ -41,6 +42,7 @@ export class TMActor extends Actor {
   s.player_erudition  = s.base_erudition;
   s.player_virtue     = s.base_virtue;
 
+
   // === SECUNDÁRIOS / INICIAIS ===
   if (!Number.isInteger(s.player_reflex)) s.player_reflex = 0;
   if (!Number.isInteger(s.player_wisdom)) s.player_wisdom = 0;
@@ -60,6 +62,27 @@ export class TMActor extends Actor {
   if (!Number.isInteger(s.player_pa_max)) s.player_pa_max = 8;
   s.player_hp = Math.min(s.player_hp, s.player_hp_max);
   s.player_pa = Math.min(s.player_pa, s.player_pa_max);
+
+  // === TALENTOS ===
+s.talents ??= {};
+s.talents.skills ??= {};
+s.talents.knowledges ??= {};
+
+for (const skill of SkillsDB) {
+  const id = skill.id;
+  if (!s.talents.skills[id]) {
+    s.talents.skills[id] = { level: 0 };
+  }
+}
+
+for (const knowledge of KnowledgesDB) {
+  const id = knowledge.id;
+  if (!s.talents.knowledges[id]) {
+    s.talents.knowledges[id] = { level: 0 };
+  }
+}
+
+
 
   // === BUFFS POR CARTAS ESCOLHIDAS NO CARD PANEL ===
   const selected = s.activeCards || {};
@@ -123,6 +146,10 @@ if (subrace) {
   if (validAttrs.includes(buff2)) s[`player_${buff2}`] += 1;
 }
 
+// === SABEDORIA FINAL ===
+const erud = s.player_erudition;
+s.player_knowledge = 14 + erud;
+console.log(`[Actor] SAB calculado: ${s.player_knowledge}`);
 
 
   // === RESISTÊNCIAS ===
