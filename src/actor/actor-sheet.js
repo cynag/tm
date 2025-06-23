@@ -190,7 +190,6 @@ html.find("[data-action='show-origin']").on("click", async () => {
 });
 
 html.find("[data-target='system.base_erudition']").on("change", async () => {
-  // Salva scroll antes de atualizar o ator
   const el = this.element?.find(".main-content")[0];
   if (el) {
     const key = `scroll-${this.actor.id}`;
@@ -200,11 +199,13 @@ html.find("[data-target='system.base_erudition']").on("change", async () => {
 
   const erud = this.actor.system.base_erudition;
   const sab = 14 + erud;
-  this._blockScrollSave = true;
-await this.actor.update({ "system.player_knowledge": sab });
+  await this.actor.update({ "system.player_knowledge": sab });
+
+  this._blockScrollSave = true; // <- só BLOQUEIA após update
 
   console.log(`[Atualização] Sabedoria recalculada: ${sab}`);
 });
+
 }
 
   async close(...args) {
