@@ -83,29 +83,25 @@
 
   <div style="margin-top: 5px;">
 
-    <strong>{{localize "TM.LabelRace"}}:</strong>
-<span class="race-display" data-action="show-race" style="cursor: pointer; text-decoration: underline dotted;">
+    <div class="tag-row">
   {{#if actor.flags.tm.raceData.name}}
-    {{actor.flags.tm.raceData.name}}{{#if actor.flags.tm.subRaceData.name}} ({{actor.flags.tm.subRaceData.name}}){{/if}}
-  {{else}}
-    <em>—</em>
+    <span class="tag race-display" data-action="show-race">
+      {{actor.flags.tm.raceData.name}}{{#if actor.flags.tm.subRaceData.name}} ({{actor.flags.tm.subRaceData.name}}){{/if}}
+    </span>
   {{/if}}
-</span>
 
-
-
-    &nbsp;&nbsp;&nbsp;
-    <strong>{{localize "TM.LabelOrigin"}}:</strong>
-<span class="origin-display" data-action="show-origin" style="cursor: pointer; text-decoration: underline dotted;">
   {{#if originName}}
-    {{originName}}
+    <span class="tag origin-display" data-action="show-origin">
+      {{originName}}
+    </span>
   {{else}}
-    <strong style="color: #ff4444;"> ! </strong>
+    <span class="tag origin-display tag-warning" data-action="show-origin">
+      ORIGEM ⚠️
+    </span>
   {{/if}}
-</span>
+</div>
 
 
-  </div>
 </header>
 
 

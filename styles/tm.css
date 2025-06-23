@@ -1040,3 +1040,28 @@ button.btn-cancel:hover {
   background: #444;
   border-color: #aaa;
 }
+
+
+
+.tag-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.tag {
+  background: #2b2b2b;
+  color: #ddd;
+  padding: 2px 8px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.tag-warning {
+  background: #7a3700;
+  color: #fff0cc;
+  border-color: #cc7722;
+}
