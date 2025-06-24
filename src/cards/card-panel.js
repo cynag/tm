@@ -1,4 +1,6 @@
 import { CardsDB } from "./cards-db.js";
+import { CardTooltip } from "../ui/card-tooltip.js";
+
 
 export class CardPanel {
   static #animatedLevels = new Map();
@@ -27,10 +29,18 @@ row.classList.add("card-row");
       const active = s.activeCards?.[level] ?? [];
 
       for (let card of CardsDB[level] || []) {
+
+
+
         const div = document.createElement("div");
         div.classList.add("card-display");
         div.dataset.cardId = card.id;
         div.dataset.cardLevel = level;
+
+        // 🟦 Tooltip personalizado (aqui sim já existe `div`)
+div.addEventListener("mouseenter", (e) => CardTooltip.show(card, e));
+div.addEventListener("mouseleave", () => CardTooltip.close());
+
 
         const isActive = active.includes(card.id);
         const limitReached = active.length >= 3;
@@ -44,13 +54,9 @@ row.classList.add("card-row");
         img.width = 80;
         img.height = 112;
         img.alt = card.name;
-        img.title = `
-          ${card.name}\n\n
-          ${card.buff1 || ""}\n
-          ${card.buff2 || ""}\n
-          ${card.hp ? `PV: +${card.hp}` : ""}\n
-          ${card.description || ""}
-        `.trim();
+
+
+        img.title = "";
 
         const label = document.createElement("div");
         label.classList.add("card-name");

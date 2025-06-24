@@ -34,7 +34,18 @@ function renderTable(title, data, type, state, sabTotal, sabSpent, actor) {
 
   const attrValue = actor.system["player_" + entry.attribute] || 0;
   const attrBonus = attrValue * 2;
-  const attrName = entry.attribute ? entry.attribute.toUpperCase() : "-";
+  const ATTR_MAP = {
+  LETALITY: "LET",
+  DEXTERITY: "DES",
+  IMPULSE: "IMP",
+  ARCANA: "ARC",
+  ERUDITION: "ERU",
+  VIRTUE: "VIR"
+};
+
+const attrKey = ATTR_MAP[entry.attribute?.toUpperCase()] || entry.attribute?.toUpperCase() || "-";
+const attrName = game.i18n.localize(`TM.Attr${attrKey}`);
+
 const totalBonus = (level.bonus || 0) + attrBonus;
 
 const row = $(`

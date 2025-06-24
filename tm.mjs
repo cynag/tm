@@ -45,7 +45,7 @@ import { ItemTooltip } from "./src/ui/item-tooltip.js";
 
 import { CardPanel } from "./src/cards/card-panel.js";
 import { CardsDB } from "./src/cards/cards-db.js";
-
+import { CardTooltip } from "./src/ui/card-tooltip.js";
 
 
 // === INIT ===
@@ -120,6 +120,7 @@ Hooks.once("ready", () => {
 
     CardPanel,
     CardsDB,
+    CardTooltip,
 
     RaceSelector,
     RaceDB,
@@ -139,9 +140,5 @@ Hooks.once("ready", () => {
   game.tm.CardPanel.render(data.actor, container);
 });
 
-
-
   console.log("Terras Malditas | Sistema pronto");
-
-  
 });

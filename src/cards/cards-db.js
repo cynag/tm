@@ -41,7 +41,7 @@ export const CardsDB = {
       name: "O Soldado",
       img: "systems/tm/styles/assets/cards/1_5.webp",
       buff1: "impulse",
-      buff2: "erudition",
+      buff2: "letality",
       hp: 3,
       description: "Reflexos e brutalidade predatória.",
     },
