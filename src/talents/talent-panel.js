@@ -18,18 +18,9 @@ function getLevel(points) {
 function renderTable(title, data, type, state, sabTotal, sabSpent, actor) {
   const table = $(`
     <div class="talent-block">
-      <h3>${title}</h3>
+      <!-- <h3>${title}</h3> -->
       <table class="talent-table">
-        <thead>
-  <tr>
-    <th>Nome</th>
-    <th>Atributo Mod.</th>
-    <th>Nível</th>
-    <th>Bônus</th>
-    <th>Gasto</th>
-    <th></th>
-  </tr>
-</thead>
+        <!-- Cabeçalho removido -->
 
         <tbody></tbody>
       </table>
@@ -84,11 +75,14 @@ export class TalentPanel {
     const knowledges = actor.system.talents?.knowledges || {};
 
     const section = $(`<section class="talent-section"></section>`);
-    section.append(`<h2>Perícias e Conhecimentos <small>${sabSpent}/${sabTotal} SAB</small></h2>`);
+    //section.append(`<h2>Perícias e Conhecimentos <small>${sabSpent}/${sabTotal} SAB</small></h2>`);
 
     // === AQUI, passe o actor para o renderTable ===
-    section.append(renderTable("Perícias", SkillsDB, "skill", skills, sabTotal, sabSpent, actor));
-    section.append(renderTable("Conhecimentos", KnowledgesDB, "knowledge", knowledges, sabTotal, sabSpent, actor));
+  section.append(renderTable("Perícias", SkillsDB, "skill", skills, sabTotal, sabSpent, actor));
+  section.append(`<div class="talent-separator">//--//</div>`);
+  section.append(renderTable("Conhecimentos", KnowledgesDB, "knowledge", knowledges, sabTotal, sabSpent, actor));
+  section.append(`<div class="talent-separator">//--//</div>`);
+
 
     // Registra listener ANTES de anexar ao container
     section.find(".talent-row").on("click", ev =>  {
@@ -157,7 +151,10 @@ if (!level) {
   }
 
   await actor.update({ "system.talents": update });
-  actor.sheet.render(false);
+
+  const html = actor.sheet.element;
+  game.tm.TalentPanel.render(html, actor);
+
 });
 
   }

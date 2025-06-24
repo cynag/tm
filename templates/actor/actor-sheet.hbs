@@ -58,15 +58,16 @@
 
   <!-- 📌 Abas Laterais -->
 <div class="side-tabs-panel">
-  <button type="button" class="tab-button" data-tab="attributes">{{localize "TM.TabAttributes"}}</button>
-  <button type="button" class="tab-button" data-tab="skills">{{localize "TM.TabSkills"}}</button>
-  <button type="button" class="tab-button" data-tab="actions">{{localize "TM.TabActions"}}</button>
-  <button type="button" class="tab-button" data-tab="conditions">{{localize "TM.TabConditions"}}</button>
-  <button type="button" class="tab-button" data-tab="inventory">{{localize "TM.TabInventory"}}</button>
-  <button type="button" class="tab-button" data-tab="domains">{{localize "TM.TabDomains"}}</button>
-  <button type="button" class="tab-button" data-tab="cards">{{localize "TM.TabCards"}}</button>
-  <button type="button" class="tab-button" data-tab="biography">{{localize "TM.TabBiography"}}</button>
+  <button type="button" class="tab-button {{#if (eq activeTab 'attributes')}}active{{/if}}" data-tab="attributes" {{#if (eq activeTab 'attributes')}}data-active="true"{{/if}}>{{localize "TM.TabAttributes"}}</button>
+  <button type="button" class="tab-button {{#if (eq activeTab 'skills')}}active{{/if}}" data-tab="skills" {{#if (eq activeTab 'skills')}}data-active="true"{{/if}}>{{localize "TM.TabSkills"}}</button>
+  <button type="button" class="tab-button {{#if (eq activeTab 'actions')}}active{{/if}}" data-tab="actions" {{#if (eq activeTab 'actions')}}data-active="true"{{/if}}>{{localize "TM.TabActions"}}</button>
+  <button type="button" class="tab-button {{#if (eq activeTab 'conditions')}}active{{/if}}" data-tab="conditions" {{#if (eq activeTab 'conditions')}}data-active="true"{{/if}}>{{localize "TM.TabConditions"}}</button>
+  <button type="button" class="tab-button {{#if (eq activeTab 'inventory')}}active{{/if}}" data-tab="inventory" {{#if (eq activeTab 'inventory')}}data-active="true"{{/if}}>{{localize "TM.TabInventory"}}</button>
+  <button type="button" class="tab-button {{#if (eq activeTab 'domains')}}active{{/if}}" data-tab="domains" {{#if (eq activeTab 'domains')}}data-active="true"{{/if}}>{{localize "TM.TabDomains"}}</button>
+  <button type="button" class="tab-button {{#if (eq activeTab 'cards')}}active{{/if}}" data-tab="cards" {{#if (eq activeTab 'cards')}}data-active="true"{{/if}}>{{localize "TM.TabCards"}}</button>
+  <button type="button" class="tab-button {{#if (eq activeTab 'biography')}}active{{/if}}" data-tab="biography" {{#if (eq activeTab 'biography')}}data-active="true"{{/if}}>{{localize "TM.TabBiography"}}</button>
 </div>
+
 
   <!-- 🧠 Header do Personagem -->
 <header class="sheet-header header-fixed">
@@ -230,7 +231,6 @@
 <div class="tab" data-group="main-tabs" data-tab="skills">
   <div id="talent-panel-container"></div>
 
-    <h2 class="section-title">{{localize "TM.Languages"}}</h2>
     <div class="language-list">
       {{#each actor.items as |item|}}
         {{#if (eq item.type "language")}}
@@ -247,8 +247,14 @@
         {{/if}}
       {{/each}}
     </div>
+  </div>
 
-    <h2 class="section-title">{{localize "TM.Traits"}}</h2>
+  <!-- ABA ⚔️ Ações -->
+  <div class="tab" data-group="main-tabs" data-tab="actions"></div>
+
+  <!-- ABA 💢 Condições -->
+<div class="tab" data-group="main-tabs" data-tab="conditions">
+  
     <div class="trait-list">
       {{#each actor.items as |item|}}
         {{#if (eq item.type "trait")}}
@@ -271,14 +277,7 @@
         {{/if}}
       {{/each}}
     </div>
-  </div>
 
-  <!-- ABA ⚔️ Ações -->
-  <div class="tab" data-group="main-tabs" data-tab="actions"></div>
-
-  <!-- ABA 💢 Condições -->
-<div class="tab" data-group="main-tabs" data-tab="conditions">
-  <!-- Conteúdo futuro para condições -->
 </div>
 
 <!-- ABA 🎒 Inventário -->

@@ -47,7 +47,7 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
   });
 
   data.originName = origin?.name || null;
-
+  data.activeTab = this._activeTab;
   return data;
 }
 
@@ -55,11 +55,12 @@ async render(force = false, options = {}) {
   const el = this.element?.find(".main-content")[0];
 
   // Salva scroll apenas se já renderizado, não bloqueado e scroll ≠ 0
-  if (!this._blockScrollSave && this.rendered && el && el.scrollTop > 0) {
-    const key = `scroll-${this.actor.id}`;
-    sessionStorage.setItem(key, el.scrollTop);
-    console.log("[TMActorSheet] Scroll salvo:", el.scrollTop);
-  }
+  if (!this._blockScrollSave && this.rendered && el && typeof el.scrollTop === "number") {
+  const key = `scroll-${this.actor.id}`;
+  sessionStorage.setItem(key, el.scrollTop);
+  console.log("[TMActorSheet] Scroll salvo:", el.scrollTop);
+}
+
 
   this._blockScrollSave = false;
 
@@ -75,31 +76,15 @@ async render(force = false, options = {}) {
     const tabId = this._activeTab;
 
     const tabs = html.find(".tab");
-    const activeTab = html.find(`.tab[data-tab="${tabId}"]`);
-    const allButtons = html.find(".tab-button");
+const activeTab = html.find(`.tab[data-tab="${tabId}"]`);
+const allButtons = html.find(".tab-button");
 
-    tabs.hide();
-    activeTab.show();
-    allButtons.removeClass("active");
-    allButtons.filter(`[data-tab="${tabId}"]`).addClass("active");
+tabs.removeClass("active").hide();
+activeTab.addClass("active").show();
+allButtons.removeClass("active");
+const activeButton = allButtons.filter(`[data-tab="${tabId}"]`);
+if (activeButton.length) activeButton.addClass("active");
 
-    const gear = html.find("#gear-slots")[0];
-    const grid = html.find("#grid-inventory")[0];
-
-    if (gear) game.tm.GearRenderer.render(gear, this.actor);
-    if (grid) {
-      const vGrid = GridUtils.createVirtualGrid(this.actor);
-      GridRenderer.renderGrid(grid, vGrid);
-    }
-
-    const wrapper = html.closest(".app");
-    const winContent = wrapper?.find(".window-content")[0];
-    if (winContent) winContent.style.overflow = "hidden";
-
-    const talentPanel = html.find(".tab[data-tab='skills']")[0];
-    if (talentPanel) {
-      game.tm.TalentPanel.render($(talentPanel), this.actor);
-    }
 
     // 🟨 Retry até restaurar scroll corretamente
     const key = `scroll-${this.actor.id}`;
@@ -121,7 +106,19 @@ async render(force = false, options = {}) {
 
     tryRestoreScroll();
 
+    if (this._activeTab === "cards" && options.tabClicked === true) {
+  console.log("[CardPanel] ResetAnimation (por clique real na aba)");
+  if (game.tm?.CardPanel?.resetAnimation) {
+    game.tm.CardPanel.resetAnimation(this.actor.id);
+  }
+}
+
+
+
     this._isRendering = false;
+
+    this.element?.attr("data-tab", this._activeTab);
+
   });
 
   setTimeout(async () => {
@@ -163,12 +160,20 @@ async render(force = false, options = {}) {
       if (itemId) await this.actor.deleteEmbeddedDocuments("Item", [itemId]);
     });
 
-    // 🧭 Tabs laterais
-    html.find(".tab-button").on("click", (ev) => {
-      const tabId = ev.currentTarget.dataset.tab;
-      this._activeTab = tabId;
-      this.render(false, {});
-    });
+    // 🧭 Tabs laterais (sem re-render)
+html.find(".tab-button").on("click", (ev) => {
+  const tabId = ev.currentTarget.dataset.tab;
+  this._activeTab = tabId;
+
+  const tabs = html.find(".tab");
+  const allButtons = html.find(".tab-button");
+
+  tabs.hide();
+  html.find(`.tab[data-tab="${tabId}"]`).show();
+  allButtons.removeClass("active");
+  html.find(`.tab-button[data-tab="${tabId}"]`).addClass("active");
+});
+
 
     html.find(".resource-btn").on("click", async (ev) => {
   const btn = ev.currentTarget;
@@ -205,6 +210,34 @@ html.find("[data-target='system.base_erudition']").on("change", async () => {
 
   console.log(`[Atualização] Sabedoria recalculada: ${sab}`);
 });
+
+html.find('.sheet-tabs[data-group="main-tabs"]').on("click", "button[data-tab='cards']", async () => {
+  this._activeTab = "cards";
+
+  await this.render(true);
+
+});
+
+
+
+
+
+
+
+// ✅ Renders obrigatórios sempre que a sheet abre
+const gear = html.find("#gear-slots")[0];
+const grid = html.find("#grid-inventory")[0];
+const talentPanel = html.find(".tab[data-tab='skills']")[0];
+
+if (gear) game.tm.GearRenderer.render(gear, this.actor);
+if (grid) {
+  const vGrid = game.tm.GridUtils.createVirtualGrid(this.actor);
+  game.tm.GridRenderer.renderGrid(grid, vGrid);
+}
+if (talentPanel) {
+  game.tm.TalentPanel.render($(talentPanel), this.actor);
+}
+
 
 }
 
