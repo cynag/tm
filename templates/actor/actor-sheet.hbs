@@ -111,17 +111,19 @@
 
   <!-- 🎚️ Coluna Lateral de Atributos -->
   <aside class="sidebar-fixed">
-    <div>{{localize "TM.AttrLet"}}: {{actor.system.player_letality}}</div>
-    <div>{{localize "TM.AttrDes"}}: {{actor.system.player_dexterity}}</div>
-    <div>{{localize "TM.AttrImp"}}: {{actor.system.player_impulse}}</div>
-    <div>{{localize "TM.AttrArc"}}: {{actor.system.player_arcana}}</div>
-    <div>{{localize "TM.AttrEru"}}: {{actor.system.player_erudition}}</div>
-    <div>{{localize "TM.AttrVir"}}: {{actor.system.player_virtue}}</div>
     <div>{{localize "TM.Protection"}}: {{actor.system.player_protection}}</div>
     <div>{{localize "TM.Initiative"}}: {{actor.system.player_initiative}}</div>
     <div>{{localize "TM.Movement"}}: {{actor.system.player_movement}}</div>
     <div>{{localize "TM.Reflex"}}: {{actor.system.player_reflex}}</div>
     <div>{{localize "TM.Knowledge"}}: {{actor.system.player_wisdom}}</div>
+
+     <hr />
+    <div><strong>🎖️ Armadura</strong></div>
+    <div>Metal: {{actor.system.player_armor_metal}}</div>
+    <div>Ruído: {{actor.system.player_armor_noisy}}</div>
+    <div>Ref.: {{actor.system.player_armor_reforced}}</div>
+    <div>Pesada: {{actor.system.player_armor_heavy}}</div>
+    <div>Térmica: {{actor.system.player_armor_thermic}}</div>
   </aside>
 
   <!-- 📂 Área das Abas -->

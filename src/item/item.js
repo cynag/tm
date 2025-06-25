@@ -27,6 +27,21 @@ export class TMObject extends Item {
       if (typeof data.subtype !== "string") data.subtype = "";
     }
 
+    if (this.type === "gear" && this.system.gear_type === "armor") {
+  this.system.armor_protection   ??= 0;
+  this.system.armor_efficiency   ??= 100; // padrão: 100%
+  this.system.armor_requeriment  ??= 0;
+  this.system.armor_broken       ??= false;
+
+  this.system.armor_traits ??= {};
+  this.system.armor_traits.trait_metal      ??= 0;
+  this.system.armor_traits.trait_noisy      ??= 0;
+  this.system.armor_traits.trait_reinforced ??= 0;
+  this.system.armor_traits.trait_heavy      ??= 0;
+  this.system.armor_traits.trait_thermic    ??= 0;
+}
+
+
     // =============================
     // CONSUMABLE
     // =============================

@@ -90,6 +90,59 @@
       <label>Description:</label>
       <textarea name="system.description" rows="4">{{item.system.description}}</textarea>
     </div>
+{{#if (eq item.system.gear_type "armor")}}
+  <hr />
+  <h3>Armadura</h3>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+
+    <div>
+      <label>Proteção:</label>
+      <input type="number" name="system.armor_protection" value="{{item.system.armor_protection}}" style="width: 60px;" />
+    </div>
+
+    <div>
+      <label>Eficácia (%):</label>
+      <input type="number" name="system.armor_efficiency" value="{{item.system.armor_efficiency}}" style="width: 60px;" />
+    </div>
+
+    <div>
+      <label>Requisito (IMP):</label>
+      <input type="number" name="system.armor_requeriment" value="{{item.system.armor_requeriment}}" style="width: 60px;" />
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 4px;">
+      <label>Quebrada:</label>
+      <input type="checkbox" name="system.armor_broken" {{checked item.system.armor_broken}} />
+    </div>
+
+  </div>
+
+  <h4>Traços da Armadura</h4>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <label>Metal:</label>
+      <input type="number" name="system.armor_traits.trait_metal" value="{{item.system.armor_traits.trait_metal}}" style="width: 60px;" />
+    </div>
+    <div>
+      <label>Ruído:</label>
+      <input type="number" name="system.armor_traits.trait_noisy" value="{{item.system.armor_traits.trait_noisy}}" style="width: 60px;" />
+    </div>
+    <div>
+      <label>Ref.:</label>
+      <input type="number" name="system.armor_traits.trait_reinforced" value="{{item.system.armor_traits.trait_reinforced}}" style="width: 60px;" />
+    </div>
+    <div>
+      <label>Pesada:</label>
+      <input type="number" name="system.armor_traits.trait_heavy" value="{{item.system.armor_traits.trait_heavy}}" style="width: 60px;" />
+    </div>
+    <div>
+      <label>Térmica:</label>
+      <input type="number" name="system.armor_traits.trait_thermic" value="{{item.system.armor_traits.trait_thermic}}" style="width: 60px;" />
+    </div>
+  </div>
+{{/if}}
 
   </section>
 </form>

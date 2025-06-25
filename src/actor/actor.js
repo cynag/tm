@@ -174,6 +174,92 @@ console.log("[Actor] Modificadores aplicados:", {
   VIR: s.mod_virtue
 });
 
+  // === PROTEÇÃO E TRAÇOS POR ARMADURA EQUIPADA ===
+let totalProt     = 0;
+let metalSum      = 0;
+let noisySum      = 0;
+let reforcedSum   = 0;
+let heavySum      = 0;
+let thermicSum    = 0;
+
+for (const [slotId, slot] of Object.entries(s.gearSlots)) {
+  const itemId = slot.itemId;
+  if (!itemId) continue;
+
+  const item = this.items.get(itemId);
+  if (!item) continue;
+  if (item.type !== "gear") continue;
+  if (item.system.gear_type !== "armor") continue;
+
+  const isBroken = item.system.armor_broken === true;
+
+  const prot   = item.system.armor_protection   ?? 0;
+  const eff    = item.system.armor_efficiency   ?? 100;
+  const traits = item.system.armor_traits       ?? {};
+
+  const metal     = traits.trait_metal      ?? 0;
+  let noisy       = traits.trait_noisy      ?? 0;
+  let reforced    = traits.trait_reinforced ?? 0;
+  let heavy       = traits.trait_heavy      ?? 0;
+  let thermic     = traits.trait_thermic    ?? 0;
+
+  let finalProt     = prot;
+let finalEff      = eff;
+let finalNoisy    = noisy;
+let finalReforced = reforced;
+let finalThermic  = thermic;
+
+const requeriment = item.system.armor_requeriment ?? 0;
+const impMod = this.system.player_impulse ?? 0;
+const isIncompetent = impMod < requeriment;
+
+if (isIncompetent) {
+  console.warn(`[INCOMPETENTE] ${this.name} não tem IMP suficiente para usar ${item.name}. IMP: ${impMod}, Requerido: ${requeriment}`);
+}
+
+
+if (isBroken) {
+  finalProt     = Math.floor(finalProt / 2);
+  finalEff      = Math.floor(finalEff / 2);
+  finalReforced = Math.floor(finalReforced / 2);
+  finalThermic  = Math.floor(finalThermic / 2);
+  finalNoisy    = finalNoisy * 2;
+}
+
+if (isIncompetent) {
+  finalProt     = finalProt     > 0 ? Math.max(1, Math.floor(finalProt / 3))     : 0;
+  finalEff      = finalEff      > 0 ? Math.max(1, Math.floor(finalEff / 3))      : 0;
+  finalReforced = finalReforced > 0 ? Math.max(1, Math.floor(finalReforced / 3)) : 0;
+  finalThermic  = finalThermic  > 0 ? Math.max(1, Math.floor(finalThermic / 3))  : 0;
+  finalNoisy    = finalNoisy * 2;
+  heavy         = heavy * 2;
+}
+
+
+
+  totalProt     += finalProt;
+  metalSum      += metal;
+  noisySum      += finalNoisy;
+  reforcedSum   += finalReforced;
+  heavySum      += heavy;
+  thermicSum    += finalThermic;
+}
+
+s.player_protection        += totalProt;
+s.player_armor_metal       = metalSum;
+s.player_armor_noisy       = noisySum;
+s.player_armor_reforced    = reforcedSum;
+s.player_armor_heavy       = heavySum;
+s.player_armor_thermic     = thermicSum;
+
+console.log("[PROT] Proteção somada por armaduras equipadas:", totalProt);
+console.log("[ARMOR TRAITS]", {
+  metal: metalSum,
+  noisy: noisySum,
+  reforced: reforcedSum,
+  heavy: heavySum,
+  thermic: thermicSum
+});
 
 
   // === RESISTÊNCIAS ===
