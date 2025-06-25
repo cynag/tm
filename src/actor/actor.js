@@ -147,7 +147,33 @@ if (subrace) {
 // === SABEDORIA FINAL ===
 const erud = s.player_erudition;
 s.player_knowledge = 14 + erud;
-//console.log(`[Actor] SAB calculado: ${s.player_knowledge}`);
+
+
+// === MODIFICADORES DE ATRIBUTO ===
+function calcMod(val) {
+  if (val === 0) return -1;
+  return Math.floor(val / 2);
+}
+
+s.mod_letality   = calcMod(s.player_letality);
+s.mod_dexterity  = calcMod(s.player_dexterity);
+s.mod_impulse    = calcMod(s.player_impulse);
+s.mod_arcana     = calcMod(s.player_arcana);
+s.mod_erudition  = calcMod(s.player_erudition);
+s.mod_virtue     = calcMod(s.player_virtue);
+s.mod_protection = Math.floor(s.player_protection / 2); // ⚠️ PROT segue lógica normal
+
+
+
+console.log("[Actor] Modificadores aplicados:", {
+  LET: s.mod_letality,
+  DES: s.mod_dexterity,
+  IMP: s.mod_impulse,
+  ARC: s.mod_arcana,
+  ERU: s.mod_erudition,
+  VIR: s.mod_virtue
+});
+
 
 
   // === RESISTÊNCIAS ===

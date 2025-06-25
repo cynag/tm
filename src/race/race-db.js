@@ -4,8 +4,8 @@ export const RaceDB = [
     name: "Ahakom",
     img: "systems/tm/styles/assets/races/ahakom.webp",
     description: "Criaturas pequenas e quitinosas, com máscaras ósseas faciais únicas.",
-    buff1: "impulse",
-    buff2: "erudition",
+    buff1: "",
+    buff2: "",
     wildPower: "under construction"
   },
    {

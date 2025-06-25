@@ -84,10 +84,14 @@ Hooks.once("init", async function () {
   Handlebars.registerHelper("array", (...args) => args.slice(0, -1));
   Handlebars.registerHelper("abs", value => Math.abs(value));
   Handlebars.registerHelper("multiply", (a, b) => a * b);
+  
   Handlebars.registerHelper("hasOrigin", (items) => {
   return items?.some?.(i => i.type === "origin");
 });
 
+Handlebars.registerHelper("floorDiv", function (value, divisor) {
+  return Math.floor(value / divisor);
+});
 });
 
 

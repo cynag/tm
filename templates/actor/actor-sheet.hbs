@@ -175,8 +175,17 @@
       <div class="attr-defenses" style="grid-area: def;">
         <h2>{{localize "TM.Defenses"}}</h2>
         <div class="defense-pair">
-          <div class="defense-item"><label>{{localize "TM.PROT"}}</label><span>{{actor.system.player_protection}}</span></div>
-          <div class="defense-item"><label>{{localize "TM.REF"}}</label><span>{{actor.system.player_reflex}}</span></div>
+          
+         <div class="defense-item">
+  <label>{{localize "TM.PROT"}}</label>
+  <span class="mod-value">
+    {{#if (gt actor.system.mod_protection 0)}}+{{actor.system.mod_protection}}{{else}}{{actor.system.mod_protection}}{{/if}}
+    ({{actor.system.player_protection}})
+  </span>
+</div>
+   
+
+        <div class="defense-item"><label>{{localize "TM.REF"}}</label><span>{{actor.system.player_reflex}}</span></div>
         </div>
         <div class="defense-trio">
           <div><label>{{localize "TM.PM"}}</label><span>{{actor.system.player_maneuver}}</span></div>
@@ -185,18 +194,51 @@
         </div>
       </div>
 
-      <!-- ATRIBUTOS -->
-      <div class="attr-attributes" style="grid-area: attr;">
-        <h2>{{localize "TM.Attributes"}}</h2>
-        <div class="attribute-grid">
-          <div><label>LET</label><span>{{actor.system.player_letality}}</span></div>
-          <div><label>ARC</label><span>{{actor.system.player_arcana}}</span></div>
-          <div><label>DES</label><span>{{actor.system.player_dexterity}}</span></div>
-          <div><label>ERU</label><span>{{actor.system.player_erudition}}</span></div>
-          <div><label>IMP</label><span>{{actor.system.player_impulse}}</span></div>
-          <div><label>VIR</label><span>{{actor.system.player_virtue}}</span></div>
-        </div>
-      </div>
+      <div class="attribute-grid">
+  <div>
+    <label>LET</label>
+    <span class="mod-value">
+      {{#if (eq (floorDiv actor.system.player_letality 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_letality 2) 0)}}+{{floorDiv actor.system.player_letality 2}}{{else}}{{floorDiv actor.system.player_letality 2}}{{/if}}
+      ({{actor.system.player_letality}})
+    </span>
+  </div>
+  <div>
+    <label>ARC</label>
+    <span class="mod-value">
+      {{#if (eq (floorDiv actor.system.player_arcana 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_arcana 2) 0)}}+{{floorDiv actor.system.player_arcana 2}}{{else}}{{floorDiv actor.system.player_arcana 2}}{{/if}}
+      ({{actor.system.player_arcana}})
+    </span>
+  </div>
+  <div>
+    <label>DES</label>
+    <span class="mod-value">
+      {{#if (eq (floorDiv actor.system.player_dexterity 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_dexterity 2) 0)}}+{{floorDiv actor.system.player_dexterity 2}}{{else}}{{floorDiv actor.system.player_dexterity 2}}{{/if}}
+      ({{actor.system.player_dexterity}})
+    </span>
+  </div>
+  <div>
+    <label>ERU</label>
+    <span class="mod-value">
+      {{#if (eq (floorDiv actor.system.player_erudition 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_erudition 2) 0)}}+{{floorDiv actor.system.player_erudition 2}}{{else}}{{floorDiv actor.system.player_erudition 2}}{{/if}}
+      ({{actor.system.player_erudition}})
+    </span>
+  </div>
+  <div>
+    <label>IMP</label>
+    <span class="mod-value">
+      {{#if (eq (floorDiv actor.system.player_impulse 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_impulse 2) 0)}}+{{floorDiv actor.system.player_impulse 2}}{{else}}{{floorDiv actor.system.player_impulse 2}}{{/if}}
+      ({{actor.system.player_impulse}})
+    </span>
+  </div>
+  <div>
+    <label>VIR</label>
+    <span class="mod-value">
+      {{#if (eq (floorDiv actor.system.player_virtue 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_virtue 2) 0)}}+{{floorDiv actor.system.player_virtue 2}}{{else}}{{floorDiv actor.system.player_virtue 2}}{{/if}}
+      ({{actor.system.player_virtue}})
+    </span>
+  </div>
+</div>
+
 
       <!-- EXTRAS -->
       <div class="attr-extras" style="grid-area: extra;">
