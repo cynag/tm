@@ -36,15 +36,96 @@
 
     <!-- SUBTYPE -->
     {{#if (eq item.system.gear_type "weapon")}}
-      <div>
-        <label>Weapon Subtype:</label>
-        <select name="system.subtype">
-          {{#each weaponSubtypes as |s|}}
-            <option value="{{s}}" {{#if (eq ../item.system.subtype s)}}selected{{/if}}>{{s}}</option>
-          {{/each}}
-        </select>
-      </div>
-    {{/if}}
+  <hr />
+
+  <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <label>Weapon Subtype:</label>
+      <select name="system.subtype">
+        {{#each weaponSubtypes as |s|}}
+          <option value="{{s}}" {{#if (eq ../item.system.subtype s)}}selected{{/if}}>{{s}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div>
+      <label>Tipo de Dano:</label>
+      <select name="system.weapon_subtypes_2">
+        <option value="cortante"   {{#if (eq item.system.weapon_subtypes_2 "cortante")}}selected{{/if}}>Cortante</option>
+        <option value="perfurante" {{#if (eq item.system.weapon_subtypes_2 "perfurante")}}selected{{/if}}>Perfurante</option>
+        <option value="impacto"    {{#if (eq item.system.weapon_subtypes_2 "impacto")}}selected{{/if}}>Impacto</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Porte:</label>
+      <select name="system.weapon_subtypes_3">
+        <option value="leve"   {{#if (eq item.system.weapon_subtypes_3 "leve")}}selected{{/if}}>Leve</option>
+        <option value="pesada" {{#if (eq item.system.weapon_subtypes_3 "pesada")}}selected{{/if}}>Pesada</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Dano:</label>
+      <input type="text" name="system.weapon_damage" value="{{item.system.weapon_damage}}" style="width: 120px;" />
+    </div>
+
+    <div>
+      <label>Alcance (m):</label>
+      <input type="number" name="system.weapon_range" value="{{item.system.weapon_range}}" style="width: 60px;" />
+    </div>
+  </div>
+  <div style="display: flex; align-items: center; gap: 4px;">
+  <label>Quebrada:</label>
+  <input type="checkbox" name="system.weapon_broken" {{checked item.system.weapon_broken}} />
+</div>
+
+  <hr></hr>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <label>Pomo:</label>
+      <input type="checkbox" name="system.weapon_traits.weapon_trait_pom" {{checked item.system.weapon_traits.weapon_trait_pom}} />
+    </div>
+    <div>
+      <label>Pesada:</label>
+      <input type="number" name="system.weapon_traits.weapon_trait_heavy" value="{{item.system.weapon_traits.weapon_trait_heavy}}" style="width: 60px;" />
+    </div>
+    <div>
+      <label>Defensiva:</label>
+      <input type="number" name="system.weapon_traits.weapon_trait_defensive" value="{{item.system.weapon_traits.weapon_trait_defensive}}" style="width: 60px;" />
+    </div>
+    <div>
+      <label>Escudo:</label>
+      <input type="number" name="system.weapon_traits.weapon_trait_shield" value="{{item.system.weapon_traits.weapon_trait_shield}}" style="width: 60px;" />
+    </div>
+    <div>
+      <label>Descomunal (1-5):</label>
+      <input type="number" name="system.weapon_traits.weapon_trait_desc" value="{{item.system.weapon_traits.weapon_trait_desc}}" min="0" max="5" style="width: 60px;" />
+    </div>
+    <div>
+      <label>Perf./Q.Ferro:</label>
+      <select name="system.weapon_traits.weapon_trait_piercing_ironbreaker">
+        <option value="0" {{#if (eq item.system.weapon_traits.weapon_trait_piercing_ironbreaker 0)}}selected{{/if}}>Nenhum</option>
+        <option value="1" {{#if (eq item.system.weapon_traits.weapon_trait_piercing_ironbreaker 1)}}selected{{/if}}>Perfurante</option>
+        <option value="2" {{#if (eq item.system.weapon_traits.weapon_trait_piercing_ironbreaker 2)}}selected{{/if}}>Quebra-Ferro</option>
+      </select>
+    </div>
+    <div>
+      <label>Rápida:</label>
+      <input type="number" name="system.weapon_traits.weapon_trait_fast" value="{{item.system.weapon_traits.weapon_trait_fast}}" style="width: 60px;" />
+    </div>
+    <div>
+      <label>Recarga:</label>
+  <select name="system.weapon_traits.weapon_trait_recharge">
+    <option value="0" {{#if (eq item.system.weapon_traits.weapon_trait_recharge 0)}}selected{{/if}}>Nenhuma</option>
+    <option value="1" {{#if (eq item.system.weapon_traits.weapon_trait_recharge 1)}}selected{{/if}}>Recarga</option>
+    <option value="2" {{#if (eq item.system.weapon_traits.weapon_trait_recharge 2)}}selected{{/if}}>Recarga Lenta</option>
+  </select>
+    </div>
+  </div>
+{{/if}}
+
 
     {{#if (eq item.system.gear_type "armor")}}
       <div>
@@ -56,6 +137,8 @@
         </select>
       </div>
     {{/if}}
+
+
 
     {{#if (eq item.system.gear_type "accessory")}}
       <div>

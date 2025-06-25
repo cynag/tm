@@ -261,6 +261,51 @@ console.log("[ARMOR TRAITS]", {
   thermic: thermicSum
 });
 
+// === ARMAS EQUIPADAS (slot_weapon1 e slot_weapon2) ===
+s.weaponRight = {};
+s.weaponLeft  = {};
+
+for (const [slotId, slot] of Object.entries(s.gearSlots)) {
+  const item = this.items.get(slot.itemId);
+  if (!item || item.type !== "gear" || item.system.gear_type !== "weapon") continue;
+
+  const clone = foundry.utils.deepClone(item.system);
+  clone.name = item.name; // Adiciona o nome manualmente
+
+  delete clone.description;
+  delete clone.rarity;
+  delete clone.value;
+
+  if (slotId === "slot_weapon1") s.weaponRight = clone;
+  if (slotId === "slot_weapon2") s.weaponLeft  = clone;
+
+  if (clone.weapon_broken) {
+  // Reduz dano
+  if (typeof clone.weapon_damage === "string") {
+    clone.weapon_damage = clone.weapon_damage
+      .replace(/1d10/g, "1d8")
+      .replace(/1d8/g, "1d6")
+      .replace(/2d6/g, "2d4")
+      .replace(/1d6/g, "1d4");
+  }
+
+  // Traços desabilitados
+  if (clone.weapon_traits) {
+    clone.weapon_traits.weapon_trait_pom = false;
+    clone.weapon_traits.weapon_trait_defensive = 0;
+    clone.weapon_traits.weapon_trait_shield = 0;
+    clone.weapon_traits.weapon_trait_desc = 0;
+    clone.weapon_traits.weapon_trait_piercing_ironbreaker = 0;
+    clone.weapon_traits.weapon_trait_fast = 0;
+  }
+
+  console.log(`[ARMA QUEBRADA] ${this.name} => efeitos aplicados`);
+}
+
+
+  console.log(`[WEAPON SLOT] ${this.name} => ${item.name} em ${slotId}`);
+}
+
 
   // === RESISTÊNCIAS ===
   const defaultResistances = {

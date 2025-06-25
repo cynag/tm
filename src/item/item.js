@@ -41,7 +41,28 @@ export class TMObject extends Item {
   this.system.armor_traits.trait_thermic    ??= 0;
 }
 
+if (this.type === "gear" && this.system.gear_type === "weapon") {
+  // Categorias adicionais
+this.system.weapon_subtypes_2 ??= ""; // cortante, perfurante, impacto
+this.system.weapon_subtypes_3 ??= ""; // leve, pesada
+this.system.weapon_damage     ??= ""; // ex: 2d6 ou 1d6+1d4[fire]
+this.system.weapon_range      ??= 1;  // alcance simples
 
+// Traços da arma
+this.system.weapon_traits ??= {};
+this.system.weapon_traits.weapon_trait_pom               ??= false;
+this.system.weapon_traits.weapon_trait_heavy             ??= 0;
+this.system.weapon_traits.weapon_trait_defensive         ??= 0;
+this.system.weapon_traits.weapon_trait_shield            ??= 0;
+this.system.weapon_traits.weapon_trait_desc              ??= 0;
+this.system.weapon_traits.weapon_trait_fast              ??= 0;
+this.system.weapon_traits.weapon_trait_piercing_ironbreaker = Number(this.system.weapon_traits.weapon_trait_piercing_ironbreaker ?? 0);
+this.system.weapon_traits.weapon_trait_recharge = Number(this.system.weapon_traits.weapon_trait_recharge ?? 0);
+
+this.system.weapon_broken ??= false;
+
+
+}
     // =============================
     // CONSUMABLE
     // =============================
