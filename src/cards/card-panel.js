@@ -103,7 +103,7 @@ cardEl.classList.toggle("active");
     });
 
     // DEBUG: Verificar se container já tinha animado
-console.log("[CardPanel] Inicializando container:", container.dataset.initialized);
+//console.log("[CardPanel] Inicializando container:", container.dataset.initialized);
 
 if (!this.#animatedLevels.has(actor.id)) {
   this.#animatedLevels.set(actor.id, new Set());
@@ -121,12 +121,12 @@ container.querySelectorAll(".card-row").forEach(row => {
 
   });
   animatedSet.add(level);
-  console.log(`[CardPanel] Animação aplicada no nível ${level}`);
+  //console.log(`[CardPanel] Animação aplicada no nível ${level}`);
 } else {
   row.querySelectorAll(".card-display").forEach(div => {
     div.classList.remove("animated");
   });
-  console.log(`[CardPanel] Nível ${level} já animado — pulado`);
+  //console.log(`[CardPanel] Nível ${level} já animado — pulado`);
 }
 
 });

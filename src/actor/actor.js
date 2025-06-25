@@ -60,7 +60,7 @@ export class TMActor extends Actor {
   if (!Number.isInteger(s.player_hp_max)) s.player_hp_max = 10;
   if (!Number.isInteger(s.player_pa)) s.player_pa = 8;
   if (!Number.isInteger(s.player_pa_max)) s.player_pa_max = 8;
-  s.player_hp = Math.min(s.player_hp, s.player_hp_max);
+  if (s.player_hp > s.player_hp_max) s.player_hp = s.player_hp_max;
   s.player_pa = Math.min(s.player_pa, s.player_pa_max);
 
   // === TALENTOS ===
@@ -85,27 +85,25 @@ for (const knowledge of KnowledgesDB) {
 
 
   // === BUFFS POR CARTAS ESCOLHIDAS NO CARD PANEL ===
-  const selected = s.activeCards || {};
-  for (const [level, ids] of Object.entries(selected)) {
+s.player_hp_max = 10; // Reset base
+const selected = s.activeCards || {};
+for (const [level, ids] of Object.entries(selected)) {
   for (const id of ids) {
     const carta = CardsDB[level]?.find(c => c.id === id);
-if (!carta || Number(level) > s.player_level) continue;
-
-    if (!carta) continue;
+    if (!carta || Number(level) > s.player_level) continue;
 
     const b1 = carta.buff1;
-const b2 = carta.buff2;
+    const b2 = carta.buff2;
+    const validAttrs = ["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"];
 
-const validAttrs = ["letality", "dexterity", "impulse", "arcana", "erudition", "virtue"];
-
-if (validAttrs.includes(b1)) s[`player_${b1}`] += 2;
-if (validAttrs.includes(b2)) s[`player_${b2}`] += 1;
-if (Number.isInteger(carta.hp)) {
-  s.player_hp += carta.hp;
-  s.player_hp_max += carta.hp;
+    if (validAttrs.includes(b1)) s[`player_${b1}`] += 2;
+    if (validAttrs.includes(b2)) s[`player_${b2}`] += 1;
+    if (Number.isInteger(carta.hp)) {
+      s.player_hp_max += carta.hp;
+    }
+  }
 }
-  }
-  }
+
 
 
   // === CRÔNICA E CORINGAS ===
@@ -119,7 +117,7 @@ if (originScript) {
     const fn = eval(`(${originScript})`);
     if (typeof fn === "function") {
       await fn(this);
-      console.log(`[ORIGIN] Script da origem executado via flag.`);
+      //console.log(`[ORIGIN] Script da origem executado via flag.`);
     }
   } catch (err) {
     console.warn(`[ORIGIN] Erro ao executar script da origem via flag:`, err);
@@ -149,7 +147,7 @@ if (subrace) {
 // === SABEDORIA FINAL ===
 const erud = s.player_erudition;
 s.player_knowledge = 14 + erud;
-console.log(`[Actor] SAB calculado: ${s.player_knowledge}`);
+//console.log(`[Actor] SAB calculado: ${s.player_knowledge}`);
 
 
   // === RESISTÊNCIAS ===
