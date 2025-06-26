@@ -2,6 +2,7 @@
 import { GridUtils } from "../grid/grid-utils.js";
 import { GridRenderer } from "../grid/grid-renderer.js";
 import { GridAutoPosition } from "../grid/grid-auto-position.js";
+import { ActionsPanel } from "../actions/actions-panel.js";
 import { TalentPanel } from "../talents/talent-panel.js";
 
 
@@ -236,6 +237,10 @@ if (grid) {
 }
 if (talentPanel) {
   game.tm.TalentPanel.render($(talentPanel), this.actor);
+}
+const actionsPanel = html.find(".tab[data-tab='actions']")[0];
+if (actionsPanel) {
+  game.tm.ActionsPanel.render($(actionsPanel), this.actor);
 }
 
 

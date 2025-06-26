@@ -20,6 +20,7 @@ import { SubRaceSelector } from "./src/race/subrace-selector.js";
 import { OriginSelector } from "./src/origin/origin-selector.js";
 import { OriginDB } from "./src/origin/origin-db.js";
 
+import { ActionsPanel } from "./src/actions/actions-panel.js";
 
 import { GridInventory } from "./src/grid/grid-inventory.js";
 import { GridUtils } from "./src/grid/grid-utils.js";
@@ -48,6 +49,7 @@ import { CardPanel } from "./src/cards/card-panel.js";
 import { CardsDB } from "./src/cards/cards-db.js";
 import { CardTooltip } from "./src/ui/card-tooltip.js";
 
+import { MovementDialog } from "./src/ui/movement-dialog.js";
 
 // === INIT ===
 
@@ -137,6 +139,10 @@ Hooks.once("ready", () => {
     KnowledgesDB,
     TalentPanel,
     TalentRollDialog,
+
+    ActionsPanel,
+    MovementDialog
+
   };
 
   Hooks.on("renderTMActorSheet", (app, html, data) => {
