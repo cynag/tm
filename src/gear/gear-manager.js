@@ -62,39 +62,52 @@ export class GearManager {
 
 
   static async unequipItem(actor, slotId) {
-    const key = `${actor.id}-${slotId}`;
-    if (this._unequiping.has(key)) return;
-    this._unequiping.add(key);
+  const key = `${actor.id}-${slotId}`;
+  if (this._unequiping.has(key)) return;
+  this._unequiping.add(key);
 
-    const current = actor.system.gearSlots[slotId]?.itemId;
-    if (!current) {
-      this._unequiping.delete(key);
-      return;
-    }
-
-    const item = actor.items.get(current);
-    if (!item) {
-      this._unequiping.delete(key);
-      return;
-    }
-
-    await item.update({ "system.equippedSlot": null });
-    await actor.update({ [`system.gearSlots.${slotId}.itemId`]: null });
-
-    console.log(`[GearManager] ❌ ${item.name} desequipado de ${slotId}`);
-
-    const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
-    if (app) {
-      const gearContainer = app.element.find("#gear-slots")[0];
-      if (gearContainer) game.tm.GearRenderer.render(gearContainer, actor);
-
-      const gridContainer = app.element.find("#grid-inventory")[0];
-      if (gridContainer) {
-        const grid = game.tm.GridUtils.createVirtualGrid(actor);
-        game.tm.GridRenderer.renderGrid(gridContainer, grid);
-      }
-    }
-
-    setTimeout(() => this._unequiping.delete(key), 100);
+  const current = actor.system.gearSlots[slotId]?.itemId;
+  if (!current) {
+    this._unequiping.delete(key);
+    return;
   }
+
+  const item = actor.items.get(current);
+  if (!item) {
+    this._unequiping.delete(key);
+    return;
+  }
+
+  // 🔄 Atualiza estado
+  await item.update({ "system.equippedSlot": null });
+  await actor.update({ [`system.gearSlots.${slotId}`]: { itemId: null, width: 0, height: 0 } });
+
+  console.log(`[GearManager] ❌ ${item.name} desequipado de ${slotId}`);
+
+  setTimeout(() => {
+  const isPickup = game.tm.GridPickup?.pickupData?.itemId === item.id;
+  if (!isPickup) {
+    game.tm.GridAutoPosition.placeNewItem(actor, item);
+  } else {
+    console.log(`[GearManager] ⏳ Ignorando reposicionamento de ${item.name} (pickup ativo)`);
+  }
+}, 50);
+
+
+  // 🔄 Atualiza UI
+  const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+  if (app) {
+    const gearContainer = app.element.find("#gear-slots")[0];
+    if (gearContainer) game.tm.GearRenderer.render(gearContainer, actor);
+
+    const gridContainer = app.element.find("#grid-inventory")[0];
+    if (gridContainer) {
+      const grid = game.tm.GridUtils.createVirtualGrid(actor);
+      game.tm.GridRenderer.renderGrid(gridContainer, grid);
+    }
+  }
+
+  setTimeout(() => this._unequiping.delete(key), 100);
+}
+
 }

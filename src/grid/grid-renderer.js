@@ -34,13 +34,20 @@ export class GridRenderer {
         if (cell.origin && actor && cell.itemId) {
   const item = actor.items.get(cell.itemId);
 
-  // 🛑 Ignora itens não físicos
-if (!item || ["trait", "language"].includes(item.type)) continue;
+  // 🛑 Ignora itens não existentes ou não físicos
+  if (!item || ["trait", "language"].includes(item.type)) continue;
+
+  // ❌ Não renderiza se estiver equipado
+  if (item.system.equippedSlot) continue;
+
 
 
 
   const meta = actor.system.gridInventory.items.find(i => i.id === item.id);
-  if (!meta) continue;
+
+// ⛔ Evita renderizar se não tiver meta no grid (ex: acabou de ser desequipado)
+if (!meta || meta.x == null || meta.y == null) continue;
+
 
 
           const img = document.createElement("div");
@@ -77,20 +84,27 @@ img.addEventListener("mouseleave", () => {
 
           img.addEventListener("mousedown", (e) => {
   e.preventDefault();
-  if (e.button !== 0) return;
 
-  const pickup = game.tm.GridPickup.pickupData;
+  // Clique esquerdo → pickup
+  if (e.button === 0) {
+    const pickup = game.tm.GridPickup.pickupData;
+    if (pickup) return;
 
-  // 🛑 Se já estiver com item em mão, ignora clique na imagem
-  if (pickup) return;
+    const origin = { x, y };
+    game.tm.GridPositioner.removeItem(actor, item.id);
+    game.tm.GridInventory.refresh(app);
+    game.tm.GridPickup.start(actor, item, true, origin, e);
+    if (game.tm.ItemTooltip) game.tm.ItemTooltip.hide();
+    return;
+  }
 
-  const origin = { x, y };
-  game.tm.GridPositioner.removeItem(actor, item.id);
-  game.tm.GridInventory.refresh(app);
-  game.tm.GridPickup.start(actor, item, true, origin, e);
-   if (game.tm.ItemTooltip) game.tm.ItemTooltip.hide();
-  
+  // Clique direito → context menu
+  if (e.button === 2) {
+    e.preventDefault();
+    game.tm.ItemContextMenu.show(e.clientX, e.clientY, actor, item);
+  }
 });
+
 
 
 

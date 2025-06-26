@@ -193,23 +193,14 @@ overlayBox.style.pointerEvents = "none";
         }
 
         if (e.button === 2) {
-          const current = actor.system.gearSlots[slotId]?.itemId;
-          if (!current) return;
-          const item = actor.items.get(current);
-          if (!item) return;
+  e.preventDefault();
+  const current = actor.system.gearSlots[slotId]?.itemId;
+  const item = actor.items.get(current);
+  if (!item) return;
+  game.tm.ItemContextMenu.show(e.clientX, e.clientY, actor, item);
+}
 
-          await game.tm.GearManager.unequipItem(actor, slotId);
-          await game.tm.GridAutoPosition.placeNewItem(actor, item);
 
-          if (gearContainer) game.tm.GearRenderer.render(gearContainer, actor);
-          if (gridContainer) {
-            const grid = game.tm.GridUtils.createVirtualGrid(actor);
-            game.tm.GridRenderer.renderGrid(gridContainer, grid);
-          }
-
-          const sheet = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
-          if (sheet?.render) sheet.render(true);
-        }
       });
 
       wrapper.appendChild(slot);

@@ -1209,3 +1209,28 @@ button.btn-cancel:hover {
   white-space: nowrap;
 }
 
+/* Context Menu */
+
+.custom-context-menu {
+  position: fixed;
+  z-index: 10000;
+  background: #111;
+  border: 1px solid #555;
+  padding: 4px 0;
+  min-width: 130px;
+  font-size: 12px;
+  font-family: var(--font-primary);
+  color: #fff;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+  border-radius: 4px;
+}
+
+.custom-context-menu div {
+  padding: 6px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.custom-context-menu div:hover {
+  background-color: #333;
+}

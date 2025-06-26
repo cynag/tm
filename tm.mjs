@@ -42,6 +42,7 @@ import { GearConstants } from "./src/gear/gear-constants.js";
 import { GearOverlay } from "./src/gear/gear-overlay.js";
 
 import { ItemTooltip } from "./src/ui/item-tooltip.js";
+import { ItemContextMenu } from "./src/ui/item-context-menu.js";
 
 import { CardPanel } from "./src/cards/card-panel.js";
 import { CardsDB } from "./src/cards/cards-db.js";
@@ -121,7 +122,7 @@ Hooks.once("ready", () => {
     GearOverlay,
 
     ItemTooltip,
-
+    ItemContextMenu,
     CardPanel,
     CardsDB,
     CardTooltip,

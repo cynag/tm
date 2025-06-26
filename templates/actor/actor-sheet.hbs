@@ -111,67 +111,69 @@
 
   <!-- 🎚️ Coluna Lateral de Atributos -->
   <aside class="sidebar-fixed">
-    <div>{{localize "TM.Protection"}}: {{actor.system.player_protection}}</div>
-    <div>{{localize "TM.Initiative"}}: {{actor.system.player_initiative}}</div>
-    <div>{{localize "TM.Movement"}}: {{actor.system.player_movement}}</div>
-    <div>{{localize "TM.Reflex"}}: {{actor.system.player_reflex}}</div>
-    <div>{{localize "TM.Knowledge"}}: {{actor.system.player_wisdom}}</div>
+  <div>{{localize "TM.Protection"}}: {{actor.system.player_protection}}</div>
+  <div>{{localize "TM.Initiative"}}: {{actor.system.player_initiative}}</div>
+  <div>{{localize "TM.Movement"}}: {{actor.system.player_movement}}</div>
+  <div>{{localize "TM.Reflex"}}: {{actor.system.player_reflex}}</div>
+  <div>{{localize "TM.Knowledge"}}: {{actor.system.player_wisdom}}</div>
 
-     <hr />
-    <div><strong>🎖️ Armadura</strong></div>
+  <details open>
+    <summary><strong>🎖️ Armadura</strong></summary>
     <div>Metal: {{actor.system.player_armor_metal}}</div>
     <div>Ruído: {{actor.system.player_armor_noisy}}</div>
     <div>Ref.: {{actor.system.player_armor_reforced}}</div>
     <div>Pesada: {{actor.system.player_armor_heavy}}</div>
     <div>Térmica: {{actor.system.player_armor_thermic}}</div>
+  </details>
+
+  <details open>
+    <summary><strong>⚔️ Mão Direita</strong></summary>
+    <div>Nome: {{actor.system.weaponRight.name}}</div>
+    <div>Tipo: {{actor.system.weaponRight.subtype}}</div>
+    <div>Dano: {{actor.system.weaponRight.weapon_damage}}</div>
+    <div>Alcance: {{actor.system.weaponRight.weapon_range}}</div>
+    <div>Quebrada: {{#if actor.system.weaponRight.weapon_broken}}✔️{{else}}—{{/if}}</div>
+    <div>Pomo: {{#if actor.system.weaponRight.weapon_traits.weapon_trait_pom}}✔️{{else}}—{{/if}}</div>
+    <div>Pesada: {{actor.system.weaponRight.weapon_traits.weapon_trait_heavy}}</div>
+    <div>Defensiva: {{actor.system.weaponRight.weapon_traits.weapon_trait_defensive}}</div>
+    <div>Escudo: {{actor.system.weaponRight.weapon_traits.weapon_trait_shield}}</div>
+    <div>Descomunal: {{actor.system.weaponRight.weapon_traits.weapon_trait_desc}}</div>
+    <div>Perf./Q.Ferro: 
+      {{#if (eq actor.system.weaponRight.weapon_traits.weapon_trait_piercing_ironbreaker 1)}}Perfurante{{/if}}
+      {{#if (eq actor.system.weaponRight.weapon_traits.weapon_trait_piercing_ironbreaker 2)}}Quebra-Ferro{{/if}}
+    </div>
+    <div>Rápida: {{actor.system.weaponRight.weapon_traits.weapon_trait_fast}}</div>
+    <div>Recarga: 
+      {{#if (eq actor.system.weaponRight.weapon_traits.weapon_trait_recharge 1)}}Recarga{{/if}}
+      {{#if (eq actor.system.weaponRight.weapon_traits.weapon_trait_recharge 2)}}Recarga Lenta{{/if}}
+    </div>
+  </details>
+
+  <details open>
+    <summary><strong>🛡️ Mão Esquerda</strong></summary>
+    <div>Nome: {{actor.system.weaponLeft.name}}</div>
+    <div>Tipo: {{actor.system.weaponLeft.subtype}}</div>
+    <div>Dano: {{actor.system.weaponLeft.weapon_damage}}</div>
+    <div>Quebrada: {{#if actor.system.weaponLeft.weapon_broken}}✔️{{else}}—{{/if}}</div>
+    <div>Alcance: {{actor.system.weaponLeft.weapon_range}}</div>
+    <div>Pomo: {{#if actor.system.weaponLeft.weapon_traits.weapon_trait_pom}}✔️{{else}}—{{/if}}</div>
+    <div>Pesada: {{actor.system.weaponLeft.weapon_traits.weapon_trait_heavy}}</div>
+    <div>Defensiva: {{actor.system.weaponLeft.weapon_traits.weapon_trait_defensive}}</div>
+    <div>Escudo: {{actor.system.weaponLeft.weapon_traits.weapon_trait_shield}}</div>
+    <div>Descomunal: {{actor.system.weaponLeft.weapon_traits.weapon_trait_desc}}</div>
+    <div>Perf./Q.Ferro: 
+      {{#if (eq actor.system.weaponLeft.weapon_traits.weapon_trait_piercing_ironbreaker 1)}}Perfurante{{/if}}
+      {{#if (eq actor.system.weaponLeft.weapon_traits.weapon_trait_piercing_ironbreaker 2)}}Quebra-Ferro{{/if}}
+    </div>
+    <div>Rápida: {{actor.system.weaponLeft.weapon_traits.weapon_trait_fast}}</div>
+    <div>Recarga: 
+      {{#if (eq actor.system.weaponLeft.weapon_traits.weapon_trait_recharge 1)}}Recarga{{/if}}
+      {{#if (eq actor.system.weaponLeft.weapon_traits.weapon_trait_recharge 2)}}Recarga Lenta{{/if}}
+    </div>
+  </details>
+</aside>
 
 
-    <hr />
-<div><strong>⚔️ Mão Direita</strong></div>
-<div>Nome: {{actor.system.weaponRight.name}}</div>
-<div>Tipo: {{actor.system.weaponRight.subtype}}</div>
-<div>Dano: {{actor.system.weaponRight.weapon_damage}}</div>
-<div>Alcance: {{actor.system.weaponRight.weapon_range}}</div>
-<div>Quebrada: {{#if actor.system.weaponRight.weapon_broken}}✔️{{else}}—{{/if}}</div>
-<div>Pomo: {{#if actor.system.weaponRight.weapon_traits.weapon_trait_pom}}✔️{{else}}—{{/if}}</div>
-<div>Pesada: {{actor.system.weaponRight.weapon_traits.weapon_trait_heavy}}</div>
-<div>Defensiva: {{actor.system.weaponRight.weapon_traits.weapon_trait_defensive}}</div>
-<div>Escudo: {{actor.system.weaponRight.weapon_traits.weapon_trait_shield}}</div>
-<div>Descomunal: {{actor.system.weaponRight.weapon_traits.weapon_trait_desc}}</div>
-<div>Perf./Q.Ferro: 
-  {{#if (eq actor.system.weaponRight.weapon_traits.weapon_trait_piercing_ironbreaker 1)}}Perfurante{{/if}}
-  {{#if (eq actor.system.weaponRight.weapon_traits.weapon_trait_piercing_ironbreaker 2)}}Quebra-Ferro{{/if}}
-</div>
-<div>Rápida: {{actor.system.weaponRight.weapon_traits.weapon_trait_fast}}</div>
-<div>Recarga: 
-  {{#if (eq actor.system.weaponRight.weapon_traits.weapon_trait_recharge 1)}}Recarga{{/if}}
-  {{#if (eq actor.system.weaponRight.weapon_traits.weapon_trait_recharge 2)}}Recarga Lenta{{/if}}
-
-</div>
-
-<hr />
-<div><strong>🛡️ Mão Esquerda</strong></div>
-<div>Nome: {{actor.system.weaponLeft.name}}</div>
-<div>Tipo: {{actor.system.weaponLeft.subtype}}</div>
-<div>Dano: {{actor.system.weaponLeft.weapon_damage}}</div>
-<div>Quebrada: {{#if actor.system.weaponLeft.weapon_broken}}✔️{{else}}—{{/if}}</div>
-<div>Alcance: {{actor.system.weaponLeft.weapon_range}}</div>
-<div>Pomo: {{#if actor.system.weaponLeft.weapon_traits.weapon_trait_pom}}✔️{{else}}—{{/if}}</div>
-<div>Pesada: {{actor.system.weaponLeft.weapon_traits.weapon_trait_heavy}}</div>
-<div>Defensiva: {{actor.system.weaponLeft.weapon_traits.weapon_trait_defensive}}</div>
-<div>Escudo: {{actor.system.weaponLeft.weapon_traits.weapon_trait_shield}}</div>
-<div>Descomunal: {{actor.system.weaponLeft.weapon_traits.weapon_trait_desc}}</div>
-<div>Perf./Q.Ferro: 
-  {{#if (eq actor.system.weaponLeft.weapon_traits.weapon_trait_piercing_ironbreaker 1)}}Perfurante{{/if}}
-  {{#if (eq actor.system.weaponLeft.weapon_traits.weapon_trait_piercing_ironbreaker 2)}}Quebra-Ferro{{/if}}
-</div>
-<div>Rápida: {{actor.system.weaponLeft.weapon_traits.weapon_trait_fast}}</div>
-<div>Recarga: 
-  {{#if (eq actor.system.weaponLeft.weapon_traits.weapon_trait_recharge 1)}}Recarga{{/if}}
-  {{#if (eq actor.system.weaponLeft.weapon_traits.weapon_trait_recharge 2)}}Recarga Lenta{{/if}}
-</div>
-
-  </aside>
 
   
 
