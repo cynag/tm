@@ -95,8 +95,18 @@
 "TM.Res.radiant": "Radiante",
 "TM.Res.necrotic": "Necrótico",
 "TM.Res.psychic": "Mental",
-"TM.Res.chaotic": "Caótico"
+"TM.Res.chaotic": "Caótico",
 
- 
+  "TM.Label.AP": "PA",
+  "TM.Button.Cancel": "Cancelar",
+  "TM.Button.UseAction": "Usar Ação",
+  "TM.Warn.ActorNotFound": "Ator não encontrado.",
+  "TM.Warn.NotEnoughPA": "Você não tem PA suficiente para usar {name}.",
+  "TM.Tag.Movement": "Movimento",
+
+  "TM.Label.Meters": "metros",
+  "TM.Button.Use": "Usar",
+  "TM.Section.BasicActions": "Ações Básicas"
+
 
 }

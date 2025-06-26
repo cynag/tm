@@ -16,8 +16,8 @@ function renderMovementTable(data, actor) {
         <div class="talent-info">
           <div class="talent-name">${entry.name}</div>
           <div class="talent-tags">
-            <span class="tag">${entry.cost} PA</span>
-            <span class="tag">${range} metros</span>
+            <span class="tag">${entry.cost} ${game.i18n.localize("TM.Label.AP")}</span>
+            <span class="tag">${range} ${game.i18n.localize("TM.Label.Meters")}</span>
           </div>
         </div>
       </div>
@@ -52,13 +52,13 @@ function renderActionTable(title, data, type) {
         <img class="talent-icon" src="${entry.img}" width="40" height="40"/>
         <div class="talent-info">
           <div class="talent-name">${entry.name}</div>
-          <div class="talent-level">${entry.cost} PA</div>
+          <div class="talent-level">${entry.cost} ${game.i18n.localize("TM.Label.AP")}</div>
         </div>
         <div class="talent-attr"></div>
         <div class="talent-bonus"></div>
         <div class="talent-points"></div>
         <div class="talent-buttons">
-          <button class="use" data-id="${entry.id}">Usar</button>
+          <button class="use" data-id="${entry.id}">${game.i18n.localize("TM.Button.Use")}</button>
         </div>
       </div>
     `);
@@ -77,7 +77,7 @@ export class ActionsPanel {
     const section = $(`<section class="talent-section"></section>`);
     section.append(renderMovementTable(MovementDB, actor));
     section.append(`<div class="talent-separator">//--//</div>`);
-    section.append(renderActionTable("Ações Básicas", BasicActionsDB, "basic"));
+    section.append(renderActionTable(game.i18n.localize("TM.Section.BasicActions"), BasicActionsDB, "basic"));
 
     container.empty().append(section);
 
