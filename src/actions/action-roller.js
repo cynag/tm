@@ -156,8 +156,8 @@ export async function rollAttack({ attacker, target, actionId }) {
     </div>
   `;
 
-  const rolls = [atkRoll, baseDamageRoll];
-  if (eleRollResult) rolls.push(eleRollResult);
+  const rolls = [atkRoll, baseDamageRoll]; // não inclua eleRollResult aqui
+
 
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor: attacker }),
@@ -165,9 +165,10 @@ export async function rollAttack({ attacker, target, actionId }) {
     rolls
   });
 
-  // Remove o número grande do topo da rolagem (dice-total)
 Hooks.once("renderChatMessage", (msg, html) => {
   html.find("h4.dice-total").remove();
+
 });
+
 
 }
