@@ -295,13 +295,8 @@ form.tm.sheet.actor {
    📁 Tabs Internas
    ========================== */
 
-.tab {
-  display: none;
-}
 
-.tab.active {
-  display: block;
-}
+
 
 /* ==========================
    📁 LANGUAGE

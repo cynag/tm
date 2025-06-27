@@ -110,7 +110,8 @@ function renderActionTable(data, actor) {
       <div class="talent-row" data-id="${entry.id}" data-type="basic">
         <img class="talent-icon" src="${iconPath}" width="40" height="40" ${flip}/>
         <div class="talent-info">
-          <div class="talent-name">${name}</div>
+          <div class="talent-name action-roll" data-id="${entry.id}">${name}</div>
+
           <div class="talent-tags">${tagHTML}</div>
         </div>
       </div>
@@ -118,6 +119,12 @@ function renderActionTable(data, actor) {
 
     tbody.append(row);
   });
+  
+  table.find(".action-roll").on("click", async (ev) => {
+  const actionId = ev.currentTarget.dataset.id;
+await game.tm.ActionRoller.rollAttack({ attacker: actor, target: Array.from(game.user.targets)[0], actionId });
+});
+
 
   return table;
 }

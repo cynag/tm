@@ -1,0 +1,31 @@
+<div class="tm-roll-block" style="font-family: sans-serif; font-size: 1em; margin-bottom: 10px;">
+
+  <div class="tm-roll-header" style="margin-bottom: 6px;">
+    <strong style="font-size: 1.1em;">{{label}}</strong>
+  </div>
+
+  <div class="tm-roll-formula" style="border: 1px solid #000; padding: 4px; margin-bottom: 4px;">
+    <strong>Fórmula:</strong> {{formula}}
+  </div>
+
+  {{#if diceResults.length}}
+    <div class="tm-roll-breakdown" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px;">
+      {{#each diceResults}}
+        <div style="background: {{this.color}}; color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold;">
+          {{this.value}}{{this.emoji}}
+        </div>
+      {{/each}}
+    </div>
+  {{/if}}
+
+  <div class="tm-roll-total" style="margin-bottom: 4px;">
+    <strong>Total:</strong> {{total}}
+  </div>
+
+  {{#if flavor}}
+    <div class="tm-roll-flavor" style="margin-top: 6px;">
+      {{{flavor}}}
+    </div>
+  {{/if}}
+
+</div>

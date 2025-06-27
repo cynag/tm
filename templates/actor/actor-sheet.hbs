@@ -116,6 +116,10 @@
   <!-- 🎚️ Coluna Lateral de Atributos -->
   <aside class="sidebar-fixed">
   <div>{{localize "TM.Protection"}}: {{actor.system.player_protection}}</div>
+  <div>{{localize "TM.ModProtection"}}: 
+  {{#if (gt actor.system.mod_protection 0)}}+{{actor.system.mod_protection}}
+  {{else}}{{actor.system.mod_protection}}{{/if}}
+</div>
   <div>{{localize "TM.Initiative"}}: {{actor.system.player_initiative}}</div>
   <div>{{localize "TM.Movement"}}: {{actor.system.player_movement}}</div>
   <div>{{localize "TM.Reflex"}}: {{actor.system.player_reflex}}</div>
@@ -255,46 +259,41 @@
   <div>
     <label>LET</label>
     <span class="mod-value">
-      {{#if (eq (floorDiv actor.system.player_letality 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_letality 2) 0)}}+{{floorDiv actor.system.player_letality 2}}{{else}}{{floorDiv actor.system.player_letality 2}}{{/if}}
-      ({{actor.system.player_letality}})
+      {{#if (gt actor.system.mod_letality 0)}}+{{/if}}{{actor.system.mod_letality}} ({{actor.system.player_letality}})
     </span>
   </div>
   <div>
     <label>ARC</label>
     <span class="mod-value">
-      {{#if (eq (floorDiv actor.system.player_arcana 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_arcana 2) 0)}}+{{floorDiv actor.system.player_arcana 2}}{{else}}{{floorDiv actor.system.player_arcana 2}}{{/if}}
-      ({{actor.system.player_arcana}})
+      {{#if (gt actor.system.mod_arcana 0)}}+{{/if}}{{actor.system.mod_arcana}} ({{actor.system.player_arcana}})
     </span>
   </div>
   <div>
     <label>DES</label>
     <span class="mod-value">
-      {{#if (eq (floorDiv actor.system.player_dexterity 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_dexterity 2) 0)}}+{{floorDiv actor.system.player_dexterity 2}}{{else}}{{floorDiv actor.system.player_dexterity 2}}{{/if}}
-      ({{actor.system.player_dexterity}})
+      {{#if (gt actor.system.mod_dexterity 0)}}+{{/if}}{{actor.system.mod_dexterity}} ({{actor.system.player_dexterity}})
     </span>
   </div>
   <div>
     <label>ERU</label>
     <span class="mod-value">
-      {{#if (eq (floorDiv actor.system.player_erudition 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_erudition 2) 0)}}+{{floorDiv actor.system.player_erudition 2}}{{else}}{{floorDiv actor.system.player_erudition 2}}{{/if}}
-      ({{actor.system.player_erudition}})
+      {{#if (gt actor.system.mod_erudition 0)}}+{{/if}}{{actor.system.mod_erudition}} ({{actor.system.player_erudition}})
     </span>
   </div>
   <div>
     <label>IMP</label>
     <span class="mod-value">
-      {{#if (eq (floorDiv actor.system.player_impulse 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_impulse 2) 0)}}+{{floorDiv actor.system.player_impulse 2}}{{else}}{{floorDiv actor.system.player_impulse 2}}{{/if}}
-      ({{actor.system.player_impulse}})
+      {{#if (gt actor.system.mod_impulse 0)}}+{{/if}}{{actor.system.mod_impulse}} ({{actor.system.player_impulse}})
     </span>
   </div>
   <div>
     <label>VIR</label>
     <span class="mod-value">
-      {{#if (eq (floorDiv actor.system.player_virtue 2) 0)}}-1{{else if (gt (floorDiv actor.system.player_virtue 2) 0)}}+{{floorDiv actor.system.player_virtue 2}}{{else}}{{floorDiv actor.system.player_virtue 2}}{{/if}}
-      ({{actor.system.player_virtue}})
+      {{#if (gt actor.system.mod_virtue 0)}}+{{/if}}{{actor.system.mod_virtue}} ({{actor.system.player_virtue}})
     </span>
   </div>
 </div>
+
 
 
       <!-- EXTRAS -->
@@ -302,7 +301,7 @@
         <h2>{{localize "TM.Extras"}}</h2>
         <div class="defense-trio">
           <div><label>SAB</label><span>{{actor.system.player_knowledge}}</span></div>
-          <div><label>INI</label><span>{{actor.system.player_initiative}}</span></div>
+          <div><label>INI</label><span>{{#if (gt actor.system.player_initiative 0)}}+{{/if}}{{actor.system.player_initiative}}</span></div>
           <div><label>MOV</label><span>{{actor.system.player_movement}}</span></div>
         </div>
       </div>

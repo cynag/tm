@@ -136,8 +136,8 @@ if (originScript) {
 
 
   // === BUFFS POR RAÇA (via flag) ===
-const race = this.getFlag("tm", "raceData");
-const subrace = this.getFlag("tm", "subRaceData");
+  const race = this.getFlag("tm", "raceData");
+    const subrace = this.getFlag("tm", "subRaceData");
 
 const validAttrs = ["letality", "dexterity", "impulse", "arcana", "erudition", "virtue", "protection"];
 
@@ -160,9 +160,11 @@ s.player_knowledge = 14 + erud;
 
 // === MODIFICADORES DE ATRIBUTO ===
 function calcMod(val) {
-  if (val === 0) return -1;
-  return Math.floor(val / 2);
+  return val <= 0 ? -1 : Math.floor(val / 2);
 }
+
+
+
 
 s.mod_letality   = calcMod(s.player_letality);
 s.mod_dexterity  = calcMod(s.player_dexterity);
@@ -170,8 +172,18 @@ s.mod_impulse    = calcMod(s.player_impulse);
 s.mod_arcana     = calcMod(s.player_arcana);
 s.mod_erudition  = calcMod(s.player_erudition);
 s.mod_virtue     = calcMod(s.player_virtue);
+
 s.mod_protection = Math.floor(s.player_protection / 2); // ⚠️ PROT segue lógica normal
 
+// === CÁLCULOS DERIVADOS REGRADOS ===
+s.player_reflex = 9 + s.mod_dexterity;
+
+s.player_maneuver = s.mod_impulse > 0 ? s.mod_impulse * 3 : 0;
+s.player_resistance_phys = s.mod_impulse > 0 ? s.mod_impulse * 4 : 0;
+s.player_resistance_mental = s.mod_virtue > 0 ? s.mod_virtue * 4 : 0;
+s.player_initiative = s.mod_dexterity;
+
+console.log("[CALCULOS AUTO] Reflex:", s.player_reflex, "| Manobra:", s.player_maneuver, "| RF:", s.player_resistance_phys, "| RM:", s.player_resistance_mental, "| Iniciativa:", s.player_initiative);
 
 
 console.log("[Actor] Modificadores aplicados:", {
@@ -255,6 +267,8 @@ if (isIncompetent) {
 }
 
 s.player_protection        += totalProt;
+s.mod_protection = s.player_protection > 0 ? Math.floor(s.player_protection / 2) : 0;
+console.log("[MOD PROTECTION] Final:", s.player_protection, "→", s.mod_protection);
 s.player_armor_metal       = metalSum;
 s.player_armor_noisy       = noisySum;
 s.player_armor_reforced    = reforcedSum;

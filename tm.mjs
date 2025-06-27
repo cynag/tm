@@ -51,15 +51,21 @@ import { CardTooltip } from "./src/ui/card-tooltip.js";
 
 import { MovementDialog } from "./src/ui/movement-dialog.js";
 
+import * as ActionRoller from "./src/actions/action-roller.js";
+
+
 // === INIT ===
 
 Hooks.once("init", async function () {
   const templates = await foundry.applications.handlebars.loadTemplates([
-    "systems/tm/templates/actor/partials/card-panel.hbs"
-  ]);
-  
-  // 🔧 Registra manualmente como partial com nome canônico
-  Handlebars.registerPartial("tm.actor.partials.card-panel", templates[0]);
+  "systems/tm/templates/actor/partials/card-panel.hbs",
+  "systems/tm/templates/chat/roll-attack.hbs"
+]);
+
+// 🔧 Registra partials
+Handlebars.registerPartial("tm.actor.partials.card-panel", templates[0]);
+// (Opcional) se quiser nomear o segundo também
+Handlebars.registerPartial("tm.chat.roll-attack", templates[1]);
 
   console.log("Terras Malditas | System initialized");
 
@@ -157,7 +163,9 @@ Hooks.once("ready", () => {
     TalentRollDialog,
 
     ActionsPanel,
-    MovementDialog
+    MovementDialog,
+
+    ActionRoller,
 
   };
 
