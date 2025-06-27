@@ -6,6 +6,15 @@ export class TMActor extends Actor {
  async prepareBaseData() {
 
   super.prepareBaseData();
+
+const physicalTypes = ["sword", "axe", "hammer", "spear", "bow", "crossbow", "gun", "shield", "throwing", "unarmed"];
+const dmgTypes = ["slashing", "piercing", "bludgeoning"];
+const weightTypes = ["light", "heavy"];
+const elementalTypes = ["fire", "ice", "eletric", "poison", "acid", "psychic", "radiant", "necrotic", "chaotic"];
+const elemTypes = ["fire", "ice", "eletric", "poison", "acid", "psychic", "radiant", "necrotic", "chaotic"];
+
+
+
   const s = this.system;
 
   // === GEAR SLOTS ===
@@ -266,21 +275,27 @@ s.player_armor_heavy_count = heavySum;
 s.player_armor_thermic_count = thermicSum;
 
 // ⚔️ Bônus por tipo de arma
-const atkTypes = ["sword", "axe", "hammer", "spear", "bow", "crossbow", "gun", "shield", "throwing", "unarmed"];
-const dmgTypes = ["slashing", "piercing", "bludgeoning"];
-const weightTypes = ["light", "heavy"];
-const elemTypes = ["fire", "ice", "eletric", "poison", "acid", "psychic", "radiant", "necrotic", "chaotic"];
+s.bonusKeys = {
+  physical:    ["sword", "axe", "hammer", "spear", "bow", "crossbow", "gun", "shield", "throwing", "unarmed"],
+  type:        ["slashing", "piercing", "bludgeoning"],
+  weight:      ["light", "heavy"],
+  elemental:   ["fire", "ice", "eletric", "poison", "acid", "psychic", "radiant", "necrotic", "chaotic"]
+};
+
 
 s.player_attack_bonus ??= {};
 s.player_damage_bonus ??= {};
 s.player_extra_dice ??= {};
 
 // Inicializa físico
-for (const type of atkTypes) {
-  s.player_attack_bonus[type] ??= 0;
-  s.player_damage_bonus[type] ??= 0;
-  s.player_extra_dice[type] ??= 0;
+for (const list of Object.values(s.bonusKeys)) {
+  for (const type of list) {
+    s.player_attack_bonus[type] ??= 0;
+    s.player_damage_bonus[type] ??= 0;
+    s.player_extra_dice[type]  ??= 0;
+  }
 }
+
 
 // Inicializa subtipo_2 e 3
 for (const type of [...dmgTypes, ...weightTypes]) {
