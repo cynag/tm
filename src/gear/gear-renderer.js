@@ -71,46 +71,53 @@ export class GearRenderer {
       baseSlot.appendChild(label);
 
       if (slotData.itemId) {
-        const item = actor.items.get(slotData.itemId);
-        if (item) {
-          const iw = item.system.grid?.w ?? 1;
-          const ih = item.system.grid?.h ?? 1;
-          const slotW = size.w;
-          const slotH = size.h;
+  const item = actor.items.get(slotData.itemId);
+  if (item) {
+    const iw = item.system.grid?.w ?? 1;
+    const ih = item.system.grid?.h ?? 1;
+    const slotW = size.w;
+    const slotH = size.h;
 
-          const img = document.createElement("img");
-          img.src = item.img;
+    const img = document.createElement("img");
+    img.src = item.img;
+    img.style.pointerEvents = "auto";
+    img.style.zIndex = "10";
 
-          img.style.pointerEvents = "auto";
-          img.style.zIndex = "10";
+    // ⬛ Estilo especial se for weapon2 e item é 2m
+    const isWeapon2Slot = slotId === "slot_weapon2";
+    const isTwoHanded = item.system.weapon_traits?.weapon_trait_2h;
+    if (isWeapon2Slot && isTwoHanded) {
+      img.style.opacity = "0.70";
+      img.style.filter = "grayscale(100%)";
+    }
 
+    // ✅ Tooltip bind
+    img.addEventListener("mouseenter", (e) => {
+      if (game.tm.ItemTooltip) game.tm.ItemTooltip.show(item, e);
+    });
+    img.addEventListener("mouseleave", () => {
+      if (game.tm.ItemTooltip) game.tm.ItemTooltip.hide();
+    });
 
-          // ✅ Tooltip bind
-          img.addEventListener("mouseenter", (e) => {
-            if (game.tm.ItemTooltip) game.tm.ItemTooltip.show(item, e);
-          });
-          img.addEventListener("mouseleave", () => {
-            if (game.tm.ItemTooltip) game.tm.ItemTooltip.hide();
-          });
+    img.style.position = "absolute";
+    img.style.objectFit = "contain";
+    img.style.zIndex = "1";
 
-          img.style.position = "absolute";
-          img.style.objectFit = "contain";
-          img.style.zIndex = "1";
+    if (iw > slotW || ih > slotH) {
+      img.style.width = "100%";
+      img.style.height = "100%";
+    } else {
+      img.style.width = `${iw * GearConstants.SLOT_WIDTH}px`;
+      img.style.height = `${ih * GearConstants.SLOT_HEIGHT}px`;
+      img.style.left = "50%";
+      img.style.top = "50%";
+      img.style.transform = "translate(-50%, -50%)";
+    }
 
-          if (iw > slotW || ih > slotH) {
-            img.style.width = "100%";
-            img.style.height = "100%";
-          } else {
-            img.style.width = `${iw * GearConstants.SLOT_WIDTH}px`;
-            img.style.height = `${ih * GearConstants.SLOT_HEIGHT}px`;
-            img.style.left = "50%";
-            img.style.top = "50%";
-            img.style.transform = "translate(-50%, -50%)";
-          }
+    baseSlot.appendChild(img);
+  }
+}
 
-          baseSlot.appendChild(img);
-        }
-      }
 
       const slot = baseSlot;
       label.style.pointerEvents = "none";
@@ -123,9 +130,11 @@ overlayBox.style.pointerEvents = "none";
         const gearContainer = app?.element.find("#gear-slots")[0];
         const gridContainer = app?.element.find("#grid-inventory")[0];
 
-        if (e.button === 0 && pickup) {
-          const item = game.actors.get(pickup.actorId)?.items.get(pickup.itemId);
-          if (!item) return;
+        if (e.button === 0 && pickup && !pickup.itemId) return;
+
+if (e.button === 0 && pickup) {
+  const item = game.actors.get(pickup.actorId)?.items.get(pickup.itemId);
+  if (!item) return;
 
           const valid = game.tm.GearUtils.isValidForSlot(item, slotId);
           if (!valid) return;

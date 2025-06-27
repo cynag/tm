@@ -41,33 +41,60 @@ function renderActionTable(data, actor) {
   const tbody = table.find("tbody");
 
   data.forEach(entry => {
-    const slotKey = entry.id === "attack_right" ? "slot_weapon1" : "slot_weapon2";
+    const isRight = entry.id === "attack_right";
+    const slotKey = isRight ? "slot_weapon1" : "slot_weapon2";
     const equipped = actor.system.gearSlots?.[slotKey];
     const item = equipped ? actor.items.get(equipped.itemId) : null;
+
+    // ⛔ Oculta ataque da esquerda se a arma da direita for 2H
+    if (!isRight) {
+      const rightItemId = actor.system.gearSlots?.slot_weapon1?.itemId;
+      const rightItem = rightItemId ? actor.items.get(rightItemId) : null;
+      if (rightItem?.system?.weapon_traits?.weapon_trait_2h) return;
+    }
 
     let name = entry.name;
     const tags = [];
 
     if (item?.type === "gear" && item.system.gear_type === "weapon") {
       const sys = item.system;
+      const traits = sys.weapon_traits || {};
 
       name = `Atacar com ${item.name}`;
 
+      // Dano + tipo
       if (sys.weapon_damage && sys.weapon_subtypes_2)
         tags.push(`${sys.weapon_damage} ${sys.weapon_subtypes_2}`);
 
+      // Alcance
       if (sys.weapon_range)
         tags.push(`${sys.weapon_range}m`);
 
-      const traits = sys.weapon_traits || {};
+      // Traço Descomunal
       if (traits.weapon_trait_desc)
         tags.push(`DES 6.6.${traits.weapon_trait_desc}`);
-      if (traits.weapon_trait_piercing_ironbreaker)
-        tags.push("QBF");
+
+      // Quebra-Ferro ou Perfurante
+      if (sys.weapon_subtypes_2 === "perfurante") {
+        if (traits.weapon_trait_ironbreaker)
+          tags.push("QBF");
+        else
+          tags.push("PEN");
+      }
+
+      // Rápida
       if (traits.weapon_trait_fast)
         tags.push("RAP");
+
+      // Duas Mãos
+      if (traits.weapon_trait_2h)
+        tags.push("2H");
+
+      // Vulnerável
+      if (traits.weapon_trait_vulnerable)
+        tags.push("VUL");
     } else {
-      // Ataque desarmado
+      // Desarmado
       tags.push("1d2 impacto");
       tags.push("1m");
     }
@@ -94,6 +121,8 @@ function renderActionTable(data, actor) {
 
   return table;
 }
+
+
 
 
 

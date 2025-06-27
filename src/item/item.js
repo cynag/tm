@@ -50,14 +50,27 @@ this.system.weapon_range      ??= 1;  // alcance simples
 
 // Traços da arma
 this.system.weapon_traits ??= {};
+this.system.weapon_traits.weapon_trait_2h ??= false;
 this.system.weapon_traits.weapon_trait_pom               ??= false;
 this.system.weapon_traits.weapon_trait_heavy             ??= 0;
 this.system.weapon_traits.weapon_trait_defensive         ??= 0;
 this.system.weapon_traits.weapon_trait_shield            ??= 0;
 this.system.weapon_traits.weapon_trait_desc              ??= 0;
 this.system.weapon_traits.weapon_trait_fast              ??= 0;
-this.system.weapon_traits.weapon_trait_piercing_ironbreaker = Number(this.system.weapon_traits.weapon_trait_piercing_ironbreaker ?? 0);
+this.system.weapon_traits.weapon_trait_ironbreaker ??= false;
+this.system.weapon_traits.weapon_trait_vulnerable ??= false;
+
+// Lógica de traços de penetração e quebra-ferro
+const perf = this.system.weapon_subtypes_2 === "perfurante";
+const quebraFerro = !!this.system.weapon_traits.weapon_trait_ironbreaker;
+
+if (quebraFerro) {
+  this.system.weapon_traits.weapon_trait_penetrable = false; // sobrepõe
+} else {
+  this.system.weapon_traits.weapon_trait_penetrable = perf;
+}
 this.system.weapon_traits.weapon_trait_recharge = Number(this.system.weapon_traits.weapon_trait_recharge ?? 0);
+
 
 this.system.weapon_broken ??= false;
 

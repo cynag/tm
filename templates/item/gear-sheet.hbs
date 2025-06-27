@@ -84,6 +84,10 @@
 
   <div style="display: flex; flex-wrap: wrap; gap: 16px;">
     <div>
+  <label>Duas Mãos:</label>
+  <input type="checkbox" name="system.weapon_traits.weapon_trait_2h" {{checked item.system.weapon_traits.weapon_trait_2h}} />
+</div>
+    <div>
       <label>Pomo:</label>
       <input type="checkbox" name="system.weapon_traits.weapon_trait_pom" {{checked item.system.weapon_traits.weapon_trait_pom}} />
     </div>
@@ -96,21 +100,25 @@
       <input type="number" name="system.weapon_traits.weapon_trait_defensive" value="{{item.system.weapon_traits.weapon_trait_defensive}}" style="width: 60px;" />
     </div>
     <div>
-      <label>Escudo:</label>
-      <input type="number" name="system.weapon_traits.weapon_trait_shield" value="{{item.system.weapon_traits.weapon_trait_shield}}" style="width: 60px;" />
+    <label>Escudo:</label>
+    <input type="number" name="system.weapon_traits.weapon_trait_shield" value="{{item.system.weapon_traits.weapon_trait_shield}}" style="width: 60px;" />
     </div>
     <div>
-      <label>Descomunal (1-5):</label>
-      <input type="number" name="system.weapon_traits.weapon_trait_desc" value="{{item.system.weapon_traits.weapon_trait_desc}}" min="0" max="5" style="width: 60px;" />
+    <label>Descomunal (1-5):</label>
+    <input type="number" name="system.weapon_traits.weapon_trait_desc" value="{{item.system.weapon_traits.weapon_trait_desc}}" min="0" max="5" style="width: 60px;" />
     </div>
+    
     <div>
-      <label>Perf./Q.Ferro:</label>
-      <select name="system.weapon_traits.weapon_trait_piercing_ironbreaker">
-        <option value="0" {{#if (eq item.system.weapon_traits.weapon_trait_piercing_ironbreaker 0)}}selected{{/if}}>Nenhum</option>
-        <option value="1" {{#if (eq item.system.weapon_traits.weapon_trait_piercing_ironbreaker 1)}}selected{{/if}}>Perfurante</option>
-        <option value="2" {{#if (eq item.system.weapon_traits.weapon_trait_piercing_ironbreaker 2)}}selected{{/if}}>Quebra-Ferro</option>
-      </select>
+  <label>Quebra-Ferro:</label>
+  <input type="checkbox" name="system.weapon_traits.weapon_trait_ironbreaker" {{checked item.system.weapon_traits.weapon_trait_ironbreaker}} />
+</div>
+
+    <div>
+    <label>Vulnerável:</label>
+    <input type="checkbox" name="system.weapon_traits.weapon_trait_vulnerable" {{checked item.system.weapon_traits.weapon_trait_vulnerable}} />
     </div>
+
+
     <div>
       <label>Rápida:</label>
       <input type="number" name="system.weapon_traits.weapon_trait_fast" value="{{item.system.weapon_traits.weapon_trait_fast}}" style="width: 60px;" />
@@ -228,4 +236,7 @@
 {{/if}}
 
   </section>
+
+
+
 </form>
