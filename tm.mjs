@@ -87,7 +87,7 @@ Hooks.once("init", async function () {
   Handlebars.registerHelper("array", (...args) => args.slice(0, -1));
   Handlebars.registerHelper("abs", value => Math.abs(value));
   Handlebars.registerHelper("multiply", (a, b) => a * b);
-  
+
   Handlebars.registerHelper("hasOrigin", (items) => {
   return items?.some?.(i => i.type === "origin");
 });
@@ -95,6 +95,22 @@ Hooks.once("init", async function () {
 Handlebars.registerHelper("floorDiv", function (value, divisor) {
   return Math.floor(value / divisor);
 });
+
+Handlebars.registerHelper("lookup", (obj, key) => obj?.[key]);
+Handlebars.registerHelper("switch", function(value, options) {
+  this._switch_value_ = value;
+  return options.fn(this);
+});
+
+Handlebars.registerHelper("case", function(value, options) {
+  if (value === this._switch_value_) {
+    return options.fn(this);
+  }
+});
+
+
+
+
 });
 
 

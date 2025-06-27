@@ -252,6 +252,49 @@ s.player_armor_reforced    = reforcedSum;
 s.player_armor_heavy       = heavySum;
 s.player_armor_thermic     = thermicSum;
 
+// === ABA CFG: Valores internos ===
+
+// 🎲 Dados de Ação
+s.player_action_dice ??= "3d6";
+
+// 🛡️ Contagem total de metal
+s.player_armor_metal_count = metalSum;
+s.player_armor_is_metal = metalSum >= 8;
+s.player_armor_noisy_count = noisySum;
+s.player_armor_reforced_count = reforcedSum;
+s.player_armor_heavy_count = heavySum;
+s.player_armor_thermic_count = thermicSum;
+
+// ⚔️ Bônus por tipo de arma
+const atkTypes = ["sword", "axe", "hammer", "spear", "bow", "crossbow", "gun", "shield", "throwing", "unarmed"];
+const dmgTypes = ["slashing", "piercing", "bludgeoning"];
+const weightTypes = ["light", "heavy"];
+const elemTypes = ["fire", "ice", "eletric", "poison", "acid", "psychic", "radiant", "necrotic", "chaotic"];
+
+s.player_attack_bonus ??= {};
+s.player_damage_bonus ??= {};
+s.player_extra_dice ??= {};
+
+// Inicializa físico
+for (const type of atkTypes) {
+  s.player_attack_bonus[type] ??= 0;
+  s.player_damage_bonus[type] ??= 0;
+  s.player_extra_dice[type] ??= 0;
+}
+
+// Inicializa subtipo_2 e 3
+for (const type of [...dmgTypes, ...weightTypes]) {
+  s.player_attack_bonus[type] ??= 0;
+  s.player_damage_bonus[type] ??= 0;
+}
+
+// Inicializa mágicos
+for (const type of elemTypes) {
+  s.player_attack_bonus[type] ??= 0;
+  s.player_damage_bonus[type] ??= 0;
+  s.player_extra_dice[type] ??= 0;
+}
+
 console.log("[PROT] Proteção somada por armaduras equipadas:", totalProt);
 console.log("[ARMOR TRAITS]", {
   metal: metalSum,

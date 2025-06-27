@@ -66,6 +66,10 @@
   <button type="button" class="tab-button {{#if (eq activeTab 'domains')}}active{{/if}}" data-tab="domains" {{#if (eq activeTab 'domains')}}data-active="true"{{/if}}>{{localize "TM.TabDomains"}}</button>
   <button type="button" class="tab-button {{#if (eq activeTab 'cards')}}active{{/if}}" data-tab="cards" {{#if (eq activeTab 'cards')}}data-active="true"{{/if}}>{{localize "TM.TabCards"}}</button>
   <button type="button" class="tab-button {{#if (eq activeTab 'biography')}}active{{/if}}" data-tab="biography" {{#if (eq activeTab 'biography')}}data-active="true"{{/if}}>{{localize "TM.TabBiography"}}</button>
+  {{#if isGM}}
+  <button type="button" class="tab-button {{#if (eq activeTab 'config')}}active{{/if}}" data-tab="config" {{#if (eq activeTab 'config')}}data-active="true"{{/if}}>{{localize "TM.TabConfig"}}</button>
+{{/if}}
+
 </div>
 
 
@@ -404,6 +408,66 @@
   <h2>{{localize "TM.Chronicle"}}</h2>
   <textarea name="system.player_chronicle" style="width: 100%; height: 150px; text-align: justify;">{{actor.system.player_chronicle}}</textarea>
 </div>
+
+<!-- ABA ⚙️ CONFIG -->
+<!-- ABA ⚙️ CONFIG -->
+{{#if isGM}}
+<div class="tab" data-group="main-tabs" data-tab="config">
+  <h2>⚙️ CFG: Parâmetros Internos</h2>
+  <hr>
+
+  <!-- 🎲 Dados de Ação -->
+  <h3>🎲 Dados de Ação</h3>
+  <div>
+    <label>Action Dice:</label>
+    <input type="text" name="system.player_action_dice" value="{{actor.system.player_action_dice}}" />
+  </div>
+
+  <!-- 🛡️ Traços de Armadura -->
+  <h3>🛡️ Traços de Armadura</h3>
+  <div><label>Metal Count:</label> {{actor.system.player_armor_metal_count}}</div>
+  <div><label>Is Metal:</label> <input type="checkbox" {{checked actor.system.player_armor_is_metal}} disabled /></div>
+  <div><label>Noisy:</label> {{actor.system.player_armor_noisy_count}}</div>
+  <div><label>Reforced:</label> {{actor.system.player_armor_reforced_count}}</div>
+  <div><label>Heavy:</label> {{actor.system.player_armor_heavy_count}}</div>
+  <div><label>Thermic:</label> {{actor.system.player_armor_thermic_count}}</div>
+
+  <!-- ⚔️ Bônus Físicos -->
+  <h3>⚔️ Bônus de Ataque e Dano (Físico)</h3>
+  {{#each attackBonusKeys as |key|}}
+    {{#if (or (eq key "sword") (eq key "axe") (eq key "hammer") (eq key "spear") (eq key "bow") (eq key "crossbow") (eq key "gun") (eq key "shield") (eq key "throwing") (eq key "unarmed"))}}
+      <div><strong>{{capitalize key}}</strong>: ATK +{{lookup ../attackBonus key}}, DMG +{{lookup ../damageBonus key}}, ExtraDice +{{lookup ../extraDice key}}</div>
+    {{/if}}
+  {{/each}}
+
+  <!-- 🩸 Bônus por Tipo (Corte, Perf, Peso) -->
+  <h3>🩸 Bônus por Tipo (Corte, Perf, Peso)</h3>
+  {{#each attackBonusKeys as |key|}}
+    {{#if (or (eq key "slashing") (eq key "piercing") (eq key "bludgeoning") (eq key "light") (eq key "heavy"))}}
+      <div><strong>{{capitalize key}}</strong>: ATK +{{lookup ../attackBonus key}}, DMG +{{lookup ../damageBonus key}}</div>
+    {{/if}}
+  {{/each}}
+
+  <!-- 🔥 Bônus Elementais -->
+  <h3>🔥 Bônus de Ataque e Dano (Elementais)</h3>
+  {{#each attackBonusKeys as |key|}}
+    {{#if (or (eq key "fire") (eq key "ice") (eq key "eletric") (eq key "poison") (eq key "acid") (eq key "psychic") (eq key "radiant") (eq key "necrotic") (eq key "chaotic"))}}
+      <div><strong>{{capitalize key}}</strong>: ATK +{{lookup ../attackBonus key}}, DMG +{{lookup ../damageBonus key}}, ExtraDice +{{lookup ../extraDice key}}</div>
+    {{/if}}
+  {{/each}}
+
+</div>
+{{/if}}
+
+
+
+
+
+
+
+
+<!-- Fim das Abas -->
+
 
 
 

@@ -49,6 +49,16 @@ export class TMActorSheet extends foundry.appv1.sheets.ActorSheet {
 
   data.originName = origin?.name || null;
   data.activeTab = this._activeTab;
+  data.isGM = game.user.isGM;
+
+
+  data.attackBonusKeys = Object.keys(this.actor.system.player_attack_bonus || {});
+data.attackBonus = this.actor.system.player_attack_bonus || {};
+data.damageBonus = this.actor.system.player_damage_bonus || {};
+data.extraDice = this.actor.system.player_extra_dice || {};
+
+
+
   return data;
 }
 
