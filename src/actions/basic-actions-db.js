@@ -2,6 +2,7 @@ export const BasicActionsDB = [
   {
     id: "attack_right",
     name: "Ataque Desarmado (Direita)",
+    description: "Executa um ataque com a arma equipada na mão direita. Os traços da arma afetam diretamente a rolagem.",
     img_default: "systems/tm/styles/assets/actions/att-1.webp",
     img_sword: "systems/tm/styles/assets/actions/att-2.webp",
     img_axe: "systems/tm/styles/assets/actions/att-3.webp",
@@ -15,6 +16,7 @@ export const BasicActionsDB = [
   {
     id: "attack_left",
     name: "Ataque Desarmado (Esquerda)",
+    description: "Executa um ataque com a arma equipada na mão esquerda. Não pode ser usado se a arma da direita for 2M.",
     img_default: "systems/tm/styles/assets/actions/att-1.webp",
     img_sword: "systems/tm/styles/assets/actions/att-2.webp",
     img_axe: "systems/tm/styles/assets/actions/att-3.webp",

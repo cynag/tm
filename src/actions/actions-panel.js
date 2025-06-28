@@ -1,6 +1,7 @@
 import { MovementDB } from "./movement-db.js";
 import { BasicActionsDB } from "./basic-actions-db.js";
 import { MovementDialog } from "../ui/movement-dialog.js";
+import { AttackRollDialog } from "../ui/attack-roll-dialog.js";
 
 // 🔹 Movement actions: simplified visual with PA + range
 function renderMovementTable(data, actor) {
@@ -60,39 +61,23 @@ function renderActionTable(data, actor) {
       const sys = item.system;
       const traits = sys.weapon_traits || {};
 
-      name = `Atacar com ${item.name}`;
+     const subtype = item?.system?.subtype?.toLowerCase() || "";
+const rangedTypes = ["bow", "crossbow", "gun"];
+name = rangedTypes.includes(subtype)
+  ? `Atirar com ${item.name}`
+  : `Atacar com ${item.name}`;
 
-      // Dano + tipo
-      if (sys.weapon_damage && sys.weapon_subtypes_2)
-        tags.push(`${sys.weapon_damage} ${sys.weapon_subtypes_2}`);
 
-      // Alcance
-      if (sys.weapon_range)
-        tags.push(`${sys.weapon_range}m`);
+// tag_action_cost
+tags.push(`4 PA`);
 
-      // Traço Descomunal
-      if (traits.weapon_trait_desc)
-        tags.push(`DES 6.6.${traits.weapon_trait_desc}`);
+// tag_weapon_damage
+if (item.system?.weapon_damage && item.system?.weapon_subtypes_2)
+  tags.push(`${item.system.weapon_damage} - ${item.system.weapon_subtypes_2}`);
 
-      // Quebra-Ferro ou Perfurante
-      if (sys.weapon_subtypes_2 === "perfurante") {
-        if (traits.weapon_trait_ironbreaker)
-          tags.push("QBF");
-        else
-          tags.push("PEN");
-      }
-
-      // Rápida
-      if (traits.weapon_trait_fast)
-        tags.push("RAP");
-
-      // Duas Mãos
-      if (traits.weapon_trait_2h)
-        tags.push("2H");
-
-      // Vulnerável
-      if (traits.weapon_trait_vulnerable)
-        tags.push("VUL");
+// tag_weapon_range
+if (item.system?.weapon_range)
+  tags.push(`${item.system.weapon_range}m`);
     } else {
       // Desarmado
       tags.push("1d2 impacto");
@@ -122,8 +107,9 @@ function renderActionTable(data, actor) {
   
   table.find(".action-roll").on("click", async (ev) => {
   const actionId = ev.currentTarget.dataset.id;
-await game.tm.ActionRoller.rollAttack({ attacker: actor, target: Array.from(game.user.targets)[0], actionId });
+  AttackRollDialog.show({ actor, actionId });
 });
+
 
 
   return table;
