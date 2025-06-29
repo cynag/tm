@@ -39,8 +39,15 @@ const damageType = isUnarmed ? "impacto" : (item?.system?.weapon_subtypes_2 || "
     const line1Tags = [];
 
     if (!isUnarmed) {
-  if (item.system?.weapon_damage && item.system?.weapon_subtypes_2)
-    line1Tags.push(`${item.system.weapon_damage} ${item.system.weapon_subtypes_2}`);
+  if (item.system?.weapon_damage && item.system?.weapon_subtypes_2) {
+  const base = item.system.weapon_damage;
+  const bonusLet = actor.system.mod_letality ?? 0;
+  const bonusDmg = actor.system.player_damage_bonus?.[subtype] ?? 0;
+  const totalBonus = bonusLet + bonusDmg;
+  const totalString = totalBonus > 0 ? ` +${totalBonus}` : "";
+  line1Tags.push(`${base}${totalString} ${item.system.weapon_subtypes_2}`);
+}
+
   if (item.system?.weapon_range)
     line1Tags.push(`${item.system.weapon_range}m`);
 } else {
