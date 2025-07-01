@@ -72,8 +72,28 @@ name = rangedTypes.includes(subtype)
 tags.push(`4 PA`);
 
 // tag_weapon_damage
-if (item.system?.weapon_damage && item.system?.weapon_subtypes_2)
-  tags.push(`${item.system.weapon_damage} - ${item.system.weapon_subtypes_2}`);
+if (item.system?.weapon_damage && item.system?.weapon_subtypes_2) {
+  const damageCode = item.system.weapon_damage.trim();
+  const dmgType = item.system.weapon_subtypes_2;
+  const match = damageCode.match(/^(.+?)\{\{(.+?)\}\}$/);
+
+  if (match) {
+    const base = match[1].trim(); // ex: 1d4
+    const extra = match[2].trim(); // ex: +2d4 (Fogo)
+
+    tags.push(`${base} ${dmgType}`);
+
+    const extraMatch = extra.match(/^([+−-]?\s*\d+d\d+)\s*\(([^)]+)\)/i);
+    if (extraMatch) {
+      const [, bonusDice, elementType] = extraMatch;
+      tags.push(`${bonusDice.trim().replace("+", "")} ${elementType.trim().toLowerCase()}`);
+
+    }
+  } else {
+    tags.push(`${damageCode} ${dmgType}`);
+  }
+}
+
 
 // tag_weapon_range
 if (item.system?.weapon_range)
