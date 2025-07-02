@@ -1,11 +1,13 @@
 export class ItemContextMenu {
   static menuEl = null;
 
-static show(x, y, actor, item) {
+  static show(x, y, actor, item) {
   this.remove();
 
   // ❌ Só mostra se o item for do tipo "gear"
-  if (item.type !== "gear") return;
+  const allowedTypes = ["gear", "consumable"];
+if (!allowedTypes.includes(item.type)) return;
+
 
   game.tm.ItemTooltip?.hide();
   console.log("[ItemContextMenu] ✅ Menu chamado:", item.name);
@@ -68,22 +70,20 @@ options.push({
   const slots = Object.entries(actor.system.gearSlots)
     .filter(([slotId, slot]) => !slot.itemId && game.tm.GearUtils.isValidForSlot(item, slotId));
 
-  if (slots.length === 0) {
-    options.push({
-      label: "Equipar",
-      icon: '<i class="fas fa-ban"></i>',
-      disabled: true
-    });
-  } else if (slots.length === 1) {
-    options.push({
-      label: "Equipar",
-      action: () => {
-        game.tm.GearManager.equipItem(actor, item, slots[0][0]);
-      }
-    });
-  }
 }
 // Excluir item (qualquer tipo)
+// Dividir Stack (apenas para consumable > ammo com qty > 1)
+if (
+  item.type === "consumable" &&
+  item.system?.category === "ammo" &&
+  (item.system?.ammo_quantity ?? 0) > 1
+) {
+  options.push({
+    label: "✂️ Dividir Stack",
+    action: () => this.splitStack(actor, item)
+  });
+}
+
 options.push({
   label: "🗑️ Excluir",
   action: () => {
@@ -183,10 +183,53 @@ if (game.user.isGM) {
     }
     document.removeEventListener("mousedown", this._onGlobalClick);
   }
-
+  
   static _onGlobalClick = (e) => {
     if (!this.menuEl?.contains(e.target)) {
       this.remove();
     }
   };
+
+  static splitStack(actor, item) {
+  const qty = item.system.ammo_quantity ?? 0;
+  if (qty <= 1) return;
+
+  const newQty = Math.floor(qty / 2);
+  const remainder = qty - newQty;
+
+  actor.updateEmbeddedDocuments("Item", [{
+    _id: item.id,
+    "system.ammo_quantity": remainder
+  }]);
+
+  const newItem = foundry.utils.duplicate(item);
+newItem.system.ammo_quantity = newQty;
+delete newItem._id;
+newItem.flags = {
+  ...newItem.flags,
+  tm: {
+    ...(newItem.flags?.tm ?? {}),
+    noAutoStack: true
+  }
+};
+
+if (newItem.flags?.tm?.originalSize) delete newItem.flags.tm.originalSize;
+
+newItem.flags = newItem.flags || {};
+newItem.flags.tm = newItem.flags.tm || {};
+newItem.flags.tm.noAutoStack = true;
+
+
+Hooks.once("createItem", async (created) => {
+  await game.tm.GridAutoPosition.placeNewItem(actor, created);
+});
+
+actor.createEmbeddedDocuments("Item", [newItem]);
+
+console.log(`[STACK] ${item.name} dividido: ${remainder} + ${newQty}`);
+
+
+}
+
+  
 }

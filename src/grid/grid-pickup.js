@@ -89,6 +89,15 @@ if (item.system?.equippedSlot) {
   if (!actor || !item) return;
 
   const app = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+  if (!item) {
+  console.warn("[GridPickup] ❌ Item já foi deletado. Cancelamento visual apenas.");
+  this.pickupData = null;
+  this._removePreview();
+  this._removeOverlay();
+  this._removeListeners();
+  game.tm.GridDelete.disable();
+  return;
+}
   const grid = game.tm.GridUtils.createVirtualGrid(actor);
 
   let placed = false;

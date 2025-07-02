@@ -1,7 +1,12 @@
 export class GridPositioner {
   static placeItem(actor, item, x, y, rotated = false) {
- 
-    const rawW = item?.system?.grid?.w ?? 1;
+  if (!item || !item.id) {
+    console.warn("[GridPositioner] ⛔ Item inválido ou deletado");
+    return;
+  }
+
+  const rawW = item?.system?.grid?.w ?? 1;
+
     const rawH = item?.system?.grid?.h ?? 1;
 
     const w = rotated ? rawH : rawW;

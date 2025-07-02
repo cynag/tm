@@ -5,11 +5,16 @@ export class GridAutoPosition {
    * 2. Tenta rotacionado
    * 3. Se nenhum couber, cancela e avisa
    */
-  static placeNewItem(actor, item) {
-    if (["trait", "language"].includes(item.type)) {
-  console.warn(`[GridAutoPosition] ⛔ Ignorado tipo não físico: ${item.type}`);
-  return;
-}
+static async placeNewItem(actor, item) {
+  const noStack = item.flags?.tm?.noAutoStack === true;
+if (!noStack && await game.tm.GridUtils.tryStackItem(actor, item)) return;
+
+
+  if (["trait", "language"].includes(item.type)) {
+    console.warn(`[GridAutoPosition] ⛔ Ignorado tipo não físico: ${item.type}`);
+    return;
+  }
+
 
     const rawW = item.system.grid?.w ?? 1;
     const rawH = item.system.grid?.h ?? 1;

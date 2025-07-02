@@ -183,17 +183,17 @@ s.player_resistance_phys = s.mod_impulse > 0 ? s.mod_impulse * 4 : 0;
 s.player_resistance_mental = s.mod_virtue > 0 ? s.mod_virtue * 4 : 0;
 s.player_initiative = s.mod_dexterity;
 
-console.log("[CALCULOS AUTO] Reflex:", s.player_reflex, "| Manobra:", s.player_maneuver, "| RF:", s.player_resistance_phys, "| RM:", s.player_resistance_mental, "| Iniciativa:", s.player_initiative);
+//console.log("[CALCULOS AUTO] Reflex:", s.player_reflex, "| Manobra:", s.player_maneuver, "| RF:", s.player_resistance_phys, "| RM:", s.player_resistance_mental, "| Iniciativa:", s.player_initiative);
 
 
-console.log("[Actor] Modificadores aplicados:", {
+/*console.log("[Actor] Modificadores aplicados:", {
   LET: s.mod_letality,
   DES: s.mod_dexterity,
   IMP: s.mod_impulse,
   ARC: s.mod_arcana,
   ERU: s.mod_erudition,
   VIR: s.mod_virtue
-});
+});*/
 
   // === PROTEÇÃO E TRAÇOS POR ARMADURA EQUIPADA ===
 let totalProt     = 0;
@@ -268,12 +268,12 @@ if (isIncompetent) {
 
 s.player_protection        += totalProt;
 s.mod_protection = s.player_protection > 0 ? Math.floor(s.player_protection / 2) : 0;
-console.log("[MOD PROTECTION] Final:", s.player_protection, "→", s.mod_protection);
+/*console.log("[MOD PROTECTION] Final:", s.player_protection, "→", s.mod_protection);
 s.player_armor_metal       = metalSum;
 s.player_armor_noisy       = noisySum;
 s.player_armor_reforced    = reforcedSum;
 s.player_armor_heavy       = heavySum;
-s.player_armor_thermic     = thermicSum;
+s.player_armor_thermic     = thermicSum;*/
 
 // === ABA CFG: Valores internos ===
 
@@ -324,14 +324,14 @@ for (const type of elemTypes) {
   s.player_extra_dice[type] ??= 0;
 }
 
-console.log("[PROT] Proteção somada por armaduras equipadas:", totalProt);
-console.log("[ARMOR TRAITS]", {
+//console.log("[PROT] Proteção somada por armaduras equipadas:", totalProt);
+/*console.log("[ARMOR TRAITS]", {
   metal: metalSum,
   noisy: noisySum,
   reforced: reforcedSum,
   heavy: heavySum,
   thermic: thermicSum
-});
+});*/
 
 // === ARMAS EQUIPADAS (slot_weapon1 e slot_weapon2) ===
 s.weaponRight = {};
@@ -382,10 +382,10 @@ for (const [slotId, slot] of Object.entries(s.gearSlots)) {
       clone.weapon_traits.weapon_trait_fast = 0;
     }
 
-    console.log(`[ARMA QUEBRADA] ${this.name} => efeitos aplicados`);
+    //console.log(`[ARMA QUEBRADA] ${this.name} => efeitos aplicados`);
   }
 
-  console.log(`[WEAPON SLOT] ${this.name} => ${item.name} em ${slotId}`);
+  //console.log(`[WEAPON SLOT] ${this.name} => ${item.name} em ${slotId}`);
 }
 
 

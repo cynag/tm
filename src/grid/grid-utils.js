@@ -2,6 +2,7 @@ export const GridUtils = {
   GRID_WIDTH: 10,
   GRID_HEIGHT: 5,
 
+
   createVirtualGrid(actor) {
   const grid = this.createEmptyGrid();
 
@@ -151,6 +152,75 @@ isItemRotated(actor, itemId) {
     (meta.w < meta.h && original.w > original.h) ||
     (meta.w > meta.h && original.w < original.h)
   );
+},
+
+canStackItems(itemA, itemB) {
+  if (!itemA || !itemB) return false;
+  if (itemA.id === itemB.id) return false;
+  if (itemA.type !== "consumable") return false;
+  if (itemB.type !== "consumable") return false;
+  if (itemA.system?.category !== "ammo") return false;
+  if (itemB.system?.category !== "ammo") return false;
+  if (itemA.name !== itemB.name) return false;
+
+  const max = itemA.system?.stack_value ?? 10;
+  const total = (itemA.system?.ammo_quantity ?? 0) + (itemB.system?.ammo_quantity ?? 0);
+  return total <= max;
+},
+
+
+async tryStackItem(actor, item) {
+  const isAmmo = item.type === "consumable" && item.system.category === "ammo";
+  if (!isAmmo) return false;
+
+  const inv = actor.items.filter(i =>
+    i.id !== item.id &&
+    i.type === "consumable" &&
+    i.system?.category === "ammo" &&
+    i.name === item.name
+  );
+
+  if (inv.length === 0) return false;
+
+  const max = item.system.stack_value ?? 10;
+const add = item.system.ammo_quantity ?? 0;
+
+for (const target of inv) {
+  const current = target.system.ammo_quantity ?? 0;
+  if (current >= max) continue;
+
+  const total = current + add;
+  const newQty = Math.min(max, total);
+  const remainder = total > max ? total - max : 0;
+
+  await target.update({ "system.ammo_quantity": newQty });
+
+  if (remainder > 0) {
+    await item.update({ "system.ammo_quantity": remainder });
+    console.log(`[STACK] ${item.name}: parcial (${newQty} + ${remainder})`);
+    return false;
+  }
+
+  await actor.deleteEmbeddedDocuments("Item", [item.id]);
+  console.log(`[STACK] ${item.name}: total (${newQty})`);
+
+  // Encerrar pickup se estiver ativo
+  if (game.tm.GridPickup?.pickupData?.itemId === item.id) {
+    game.tm.GridPickup.pickupData = null;
+    game.tm.GridPickup._removePreview?.();
+    game.tm.GridPickup._removeOverlay?.();
+    game.tm.GridPickup._removeListeners?.();
+  }
+
+  return true;
 }
 
+// ⛔ Se nenhum stack for válido
+return false;
+
+}
+
+
 };
+game.tm = game.tm || {};
+game.tm.GridUtils = GridUtils;

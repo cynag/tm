@@ -27,7 +27,7 @@ export class GridOverlay {
     //console.log("[GridOverlay] ✅ Overlay criado");
   }
 
-  static update(actor, gridData, relX, relY) {
+  static async update(actor, gridData, relX, relY) {
     if (!this.overlay) return;
 
     this.clear();
@@ -43,6 +43,14 @@ export class GridOverlay {
 
     const grid = game.tm.GridUtils.createVirtualGrid(actor);
 const ids = game.tm.GridUtils.getItemsUnderAreaFromGrid(grid, gridX, gridY, w, h);
+let stackable = false;
+if (ids.length === 1) {
+  const itemId = ids[0];
+  const item = actor.items.get(itemId);
+  const pickupItem = actor.items.get(pickup.itemId);
+  stackable = await game.tm.GridUtils.canStackItems(pickupItem, item);
+}
+
 const valid = ids.length === 0;
 const swapTarget = ids.length === 1;
 
@@ -58,10 +66,12 @@ const swapTarget = ids.length === 1;
         cell.style.width = "50px";
         cell.style.height = "50px";
         cell.style.backgroundColor = valid
-  ? "rgba(0,255,0,0.3)"
-  : swapTarget
-    ? "rgba(255,165,0,0.4)" // laranja
-    : "rgba(255,0,0,0.3)";
+  ? "rgba(0,255,0,0.3)" // verde
+  : stackable
+    ? "rgba(0,150,255,0.4)" // azul
+    : swapTarget
+      ? "rgba(255,165,0,0.4)" // laranja
+      : "rgba(255,0,0,0.3)"; // vermelho
 
         this.overlay.appendChild(cell);
       }

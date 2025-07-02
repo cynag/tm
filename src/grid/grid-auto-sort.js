@@ -1,10 +1,21 @@
 export class GridAutoSort {
-  static sort(actor) {
+  static async sort(actor) {
+    // 🔁 Stacka tudo que for possível antes de ordenar
+    const all = actor.items.filter(i =>
+      i.system.grid &&
+      !i.system.equippedSlot &&
+      !["trait", "language"].includes(i.type)
+    );
+
+    for (let item of all) {
+      await game.tm.GridUtils.tryStackItem(actor, item);
+    }
+
+    // 🔽 Continua organização visual
     const items = actor.items.filter(i =>
       i.system.grid &&
       !i.system.equippedSlot &&
       !["trait", "language"].includes(i.type)
-
     );
 
     const sorted = [...items].sort((a, b) => {

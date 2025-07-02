@@ -58,6 +58,17 @@ const targetIds = game.tm.GridUtils.getItemsUnderAreaFromGrid(gridSim, gridX, gr
 
   const itemA = actor.items.get(pickup.itemId); // item em mão
   const itemB = actor.items.get(targetIds[0]);  // alvo do clique
+  const item = actor.items.get(pickup.itemId);
+  if (!itemA) {
+  console.warn("[STACK] ❌ itemA undefined");
+  return;
+}
+
+  if (await game.tm.GridUtils.tryStackItem(actor, item)) return;
+  if (!itemA) return;
+const stacked = await game.tm.GridUtils.tryStackItem(actor, itemA);
+if (stacked) return;
+
   if (!itemA || !itemB) return;
 
 

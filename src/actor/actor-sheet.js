@@ -69,7 +69,7 @@ async render(force = false, options = {}) {
   if (!this._blockScrollSave && this.rendered && el && typeof el.scrollTop === "number") {
   const key = `scroll-${this.actor.id}`;
   sessionStorage.setItem(key, el.scrollTop);
-  console.log("[TMActorSheet] Scroll salvo:", el.scrollTop);
+  //console.log("[TMActorSheet] Scroll salvo:", el.scrollTop);
 }
 
 
@@ -106,7 +106,7 @@ if (activeButton.length) activeButton.addClass("active");
       const el = this.element.find(".main-content")[0];
       if (el) {
         el.scrollTop = scrollValue;
-        console.log("[TMActorSheet] Scroll restaurado:", scrollValue);
+        //console.log("[TMActorSheet] Scroll restaurado:", scrollValue);
         if (el.scrollTop === scrollValue || attempts >= 5) return;
       }
       if (attempts < 5) {
@@ -118,7 +118,7 @@ if (activeButton.length) activeButton.addClass("active");
     tryRestoreScroll();
 
     if (this._activeTab === "cards" && options.tabClicked === true) {
-  console.log("[CardPanel] ResetAnimation (por clique real na aba)");
+  //console.log("[CardPanel] ResetAnimation (por clique real na aba)");
   if (game.tm?.CardPanel?.resetAnimation) {
     game.tm.CardPanel.resetAnimation(this.actor.id);
   }
@@ -135,7 +135,7 @@ if (activeButton.length) activeButton.addClass("active");
   setTimeout(async () => {
     const hasRace = await this.actor.getFlag("tm", "raceConfirmed");
     if (!hasRace) {
-      console.log("[RaceSelector] Exibindo tela de seleção de raça");
+      //console.log("[RaceSelector] Exibindo tela de seleção de raça");
       const { RaceSelector } = await import("../race/race-selector.js");
       new RaceSelector(this.actor).render(true);
     }
@@ -160,7 +160,7 @@ if (activeButton.length) activeButton.addClass("active");
 
     // 🧽 Auto-sort
     html.find(".auto-sort-btn").on("click", () => {
-      console.log("[AutoSort] 🔁 Auto-sort iniciado");
+      //console.log("[AutoSort] 🔁 Auto-sort iniciado");
       game.tm.GridAutoSort.sort(this.actor);
     });
 
@@ -210,7 +210,7 @@ html.find("[data-target='system.base_erudition']").on("change", async () => {
   if (el) {
     const key = `scroll-${this.actor.id}`;
     sessionStorage.setItem(key, el.scrollTop);
-    console.log("[TMActorSheet] Scroll pré-update salvo:", el.scrollTop);
+    //console.log("[TMActorSheet] Scroll pré-update salvo:", el.scrollTop);
   }
 
   const erud = this.actor.system.base_erudition;
@@ -219,7 +219,7 @@ html.find("[data-target='system.base_erudition']").on("change", async () => {
 
   this._blockScrollSave = true; // <- só BLOQUEIA após update
 
-  console.log(`[Atualização] Sabedoria recalculada: ${sab}`);
+  //console.log(`[Atualização] Sabedoria recalculada: ${sab}`);
 });
 
 html.find('.sheet-tabs[data-group="main-tabs"]').on("click", "button[data-tab='cards']", async () => {

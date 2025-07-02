@@ -5206,3 +5206,19 @@ h4.dice-total {
 .dice-ácido .dice-bg {
   filter: hue-rotate(340deg) saturate(0.8) brightness(0.7) ;
 }
+
+
+
+.stack-label {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1px 4px;
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 10;
+}

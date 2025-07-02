@@ -81,6 +81,16 @@ img.addEventListener("mouseleave", () => {
           img.style.left = `${x * 50}px`;
           img.style.top = `${y * 50}px`;
 
+          // 🧮 Exibe quantidade empilhada se for munição
+const isAmmo = item.type === "consumable" && item.system?.category === "ammo";
+const qty = item.system?.ammo_quantity ?? 0;
+
+if (isAmmo && qty > 1) {
+  const label = document.createElement("div");
+  label.classList.add("stack-label");
+  label.textContent = qty;
+  img.appendChild(label);
+}
 
           img.addEventListener("mousedown", (e) => {
   e.preventDefault();
