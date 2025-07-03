@@ -138,17 +138,19 @@ if (
   });
 }
 
-// Dividir Stack (apenas para consumable > ammo com qty > 1)
+// Dividir Stack (apenas se não estiver vinculada a uma arma)
 if (
   item.type === "consumable" &&
   item.system?.category === "ammo" &&
-  (item.system?.ammo_quantity ?? 0) > 1
+  (item.system?.ammo_quantity ?? 0) > 1 &&
+  !item.flags?.tm?.linkedWeapon
 ) {
   options.push({
-    label: "✂️ Dividir Stack",
+    label: "✂️ Dividir",
     action: () => this.splitStack(actor, item)
   });
 }
+
 
 
 

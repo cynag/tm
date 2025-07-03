@@ -2,6 +2,31 @@
 import { BasicActionsDB } from "../actions/basic-actions-db.js";
 
 export async function rollAttack({ attacker, target, actionId, forcedDice }) {
+    // 📌 Verifica se é uma arma de projétil e requer munição
+const isRight = actionId === "attack_right";
+const slotKey = isRight ? "slot_weapon1" : "slot_weapon2";
+const equipped = attacker.system.gearSlots?.[slotKey];
+const item = equipped ? attacker.items.get(equipped.itemId) : null;
+const isUnarmed = !item;
+
+const isProjectile = ["bow", "crossbow", "gun"].includes(item?.system?.subtype);
+
+// 🔍 Busca munição vinculada com base no .flags.tm.linkedWeapon
+const ammo = attacker.items.find(i =>
+  i.type === "consumable" &&
+  i.flags?.tm?.linkedWeapon === item?.id &&
+  i.system?.ammo_damage > 0 &&
+  i.system?.ammo_quantity > 0
+);
+
+if (isProjectile && !ammo) {
+  ui.notifications.warn(`⚠️ Você precisa equipar uma munição válida para usar essa arma.`);
+  console.warn(`[AttackRoll] ❌ Sem munição vinculada para arma de projétil`);
+  return;
+}
+
+
+
   if (!attacker || !target) return ui.notifications.warn("Selecione um atacante e um alvo.");
   const targetActor = target?.actor;
   if (!targetActor) return ui.notifications.warn("O alvo não possui ficha de ator.");
@@ -12,12 +37,6 @@ export async function rollAttack({ attacker, target, actionId, forcedDice }) {
 
   let elementalKeyRaw = "";
 
-  
-  const isRight = actionId === "attack_right";
-  const slotKey = isRight ? "slot_weapon1" : "slot_weapon2";
-  const equipped = attackerSystem.gearSlots?.[slotKey];
-  const item = equipped ? attacker.items.get(equipped.itemId) : null;
-  const isUnarmed = !item;
   if (isUnarmed) console.warn("[ActionRoll] Ataque desarmado permitido.");
 
   const actionData = BasicActionsDB.find(a => a.id === actionId);
@@ -110,7 +129,8 @@ if (!hit) {
   earlyFailMsgContent = `
     <div class="chat-attack" style="font-family: var(--font-primary); font-size: 1.1em;">
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-        <img src="${actionData?.img_default || "icons/svg/sword.svg"}" width="48" height="48" style="border:1px solid #555; border-radius:4px;" />
+        <img src="${actionData?.[`img_${subtype}`] || item?.img || actionData?.img_default || "icons/svg/sword.svg"}" width="48" height="48" style="border:1px solid #555; border-radius:4px;" />
+
         <div>
           <h2 style="margin: 0 0 4px 0; font-size: 16px;">${isUnarmed ? "Ataque Desarmado" : `Atacar com ${item.name?.trim() || "arma"}`}</h2>
           <div style="margin-bottom: 2px;">
@@ -656,6 +676,21 @@ ${elementalRoll ? `
   ${outcomeHTML}
 </div>
 `;
+
+  // 🔻 Consome 1 de munição após ataque com projétil
+ if (isProjectile && ammo) {
+  const newQty = Math.max(0, (ammo.system.ammo_quantity ?? 0) - 1);
+
+  if (newQty === 0) {
+    await ammo.delete();
+    console.log(`[AttackRoll] 🗑️ Munição ${ammo.name} removida do inventário (0 restantes)`);
+  } else {
+    await ammo.update({ "system.ammo_quantity": newQty });
+    console.log(`[AttackRoll] 🧨 Munição consumida: ${ammo.name} → ${newQty}`);
+  }
+}
+
+
 
 
   const rolls = hit ? [atkRoll, baseRoll] : [atkRoll];
