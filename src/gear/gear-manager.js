@@ -167,7 +167,7 @@ if (game.tm.GridPickup.pickupData?.itemId === item.id) {
     const sheet = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
     if (sheet?.render) sheet.render(true);
 
-    ui.notifications.info(`✅ ${ammo.name} vinculado a ${weapon.name}`);
+    console.log(`✅ ${ammo.name} vinculado a ${weapon.name}`);
   }
 
   static async unlinkAmmoFromWeapon(actor, weaponId) {

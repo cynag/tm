@@ -143,18 +143,32 @@ if (e.button === 0 && pickup) {
           const currentItem = currentId ? actor.items.get(currentId) : null;
 
           if (currentItem && currentItem.id !== item.id) {
-            console.debug(`[Swap] Slot ${slotId} ocupado por ${currentItem.name}, iniciando swap`);
-            await game.tm.GearManager.unequipItem(actor, slotId);
-            await game.tm.GearManager.equipItem(actor, item, slotId);
+  console.debug(`[Swap] Slot ${slotId} ocupado por ${currentItem.name}, iniciando swap`);
 
-            game.tm.GridPickup.pickupData = null;
-            game.tm.GridPickup._removePreview();
-            game.tm.GridPickup._removeOverlay();
-            game.tm.GridPickup._removeListeners();
-            game.tm.GridDelete.disable();
 
-            game.tm.GridPickup.start(actor, currentItem, false, null, e);
-            await currentItem.update({ "system.equippedSlot": null });
+  if (
+    currentItem.type === "gear" &&
+    currentItem.system.gear_type === "weapon" &&
+    (slotId === "slot_weapon1" || slotId === "slot_weapon2")
+  ) {
+    await game.tm.GearManager.unlinkAmmoFromWeapon(actor, currentItem.id);
+  }
+
+  await game.tm.GearManager.unequipItem(actor, slotId);
+
+game.tm.GridPickup.start(actor, currentItem, false, null, e);
+await currentItem.update({ "system.equippedSlot": null });
+
+await game.tm.GearManager.equipItem(actor, item, slotId);
+
+
+
+game.tm.GridPickup.pickupData = null;
+game.tm.GridPickup._removePreview();
+game.tm.GridPickup._removeOverlay();
+game.tm.GridPickup._removeListeners();
+game.tm.GridDelete.disable();
+
 
             const imgs = gridContainer?.querySelectorAll(".grid-item-image");
             imgs?.forEach(el => {

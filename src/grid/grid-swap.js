@@ -58,6 +58,46 @@ const targetIds = game.tm.GridUtils.getItemsUnderAreaFromGrid(gridSim, gridX, gr
 
   const itemA = actor.items.get(pickup.itemId); // item em mão
   const itemB = actor.items.get(targetIds[0]);  // alvo do clique
+
+  // 🧠 Verifica se itemB é uma arma equipada no slot_weapon1 ou slot_weapon2
+if (itemB?.type === "gear" && itemB.system.gear_type === "weapon") {
+  const slot = itemB.system.equippedSlot;
+
+  if (slot === "slot_weapon1" || slot === "slot_weapon2") {
+    console.log(`[GridSwap] 💥 Arma equipada no ${slot} será substituída por swap`);
+
+    // 1️⃣ Desequipar munição vinculada
+    await game.tm.GearManager.unlinkAmmoFromWeapon(actor, itemB.id);
+
+    // 2️⃣ Desequipar arma atual
+    await game.tm.GearManager.unequipItem(actor, slot);
+
+    // 3️⃣ Equipar itemA no lugar (ainda será movido visualmente depois)
+    await game.tm.GearManager.equipItem(actor, itemA, slot);
+
+    // 4️⃣ Força itemB a entrar em pickup
+    game.tm.GridPickup.pickupData = {
+      actorId: actor.id,
+      itemId: itemB.id,
+      w: itemB.system.grid?.w ?? 1,
+      h: itemB.system.grid?.h ?? 1,
+      rotated: false,
+      origin: null,
+      img: itemB.img,
+      fromGrid: false,
+      mousePos: { x, y },
+      original: {
+        w: itemB.system.grid?.w ?? 1,
+        h: itemB.system.grid?.h ?? 1
+      }
+    };
+
+    console.log(`[GridSwap] 🧤 ${itemB.name} agora está em pickup`);
+    return; // Encerra aqui — não executa o swap padrão
+  }
+}
+
+
   const item = actor.items.get(pickup.itemId);
   if (!itemA) {
   console.warn("[STACK] ❌ itemA undefined");
