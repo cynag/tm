@@ -168,57 +168,91 @@ canStackItems(itemA, itemB) {
   return total <= max;
 },
 
+getAmmoSprite(item) {
+  const sprites = item.system.ammo_sprites;
+  const qty = item.system.ammo_quantity ?? 0;
+  const max = item.system.stack_value ?? 1;
+
+  if (!sprites || max === 0) return item.img;
+
+  const percent = (qty / max) * 100;
+
+  if (percent >= 100 && sprites.s6) return sprites.s6;
+  if (percent >= 80 && sprites.s5) return sprites.s5;
+  if (percent >= 60 && sprites.s4) return sprites.s4;
+  if (percent >= 40 && sprites.s3) return sprites.s3;
+  if (percent >= 20 && sprites.s2) return sprites.s2;
+  if (percent >= 1 && sprites.s1) return sprites.s1;
+
+  return item.img;
+},
 
 async tryStackItem(actor, item) {
   const isAmmo = item.type === "consumable" && item.system.category === "ammo";
   if (!isAmmo) return false;
 
-  const inv = actor.items.filter(i =>
-    i.id !== item.id &&
-    i.type === "consumable" &&
-    i.system?.category === "ammo" &&
-    i.name === item.name
-  );
+  const stackRoot = item.flags?.tm?.originalStackId || item.id;
+
+  const inv = actor.items.filter(i => {
+    const sameType = i.type === "consumable" && i.system?.category === "ammo";
+    const sameName = i.name === item.name;
+    const notSelf = i.id !== item.id;
+    const spaceLeft = (i.system?.ammo_quantity ?? 0) < (i.system?.stack_value ?? 1);
+
+    const iRoot = i.flags?.tm?.originalStackId || i.id;
+      // ✅ Só impede stack no item original IMEDIATO, não em irmãos
+  const sameOrigin = i.id === stackRoot;
+
+    return sameType && sameName && notSelf && spaceLeft && !sameOrigin;
+
+  });
 
   if (inv.length === 0) return false;
 
-  const max = item.system.stack_value ?? 10;
-const add = item.system.ammo_quantity ?? 0;
-
-for (const target of inv) {
-  const current = target.system.ammo_quantity ?? 0;
-  if (current >= max) continue;
-
-  const total = current + add;
-  const newQty = Math.min(max, total);
-  const remainder = total > max ? total - max : 0;
-
-  await target.update({ "system.ammo_quantity": newQty });
-
-  if (remainder > 0) {
-    await item.update({ "system.ammo_quantity": remainder });
-    console.log(`[STACK] ${item.name}: parcial (${newQty} + ${remainder})`);
-    return false;
+  console.log(`[DEBUG] Tentando stackar '${item.name}' (${item.system.ammo_quantity}) com outros stacks válidos:`);
+  for (const i of inv) {
+    console.log(`- [${i.id}] ${i.name} (${i.system.ammo_quantity}/${i.system.stack_value})`);
   }
 
-  await actor.deleteEmbeddedDocuments("Item", [item.id]);
-  console.log(`[STACK] ${item.name}: total (${newQty})`);
+  for (const target of inv) {
+    const current = target.system.ammo_quantity ?? 0;
+    const max = target.system.stack_value ?? 10;
+    const add = item.system.ammo_quantity ?? 0;
 
-  // Encerrar pickup se estiver ativo
-  if (game.tm.GridPickup?.pickupData?.itemId === item.id) {
-    game.tm.GridPickup.pickupData = null;
-    game.tm.GridPickup._removePreview?.();
-    game.tm.GridPickup._removeOverlay?.();
-    game.tm.GridPickup._removeListeners?.();
+    if (current >= max) continue;
+
+    const total = current + add;
+    const newQty = Math.min(max, total);
+    const remainder = Math.max(0, total - max);
+
+    await target.update({ "system.ammo_quantity": newQty });
+
+    if (remainder > 0) {
+      await item.update({ "system.ammo_quantity": remainder });
+      console.log(`[STACK] ${item.name}: parcial (${newQty} + ${remainder})`);
+      return false;
+    }
+
+    await actor.deleteEmbeddedDocuments("Item", [item.id]);
+    console.log(`[STACK] ${item.name}: total → fundido em [${target.id}] = ${newQty}`);
+
+    if (game.tm.GridPickup?.pickupData?.itemId === item.id) {
+      game.tm.GridPickup.pickupData = null;
+      game.tm.GridPickup._removePreview?.();
+      game.tm.GridPickup._removeOverlay?.();
+      game.tm.GridPickup._removeListeners?.();
+    }
+
+    return true;
   }
 
-  return true;
+  return false;
 }
 
-// ⛔ Se nenhum stack for válido
-return false;
 
-}
+
+
+
 
 
 };

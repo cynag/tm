@@ -17,6 +17,8 @@ export class ConsumableSheet extends foundry.appv1.sheets.ItemSheet {
       medicinal: ["sedative", "soothing", "healing", "stimulant", "stabilizer", "preventive", "purifier", "tool"],
       alchemical: ["potion", "poison", "catalyst"]
     };
+    context.stackImages = this.object.system.stackImages ?? {};
+
     return context;
   }
 

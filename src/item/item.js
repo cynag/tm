@@ -94,6 +94,16 @@ this.system.weapon_broken ??= false;
         if (!Number.isInteger(data.ammo_damage)) data.ammo_damage = 0;
         if (!Number.isInteger(data.ammo_quantity)) data.ammo_quantity = 0;
         if (!Number.isInteger(data.stack_value)) data.stack_value = 10;
+        // Sprites por quantidade
+        // Sprites por quantidade
+         data.ammo_sprites ??= {};
+        data.ammo_sprites.s1 ??= "";
+        data.ammo_sprites.s2 ??= "";
+        data.ammo_sprites.s3 ??= "";
+        data.ammo_sprites.s4 ??= "";
+        data.ammo_sprites.s5 ??= "";
+        data.ammo_sprites.s6 ??= "";
+
       }
     }
 

@@ -59,8 +59,26 @@ if (!meta || meta.x == null || meta.y == null) continue;
 img.addEventListener("mouseleave", () => {
   ItemTooltip.hide();
 });
+const isAmmo = item.type === "consumable" && item.system?.category === "ammo";
+let imgSrc = item.img;
 
-          img.style.backgroundImage = `url(${item.img})`;
+// 🧠 Aplica sprite alternativo se for munição com sprites definidos
+if (isAmmo && item.system?.ammo_sprites && item.system?.stack_value) {
+  const qty = item.system.ammo_quantity ?? 0;
+  const max = item.system.stack_value;
+  const percent = (qty / max) * 100;
+
+  const sprites = item.system.ammo_sprites;
+  if (percent >= 100 && sprites.s6) imgSrc = sprites.s6;
+  else if (percent >= 80 && sprites.s5) imgSrc = sprites.s5;
+  else if (percent >= 60 && sprites.s4) imgSrc = sprites.s4;
+  else if (percent >= 40 && sprites.s3) imgSrc = sprites.s3;
+  else if (percent >= 20 && sprites.s2) imgSrc = sprites.s2;
+  else if (percent >= 1 && sprites.s1) imgSrc = sprites.s1;
+}
+
+img.style.backgroundImage = `url(${imgSrc})`;
+
           img.style.backgroundSize = "cover";
           img.style.backgroundRepeat = "no-repeat";
           img.style.position = "absolute";
@@ -82,13 +100,13 @@ img.addEventListener("mouseleave", () => {
           img.style.top = `${y * 50}px`;
 
           // 🧮 Exibe quantidade empilhada se for munição
-const isAmmo = item.type === "consumable" && item.system?.category === "ammo";
 const qty = item.system?.ammo_quantity ?? 0;
 
 if (isAmmo && qty > 1) {
   const label = document.createElement("div");
   label.classList.add("stack-label");
   label.textContent = qty;
+  
   img.appendChild(label);
 }
 

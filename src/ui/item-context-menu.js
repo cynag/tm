@@ -190,46 +190,55 @@ if (game.user.isGM) {
     }
   };
 
-  static splitStack(actor, item) {
+  static async splitStack(actor, item) {
   const qty = item.system.ammo_quantity ?? 0;
   if (qty <= 1) return;
 
   const newQty = Math.floor(qty / 2);
   const remainder = qty - newQty;
 
-  actor.updateEmbeddedDocuments("Item", [{
+  // Atualiza o original
+  await actor.updateEmbeddedDocuments("Item", [{
     _id: item.id,
     "system.ammo_quantity": remainder
   }]);
 
+  // Clona o item
   const newItem = foundry.utils.duplicate(item);
-newItem.system.ammo_quantity = newQty;
-delete newItem._id;
-newItem.flags = {
-  ...newItem.flags,
-  tm: {
-    ...(newItem.flags?.tm ?? {}),
-    noAutoStack: true
-  }
-};
+  newItem.system.ammo_quantity = newQty;
+  delete newItem._id;
 
-if (newItem.flags?.tm?.originalSize) delete newItem.flags.tm.originalSize;
+  // Marca com noAutoStack e originalStackId
+  newItem.flags = {
+    ...item.flags,
+    tm: {
+      ...(item.flags?.tm ?? {}),
+      noAutoStack: true,
+      originalStackId: item.flags?.tm?.originalStackId || item.id
+    }
+  };
 
-newItem.flags = newItem.flags || {};
-newItem.flags.tm = newItem.flags.tm || {};
-newItem.flags.tm.noAutoStack = true;
+  // Cria o item novo
+  const [created] = await actor.createEmbeddedDocuments("Item", [newItem]);
 
+  console.log(`[STACK] ${item.name} dividido: ${remainder} + ${newQty}`);
+  console.log(`[DEBUG] Novos IDs: ${item.id}, ${created.id}`);
 
-Hooks.once("createItem", async (created) => {
+  // ⛔ Garante que o novo item não stacke automaticamente ao ser posicionado
+  await created.update({ "flags.tm.noAutoStack": true });
+
+  // ✅ Força revalidação do grid real após alteração do original
   await game.tm.GridAutoPosition.placeNewItem(actor, created);
-});
-
-actor.createEmbeddedDocuments("Item", [newItem]);
-
-console.log(`[STACK] ${item.name} dividido: ${remainder} + ${newQty}`);
-
-
 }
+
+
+
+
+
+
+
+
+
 
   
 }

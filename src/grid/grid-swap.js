@@ -64,10 +64,17 @@ const targetIds = game.tm.GridUtils.getItemsUnderAreaFromGrid(gridSim, gridX, gr
   return;
 }
 
-  if (await game.tm.GridUtils.tryStackItem(actor, item)) return;
-  if (!itemA) return;
-const stacked = await game.tm.GridUtils.tryStackItem(actor, itemA);
-if (stacked) return;
+// ✅ Tentativa de stack direto com o alvo (antes do swap)
+if (itemA && itemB) {
+  const stacked = await GridSwap.tryAmmoStackOnSwap(actor, itemA, itemB);
+  if (stacked) {
+    console.log("[GridSwap] ✅ Stack direto no alvo. Swap cancelado.");
+    return;
+  }
+  
+}
+
+
 
   if (!itemA || !itemB) return;
 
@@ -187,6 +194,39 @@ static finalizePickupAfterSwap(actor) {
       game.tm.GridInventory.refresh(app);
     });
   });
+}
+
+static async tryAmmoStackOnSwap(actor, pickupItem, targetItem) {
+  const canStack = game.tm.GridUtils.canStackItems(pickupItem, targetItem);
+  if (!canStack) return false;
+
+  const qtyA = pickupItem.system.ammo_quantity ?? 0;
+  const qtyB = targetItem.system.ammo_quantity ?? 0;
+  const max = targetItem.system.stack_value ?? 1;
+  const total = qtyA + qtyB;
+
+  const newQty = Math.min(max, total);
+  const remainder = Math.max(0, total - max);
+
+  await targetItem.update({ "system.ammo_quantity": newQty });
+
+  if (remainder > 0) {
+    await pickupItem.update({ "system.ammo_quantity": remainder });
+    console.log(`[STACK SWAP] ${pickupItem.name}: parcial (${newQty} + ${remainder})`);
+    return true;
+  }
+
+  await actor.deleteEmbeddedDocuments("Item", [pickupItem.id]);
+  console.log(`[STACK SWAP] ${pickupItem.name}: total (${newQty}) → fundido em [${targetItem.id}]`);
+  // ✅ Encerra o estado de pickup se ainda estiver ativo
+if (game.tm.GridPickup?.pickupData?.itemId === pickupItem.id) {
+  game.tm.GridPickup.pickupData = null;
+  game.tm.GridPickup._removePreview?.();
+  game.tm.GridPickup._removeOverlay?.();
+  game.tm.GridPickup._removeListeners?.();
+}
+
+  return true;
 }
 
 }

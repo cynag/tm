@@ -6,7 +6,10 @@ export class GridPreview {
 
     const ghost = document.createElement("img");
     ghost.id = "pickup-ghost";
-    ghost.src = pickupData.img;
+    const item = game.actors.get(pickupData.actorId)?.items?.get(pickupData.itemId);
+const sprite = game.tm.GridUtils.getAmmoSprite(item);
+ghost.src = sprite || pickupData.img;
+
     ghost.classList.add("ghost-preview");
     ghost.style.position = "fixed";
 
