@@ -387,6 +387,24 @@ for (const [slotId, slot] of Object.entries(s.gearSlots)) {
 
   //console.log(`[WEAPON SLOT] ${this.name} => ${item.name} em ${slotId}`);
 }
+// === BÔNUS DE DANO POR MUNIÇÃO VINCULADA ===
+s.ammo_damage_bonus_right = 0;
+s.ammo_damage_bonus_left  = 0;
+
+for (const item of this.items) {
+  if (item.type !== "consumable") continue;
+  if (item.system?.category !== "ammo") continue;
+  const bonus = item.system?.ammo_damage ?? 0;
+  const linked = item.flags?.tm?.linkedWeapon;
+  if (!linked) continue;
+
+  const weapon = this.items.get(linked);
+  if (!weapon || weapon.type !== "gear") continue;
+
+  const slot = weapon.system?.equippedSlot;
+  if (slot === "slot_weapon1") s.ammo_damage_bonus_right += bonus;
+  if (slot === "slot_weapon2") s.ammo_damage_bonus_left  += bonus;
+}
 
 
 

@@ -115,6 +115,7 @@ if (game.tm.GridPickup.pickupData?.itemId === item.id) {
       updatedSlots[`system.gearSlots.${id}`] = { itemId: null, width: 0, height: 0 };
     }
   }
+  await this.unlinkAmmoFromWeapon(actor, item.id);
 
   await item.update({ "system.equippedSlot": null });
   await actor.update(updatedSlots);
@@ -145,5 +146,50 @@ if (game.tm.GridPickup.pickupData?.itemId === item.id) {
   setTimeout(() => this._unequiping.delete(key), 100);
 }
 
+  static async linkAmmo(actor, weapon, ammo) {
+    console.log(`[GearManager] 🔗 Vinculando ${ammo.name} com ${weapon.name}`);
+
+    // Remove vínculo anterior
+    for (const i of actor.items) {
+      if (i.type === "consumable" && i.system?.category === "ammo" && i.flags?.tm?.linkedWeapon === weapon.id) {
+        await i.update({ "flags.tm.linkedWeapon": null });
+      }
+    }
+
+    // Define vínculo novo
+    await ammo.update({ "flags.tm.linkedWeapon": weapon.id });
+
+    // Atualiza arma com bônus
+    const bonus = ammo.system.ammo_damage ?? 0;
+    await weapon.update({ "system.weapon_ammo_bonus": bonus });
+
+    // Força render
+    const sheet = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+    if (sheet?.render) sheet.render(true);
+
+    ui.notifications.info(`✅ ${ammo.name} vinculado a ${weapon.name}`);
+  }
+
+  static async unlinkAmmoFromWeapon(actor, weaponId) {
+  const ammo = actor.items.find(i =>
+    i.type === "consumable" &&
+    i.system?.category === "ammo" &&
+    i.flags?.tm?.linkedWeapon === weaponId
+  );
+
+  if (!ammo) return;
+
+  console.log(`[GearManager] 🔓 Desvinculando ${ammo.name} de arma ${weaponId}`);
+
+  await ammo.update({ "flags.tm.linkedWeapon": null });
+
+  const weapon = actor.items.get(weaponId);
+  if (weapon) {
+    await weapon.update({ "system.weapon_ammo_bonus": 0 });
+  }
+
+  const sheet = Object.values(ui.windows).find(w => w.actor?.id === actor.id);
+  if (sheet?.render) sheet.render(true);
+}
 
 }

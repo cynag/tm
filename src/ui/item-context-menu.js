@@ -71,7 +71,73 @@ options.push({
     .filter(([slotId, slot]) => !slot.itemId && game.tm.GearUtils.isValidForSlot(item, slotId));
 
 }
-// Excluir item (qualquer tipo)
+
+
+
+
+
+// === VINCULAR MUNIÇÃO A ARMA DE PROJÉTIL ===
+if (
+  item.type === "consumable" &&
+  item.system?.category === "ammo" &&
+  !item.flags?.tm?.linkedWeapon
+) {
+  const subtype = item.system.subtype;
+
+  const weapons = actor.items.filter(i => {
+    if (i.type !== "gear") return false;
+    if (i.system.gear_type !== "weapon") return false;
+    if (!i.system.equippedSlot?.startsWith("slot_weapon")) return false;
+
+    const wSub = i.system.subtype;
+    if (subtype === "arrow" && wSub === "bow") return true;
+    if (subtype === "bolt" && wSub === "crossbow") return true;
+    if (subtype === "slug" && wSub === "gun") return true;
+    return false;
+  });
+
+  for (const weapon of weapons) {
+    const slot = weapon.system.equippedSlot;
+    const isTwoHanded = weapon.system.weapon_traits?.weapon_trait_2h;
+
+    let label = "";
+    if (isTwoHanded) {
+      label = `✅ Usar munição com ${weapon.name}`;
+    } else if (slot === "slot_weapon1") {
+      label = `✅ Usar munição com ${weapon.name} (mão direita)`;
+    } else if (slot === "slot_weapon2") {
+      label = `✅ Usar munição com ${weapon.name} (mão esquerda)`;
+    }
+
+    if (label) {
+      options.push({
+        label,
+        action: () => {
+          game.tm.GearManager.linkAmmo(actor, weapon, item);
+        }
+      });
+    }
+  }
+}
+
+
+// === DESVINCULAR MUNIÇÃO VINCULADA ===
+if (
+  item.type === "consumable" &&
+  item.system?.category === "ammo" &&
+  item.flags?.tm?.linkedWeapon
+) {
+  const weapon = actor.items.get(item.flags.tm.linkedWeapon);
+  const weaponName = weapon?.name || "arma";
+
+  options.push({
+    label: `❌ Desequipar munição de ${weaponName}`,
+    action: () => {
+      game.tm.GearManager.unlinkAmmoFromWeapon(actor, item.flags.tm.linkedWeapon);
+    }
+  });
+}
+
 // Dividir Stack (apenas para consumable > ammo com qty > 1)
 if (
   item.type === "consumable" &&
@@ -84,6 +150,10 @@ if (
   });
 }
 
+
+
+
+// Excluir item (qualquer tipo)
 options.push({
   label: "🗑️ Excluir",
   action: () => {

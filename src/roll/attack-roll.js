@@ -1,5 +1,5 @@
-// action-roller.js
-import { BasicActionsDB } from "./basic-actions-db.js";
+// attack-roll.js
+import { BasicActionsDB } from "../actions/basic-actions-db.js";
 
 export async function rollAttack({ attacker, target, actionId, forcedDice }) {
   if (!attacker || !target) return ui.notifications.warn("Selecione um atacante e um alvo.");
@@ -18,7 +18,7 @@ export async function rollAttack({ attacker, target, actionId, forcedDice }) {
   const equipped = attackerSystem.gearSlots?.[slotKey];
   const item = equipped ? attacker.items.get(equipped.itemId) : null;
   const isUnarmed = !item;
-  if (isUnarmed) console.warn("[ActionRoller] Ataque desarmado permitido.");
+  if (isUnarmed) console.warn("[ActionRoll] Ataque desarmado permitido.");
 
   const actionData = BasicActionsDB.find(a => a.id === actionId);
   const subtype = isUnarmed ? "unarmed" : item.system?.subtype?.toLowerCase();
@@ -163,10 +163,32 @@ if (matchCustom) {
   elementalRaw = matchCustom[2].trim();     // Ex: "+2d4(fogo)"
 }
 
-let baseRoll = null, baseDmg = 0, dmgDiceObjs = [];
+let baseRoll = null, baseDmg = 0, dmgDiceObjs = [], dmgBonus = 0;
 if (hit) {
   baseRoll = await new Roll(weaponDamageBase).evaluate();
-  baseDmg = baseRoll.total;
+  const rollMatch = weaponDamageBase.match(/^(\d+)d(\d+)([+-]\d+)?$/);
+  const weaponBonusFlat = rollMatch && rollMatch[3] ? parseInt(rollMatch[3]) : 0;
+
+
+
+
+  baseDmg = baseRoll.total - weaponBonusFlat;
+
+  dmgBonus += (attackerSystem.mod_letality ?? 0)
+  + (attackerSystem.player_damage_bonus?.[subtype] ?? 0)
+  + (attackerSystem.player_damage_bonus?.[damageType] ?? 0)
+  + (attackerSystem.player_damage_bonus?.[size] ?? 0)
+  + weaponBonusFlat;
+
+  
+  const ammoBonus = isRight
+  ? (attackerSystem.ammo_damage_bonus_right ?? 0)
+  : (attackerSystem.ammo_damage_bonus_left ?? 0);
+
+  if (ammoBonus > 0) {
+  dmgBonus += ammoBonus;
+  console.log(`[AMMO BONUS] +${ammoBonus} de dano da munição`);
+}
 
   dmgDiceObjs = baseRoll.terms
     .filter(t => t instanceof DieTerm)
@@ -175,11 +197,7 @@ if (hit) {
 
 
 
-  const dmgBonus = (attackerSystem.mod_letality ?? 0)
-  + (attackerSystem.player_damage_bonus?.[subtype] ?? 0)
-  + (attackerSystem.player_damage_bonus?.[damageType] ?? 0)
-  + (attackerSystem.player_damage_bonus?.[size] ?? 0);
-
+  
 
   let finalDmg = (baseDmg * critMult) + dmgBonus;
 
@@ -690,3 +708,5 @@ Hooks.once("ready", () => {
     });
   }
 });
+
+export const AttackRoll = { rollAttack };

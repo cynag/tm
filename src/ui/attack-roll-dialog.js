@@ -116,7 +116,7 @@ const damageType = isUnarmed ? "impacto" : (item?.system?.weapon_subtypes_2 || "
           label: "Usar Ação",
           callback: async () => {
             console.log(`[AttackRollDialog] Ação confirmada com ${diceCountRef.value}d6`);
-            await game.tm.ActionRoller.rollAttack({
+            await game.tm.AttackRoll.rollAttack({
               attacker: actor,
               target: Array.from(game.user.targets)[0],
               actionId,

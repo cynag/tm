@@ -160,6 +160,27 @@ if (this.type === "trait") {
 
   return super._preCreate(data, options, user);
 }
+  async _preDelete(options, user) {
+  const actor = this.parent;
+  if (!actor) return super._preDelete(options, user);
+
+  // 🔥 Desvincula munição se esta arma estava usando uma
+  if (this.type === "gear" && this.system.gear_type === "weapon") {
+    await game.tm.GearManager.unlinkAmmoFromWeapon(actor, this.id);
+  }
+
+  // 🔥 Desvincula se for a munição usada por alguma arma
+  if (this.type === "consumable" && this.system.category === "ammo") {
+    if (this.flags?.tm?.linkedWeapon) {
+      const weapon = actor.items.get(this.flags.tm.linkedWeapon);
+      if (weapon) {
+        await weapon.update({ "system.weapon_ammo_bonus": 0 });
+      }
+    }
+  }
+
+  return super._preDelete(options, user);
+}
 
 }
 

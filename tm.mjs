@@ -51,9 +51,8 @@ import { CardTooltip } from "./src/ui/card-tooltip.js";
 
 import { MovementDialog } from "./src/ui/movement-dialog.js";
 
-import * as ActionRoller from "./src/actions/action-roller.js";
 import { AttackRollDialog } from "./src/ui/attack-roll-dialog.js";
-
+import { AttackRoll } from "./src/roll/attack-roll.js";
 
 
 // === INIT ===
@@ -167,7 +166,7 @@ Hooks.once("ready", () => {
     ActionsPanel,
     MovementDialog,
 
-    ActionRoller,
+    AttackRoll,
     AttackRollDialog,
 
 

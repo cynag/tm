@@ -110,6 +110,12 @@ div.main-content.sheet-tabs{
   z-index: 10000;
   background-color: rgba(255, 0, 0, 0.3); /* fallback */
 }
+
+.grid-item-linked-ammo {
+  outline: 1px solid #00ff00;
+  outline-offset: -1px;
+}
+
 /* === GEAR SLOTS === */
 #gear-slots {
   display: flex;

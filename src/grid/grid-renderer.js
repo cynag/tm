@@ -84,7 +84,6 @@ img.style.backgroundImage = `url(${imgSrc})`;
           img.style.position = "absolute";
           img.style.pointerEvents = "auto";
           img.style.zIndex = "5";
-
           img.style.width = `${meta.w * 50}px`;
           img.style.height = `${meta.h * 50}px`;
           if (meta.rotated) {
@@ -93,6 +92,11 @@ img.style.backgroundImage = `url(${imgSrc})`;
   img.style.transform = "rotate(90deg) translate(0, -100%)";
   img.style.transformOrigin = "top left";
 }
+// ✅ Borda verde para munição equipada
+if (isAmmo && item.flags?.tm?.linkedWeapon) {
+  img.classList.add("grid-item-linked-ammo");
+}
+
 
 
 

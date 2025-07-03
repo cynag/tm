@@ -138,7 +138,13 @@
     <summary><strong>⚔️ Mão Direita</strong></summary>
     <div>Nome: {{actor.system.weaponRight.name}}</div>
     <div>Tipo: {{actor.system.weaponRight.subtype}}</div>
-    <div>Dano: {{actor.system.weaponRight.weapon_damage}}</div>
+    <div>
+  Dano: {{actor.system.weaponRight.weapon_damage}}
+  {{#if (and (or (eq actor.system.weaponRight.subtype "bow") (eq actor.system.weaponRight.subtype "crossbow") (eq actor.system.weaponRight.subtype "gun")) (gt actor.system.ammo_damage_bonus_right 0))}}
+    <span style="color:#0f0;">(+{{actor.system.ammo_damage_bonus_right}} munição)</span>
+  {{/if}}
+</div>
+
     <div>Alcance: {{actor.system.weaponRight.weapon_range}}</div>
     <div>Quebrada: {{#if actor.system.weaponRight.weapon_broken}}✔️{{else}}—{{/if}}</div>
     <div>Pomo: {{#if actor.system.weaponRight.weapon_traits.weapon_trait_pom}}✔️{{else}}—{{/if}}</div>
@@ -161,7 +167,13 @@
     <summary><strong>🛡️ Mão Esquerda</strong></summary>
     <div>Nome: {{actor.system.weaponLeft.name}}</div>
     <div>Tipo: {{actor.system.weaponLeft.subtype}}</div>
-    <div>Dano: {{actor.system.weaponLeft.weapon_damage}}</div>
+    <div>
+  Dano: {{actor.system.weaponLeft.weapon_damage}}
+  {{#if (and (or (eq actor.system.weaponLeft.subtype "bow") (eq actor.system.weaponLeft.subtype "crossbow") (eq actor.system.weaponLeft.subtype "gun")) (gt actor.system.ammo_damage_bonus_left 0))}}
+    <span style="color:#0f0;">(+{{actor.system.ammo_damage_bonus_left}} munição)</span>
+  {{/if}}
+</div>
+
     <div>Quebrada: {{#if actor.system.weaponLeft.weapon_broken}}✔️{{else}}—{{/if}}</div>
     <div>Alcance: {{actor.system.weaponLeft.weapon_range}}</div>
     <div>Pomo: {{#if actor.system.weaponLeft.weapon_traits.weapon_trait_pom}}✔️{{else}}—{{/if}}</div>
