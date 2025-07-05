@@ -252,6 +252,13 @@ const actionsPanel = html.find(".tab[data-tab='actions']")[0];
 if (actionsPanel) {
   game.tm.ActionsPanel.render($(actionsPanel), this.actor);
 }
+const domainsPanel = html.find(".tab[data-tab='domains']")[0];
+if (domainsPanel) {
+  game.tm.DomainsPanel.render($(domainsPanel), this.actor);
+}
+
+
+
 
 
 }

@@ -54,6 +54,12 @@ import { MovementDialog } from "./src/ui/movement-dialog.js";
 import { AttackRollDialog } from "./src/ui/attack-roll-dialog.js";
 import { AttackRoll } from "./src/roll/attack-roll.js";
 
+import {DomainsPanel} from "./src/mastery/domains-panel.js";
+import { templateMelee } from "./src/mastery/data/template-melee-db.js";
+import { templateMagic } from "./src/mastery/data/template-magic-db.js";
+
+import { MasteryMeleeAttackRoll } from "./src/roll/mastery-melee-attack-roll.js";
+import { MasteryMeleeDialog } from "./src/ui/mastery-melee-dialog.js";
 
 // === INIT ===
 
@@ -169,6 +175,10 @@ Hooks.once("ready", () => {
     AttackRoll,
     AttackRollDialog,
 
+    DomainsPanel,
+
+    MasteryMeleeAttackRoll,
+    MasteryMeleeDialog,
 
   };
 
@@ -177,6 +187,14 @@ Hooks.once("ready", () => {
   if (!container) return;
   game.tm.CardPanel.render(data.actor, container);
 });
+
+
+
+
+game.tm.DomainsDB = {
+  template_melee: templateMelee,
+  template_magic: templateMagic
+};
 
   console.log("Terras Malditas | Sistema pronto");
 });

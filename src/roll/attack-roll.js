@@ -225,7 +225,8 @@ if (hit) {
   let elementalRoll = null, elementalDamage = 0, elementalLabel = null;
   let resist = 0; // ✅ aqui
   
-  if (elementalRaw) {
+  if (elementalRaw && hit && resultLabel !== "Catastrófica" && resultLabel !== "Crítica" && resultLabel !== "Comum") {
+
   const match = elementalRaw.match(/^\+?(\d+d\d+)\s*\(([^)]+)\)/);
   if (match) {
     const [, eleRollRaw, eleType] = match;
@@ -313,7 +314,7 @@ const rawKey = (elementalLabel?.split(" ")[1] || "").toLowerCase().trim();
 const elementalKey = elementMap[rawKey] || rawKey;
 
 /////////////////
-const tmDetailsHTML = `
+    const tmDetailsHTML = `
   <div class="tm-details" style="display: none; margin-top: 6px; font-size: 12px; color: #aaa; padding: 6px; background: #111; border: 1px solid #333; border-radius: 6px;">
   <strong>Detalhes:</strong><br>
 
@@ -351,34 +352,34 @@ const tmDetailsHTML = `
     ${protFinal >= 0 ? "+" + protFinal : protFinal}
   </div>
 
-</div>
-
-
-
-<!-- Dados de ataque -->
-<div style="
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin: 4px 0 6px 0;
-  flex-wrap: wrap;
-  max-width: 320px;
-  margin-left: auto;
-  margin-right: auto;
-">
-
-
-${atkDiceObjs.map(die => {
-  console.log(`[RENDER] Dado ${die.result} | isExtra? ${die.isExtra}`);
-  return `
-  <div class="dice-icon${die.isExtra ? ' dice-extra' : ''}">
-    <div class="dice-bg" style="background-image: url('systems/tm/styles/assets/dices/d${die.faces}.svg');"></div>
-    <div class="dice-number${die.isExtra ? ' dice-extra' : ''}">
-      ${die.result}
-    </div>
   </div>
-  `;
-}).join("")}
+
+
+
+  <!-- Dados de ataque -->
+  <div style="
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 4px 0 6px 0;
+    flex-wrap: wrap;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  ">
+
+
+    ${atkDiceObjs.map(die => {
+      console.log(`[RENDER] Dado ${die.result} | isExtra? ${die.isExtra}`);
+      return `
+      <div class="dice-icon${die.isExtra ? ' dice-extra' : ''}">
+        <div class="dice-bg" style="background-image: url('systems/tm/styles/assets/dices/d${die.faces}.svg');"></div>
+        <div class="dice-number${die.isExtra ? ' dice-extra' : ''}">
+          ${die.result}
+        </div>
+      </div>
+      `;
+    }).join("")}
 
 
 
@@ -468,7 +469,7 @@ ${hit ? `
     <span>Dados de Dano:</span>
     <span>
   ${(baseDmg * critMult)}
-  ${critMult > 1 ? `<span style="font-weight: normal; color: #888;">(${resultLabel} x${critMult})</span>` : ""}
+  ${critMult > 1 ? `<span style="font-weight: normal; color: #888;">(${baseDmg}x${critMult})</span>` : ""}
 </span>
 
 
@@ -530,7 +531,10 @@ ${hit ? `
 ${elementalRoll ? `
   <div style="display: flex; justify-content: space-between; padding: 2px 0;">
     <span>Dano Elemental (${elementalKeyRaw}):</span>
-    <span>${elementalRoll.total} ×${critMult} = ${elementalRoll.total * critMult}</span>
+    <span>
+      ${(elementalRoll.total * critMult)}
+      ${critMult > 1 ? `<span style="font-weight: normal; color: #888;">(${elementalRoll.total}x${critMult})</span>` : ""}
+      </span>
   </div>
 
   ${resist !== 0 ? `

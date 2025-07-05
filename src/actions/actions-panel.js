@@ -2,6 +2,7 @@ import { MovementDB } from "./movement-db.js";
 import { BasicActionsDB } from "./basic-actions-db.js";
 import { MovementDialog } from "../ui/movement-dialog.js";
 import { AttackRollDialog } from "../ui/attack-roll-dialog.js";
+import { AttackRoll } from "../roll/attack-roll.js";
 
 // 🔹 Movement actions: simplified visual with PA + range
 function renderMovementTable(data, actor) {
@@ -135,11 +136,6 @@ if (item.system?.weapon_range)
   return table;
 }
 
-
-
-
-
-
 export class ActionsPanel {
   static async render(html, actor) {
     const container = html.find("#actions-panel-container");
@@ -150,6 +146,77 @@ export class ActionsPanel {
     section.append(`<div class="talent-separator">//--//</div>`);
     section.append(renderActionTable(BasicActionsDB, actor));
 
+    // 🔥 Maestrias desbloqueadas
+    const masteryBlock = this.#renderMasteryPanel(actor);
+    if (masteryBlock) {
+      section.append(`<div class="talent-separator">//--//</div>`);
+      section.append(masteryBlock);
+    }
+
     container.empty().append(section);
   }
+
+  static #renderMasteryPanel(actor) {
+    const trees = actor.system.masteryTrees;
+    if (!trees) return null;
+
+    const entries = [];
+
+    for (const domain in trees) {
+      for (const level in trees[domain]) {
+        for (const id of trees[domain][level]) {
+          const source = game.tm?.DomainsDB?.[domain]?.find(m => m.id === id);
+          
+          if (source) entries.push({ ...source, level, actor });
+        }
+      }
+    }
+
+    if (!entries.length) return null;
+
+    const block = $(`<div class="talent-block"><table class="talent-table"><tbody></tbody></table></div>`);
+    const tbody = block.find("tbody");
+
+    for (const m of entries) {
+      const row = $(`
+  <div class="talent-row mastery-row" data-id="${m.id}">
+    <img class="talent-icon" src="${m.mastery_img}" width="40" height="40"/>
+    <div class="talent-info">
+      <div class="talent-name">${m.mastery_name}</div>
+      <div class="talent-tags"><span class="tag">ND${m.level}</span></div>
+    </div>
+  </div>
+`);
+
+
+      row.on("mouseenter", e => game.tm?.CardTooltip?.show?.(m, e));
+row.on("mouseleave", () => game.tm?.CardTooltip?.close?.());
+
+row.on("click", async () => {
+  const actor = m.actor;
+
+  if (!actor) {
+    ui.notifications.warn("Ator não encontrado para esta maestria.");
+    return;
+  }
+
+  const type = m.mastery_type?.toLowerCase();
+  const cls = m.mastery_class?.toLowerCase();
+
+  if (type === "action" && cls === "melee") {
+    await game.tm.MasteryMeleeDialog.show({ actor, mastery: m });
+  } else {
+    ui.notifications.info("Esse tipo de maestria ainda não é suportado.");
+  }
+});
+
+
+
+      tbody.append(row);
+    }
+
+    return block;
+  }
 }
+
+
