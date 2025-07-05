@@ -190,7 +190,6 @@ if (baseRoll) {
   if (traits.weapon_trait_desc) traitLabels.push(`DES 6.6.${traits.weapon_trait_desc}`);
   if (traits.weapon_trait_fast) traitLabels.push(`RAP`);
   if (traits.weapon_trait_ironbreaker) traitLabels.push(`QBF`);
-  else if (damageType === "perfurante") traitLabels.push(`PEN`);
   if (traits.weapon_trait_vulnerable) traitLabels.push(`VUL`);
 
 
@@ -493,24 +492,76 @@ ${elementalRoll ? `
   `;
   /////////////////////////
     const msgContent = `
-    <div class="chat-attack" style="font-family: var(--font-primary); font-size: 1.1em;">
-      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-        <img src="${mastery.mastery_img}" width="48" height="48" style="border:1px solid #555; border-radius:4px;" />
+  <div class="chat-roll" style="font-family: var(--font-primary); font-size: 1.1em;">
+      <div class="chat-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+        <img class="chat-img" src="${mastery.mastery_img}" width="48" height="48" style="border:1px solid #555; border-radius:4px;" />
         <div>
-          <h2 style="margin: 0 0 4px 0; font-size: 16px;">${mastery.mastery_name}</h2>
-          <div style="margin-bottom: 2px;">
-            <span class="tag">${item.system.weapon_damage || "1d2"} ${damageType}</span>
-            <span class="tag">${item.system.weapon_range || "–"}m</span>
-          </div>
-          <div style="margin-bottom: 2px;">
-            ${traitLabels.map(t => `<span class="tag">${t}</span>`).join(" ")}
-          </div>
-          <div style="margin-bottom: 2px;">
-            <span class="tag">🎯 ${target.name}</span>
-          </div>
+        <h2 class="chat-roll-name" style="margin: 0 0 4px 0; font-size: 16px;">${mastery.mastery_name} <span style="font-weight: normal;">(${item.name})</span></h2>
+        
+  <div class="chat-tags"style="text-align: right;">
+
+    <!-- Linha 1: Tipo da Maestria -->
+    <div style="margin-bottom: 2px;">
+    <span class="tag">
+     ${{
+        action: "AÇÃO",
+        reaction: "REAÇÃO",
+        conjuration: "CONJURAÇÃO",
+        stance: "POSTURA",
+        passive: "PASSIVA"
+        }[mastery.mastery_type] || mastery.mastery_type}
+      </span>
+    </div>
+
+    <div style="margin-bottom: 2px;">
+  <span class="tag">${mastery.mastery_cost || "–"} PA</span>
+  <span class="tag">CD ${mastery.mastery_cd || "–"}</span>
+</div>  
+    <!-- Linha 2: Dano -->
+    <div style="margin-bottom: 2px;">
+    ${(() => {
+      const raw = item.system.weapon_damage || "1d2";
+      const match = raw.match(/^(.+?)\{\{(.+?)\}\}$/);
+      const tags = [];
+
+      if (match) {
+        const base = match[1].trim();
+        tags.push(`<span class="tag">${base} ${damageType}</span>`);
+
+        const extra = match[2].trim();
+        const extraMatch = extra.match(/^([+−-]?\s*\d+d\d+)\s*\(([^)]+)\)/i);
+        if (extraMatch) {
+          const [, bonusDice, element] = extraMatch;
+          tags.push(`<span class="tag">${bonusDice.trim().replace("+", "")} ${element.trim().toLowerCase()}</span>`);
+        }
+      } else {
+        tags.push(`<span class="tag">${raw} ${damageType}</span>`);
+      }
+
+      return tags.join(" ");
+    })()}
+    </div>
+
+    <!-- Linha 3: Alcance -->
+    <div style="margin-bottom: 2px;">
+      <span class="tag">${item.system.weapon_range || "–"}m</span>
+    </div>
+
+    <!-- Linha 4: Traços -->
+    <div style="margin-bottom: 2px;">
+      ${traitLabels.map(t => `<span class="tag">${t}</span>`).join(" ")}
+    </div>
+
+    <!-- Linha 5: Alvo -->
+    <div style="margin-bottom: 2px;">
+      <span class="tag">🎯 ${target.name}</span>
+    </div>
+    </div>
+
+
         </div>
       </div>
-      <div style="font-size: 13px; color: var(--color-text-light); margin-bottom: 8px;">
+      <div class="chat-description" style="font-size: 13px; color: var(--color-text-light); margin-bottom: 8px;">
         ${mastery.mastery_description || "<i>Sem descrição</i>"}
       </div>
       ${outcomeHTML}

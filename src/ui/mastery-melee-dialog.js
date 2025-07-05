@@ -1,10 +1,9 @@
-// mastery-melee-dialog.js
 import { MasteryMeleeAttackRoll } from "../roll/mastery-melee-attack-roll.js";
 
 export class MasteryMeleeDialog {
   static async show({ actor, mastery }) {
-    const diceCountRef = { value: 3 }; // base padrão
-    const handRef = { value: "right" };
+    const diceCountRef = { value: 3 };
+    let dialogHtml = null;
 
     const html = `
       <div class="attack-roll-dialog" style="display: flex; flex-direction: column; gap: 8px;">
@@ -46,29 +45,51 @@ export class MasteryMeleeDialog {
         confirm: {
           icon: '<i class="fas fa-fist-raised"></i>',
           label: "Usar Maestria",
-
           callback: async () => {
-            console.log(`[MasteryDialog] Confirmado: ${diceCountRef.value}d6 com mão ${handRef.value}`);
-            
             const target = Array.from(game.user.targets)[0];
-const slotKey = handRef.value === "right" ? "slot_weapon1" : "slot_weapon2";
-const equipped = actor.system.gearSlots?.[slotKey];
-const item = equipped ? actor.items.get(equipped.itemId) : null;
+            const selectedHand = dialogHtml.find(".hand-select").val() || "right";
+            const slotKey = selectedHand === "right" ? "slot_weapon1" : "slot_weapon2";
+            const equipped = actor.system.gearSlots?.[slotKey];
+            const item = equipped ? actor.items.get(equipped.itemId) : null;
 
-if (!item) {
-  ui.notifications.warn("Nenhuma arma encontrada na mão selecionada.");
-  return;
-}
+            if (!item) {
+              ui.notifications.warn("Você precisa equipar uma arma");
+              return;
+            }
 
-await game.tm.MasteryMeleeAttackRoll.roll({
+            const subtype = item?.system?.subtype?.toLowerCase();
+            const damage = item?.system?.weapon_subtypes_2?.toLowerCase();
+            const size = item?.system?.weapon_subtypes_3?.toLowerCase();
+            const requirements = mastery.mastery_requirements;
+
+            const fails = requirements && Array.isArray(requirements) && !requirements.some(req => {
+              const okSubtype = !req.subtype || req.subtype.includes(subtype);
+              const okDamage  = !req.damage  || req.damage.includes(damage);
+              const okSize    = !req.size    || req.size.includes(size);
+              return okSubtype && okDamage && okSize;
+            });
+
+            if (fails) {
+              const reqList = requirements.map(req => {
+                const parts = [];
+                if (req.subtype) parts.push(`subtipo: ${req.subtype.join(", ")}`);
+                if (req.damage)  parts.push(`dano: ${req.damage.join(", ")}`);
+                if (req.size)    parts.push(`porte: ${req.size.join(", ")}`);
+                return parts.join(" | ");
+              }).join(" ou ");
+
+              ui.notifications.warn(`Esta maestria requer: ${reqList}`);
+              return;
+            }
+
+            await game.tm.MasteryMeleeAttackRoll.roll({
   attacker: actor,
   target,
   mastery,
   item,
+  hand: selectedHand, // 👈 ISSO AQUI FALTAVA
   forcedDice: diceCountRef.value
 });
-
-
 
           }
         }
@@ -80,6 +101,7 @@ await game.tm.MasteryMeleeAttackRoll.roll({
 
     Hooks.once("renderDialog", (app, htmlEl) => {
       if (app.appId !== dialog.appId) return;
+      dialogHtml = htmlEl;
 
       const dom = htmlEl;
       dom.find(".step-up").on("click", () => {
@@ -90,10 +112,6 @@ await game.tm.MasteryMeleeAttackRoll.roll({
       dom.find(".step-down").on("click", () => {
         diceCountRef.value = Math.max(diceCountRef.value - 1, 1);
         dom.find(".dice-count").text(diceCountRef.value);
-      });
-
-      dom.find(".hand-select").on("change", (ev) => {
-        handRef.value = ev.target.value;
       });
     });
   }

@@ -49,7 +49,6 @@ if (isProjectile && !ammo) {
   if (traits.weapon_trait_desc) traitLabels.push(`DES 6.6.${traits.weapon_trait_desc}`);
   if (traits.weapon_trait_fast) traitLabels.push(`RAP`);
   if (traits.weapon_trait_ironbreaker) traitLabels.push(`QBF`);
-  else if (damageType === "perfurante") traitLabels.push(`PEN`);
   if (traits.weapon_trait_vulnerable) traitLabels.push(`VUL`);
 
   const extraDice = (attackerSystem.player_extra_dice?.[subtype] ?? 0)
@@ -133,6 +132,9 @@ if (!hit) {
 
         <div>
           <h2 style="margin: 0 0 4px 0; font-size: 16px;">${isUnarmed ? "Ataque Desarmado" : `Atacar com ${item.name?.trim() || "arma"}`}</h2>
+          
+          
+          
           <div style="margin-bottom: 2px;">
             ${(() => {
   const tags = [];
@@ -165,6 +167,12 @@ if (!hit) {
           <div style="margin-bottom: 2px;">
             <span class="tag">🎯 ${targetActor.name}</span>
           </div>
+
+
+
+
+
+
         </div>
       </div>
       <div style="font-size: 13px; color: var(--color-text-light); margin-bottom: 8px;">
