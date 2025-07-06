@@ -420,6 +420,52 @@ for (const item of this.items) {
     if (!Number.isInteger(s.resistances[res])) s.resistances[res] = 0;
   }
   s.resistances = foundry.utils.mergeObject(defaultResistances, s.resistances || {}, { inplace: false });
+
+// === DOMÍNIOS / MAESTRIAS ===
+s.masteryPoints ??= { total: 0, spent: 0, remaining: 0 };
+
+const trees = s.masteryTrees ?? {};
+let spent = 0;
+
+
+// === CALCULA NÍVEL DESBLOQUEADO DE CADA DOMÍNIO ===
+for (const domainKey of Object.keys(trees)) {
+  let highestND = 0;
+  for (let nd = 1; nd <= 7; nd++) {
+    const key = `nd${nd}`;
+    const list = trees[domainKey]?.[key];
+    if (Array.isArray(list) && list.length > 0) highestND = nd;
+  }
+  s[`player_domain_${domainKey}_level`] = highestND;
+}
+
+// === CONTA PONTOS DE MAESTRIA GASTOS ===
+for (const domainKey in trees) {
+  for (const ndKey in trees[domainKey]) {
+    for (const entry of trees[domainKey][ndKey]) {
+      const db = game.tm?.DomainsDB?.[domainKey];
+      if (!db) continue;
+      const mastery = db.find(m => m.id === entry.id);
+      if (!mastery) continue;
+
+      let cost = mastery.maestry_points_value ?? 1;
+      if (entry.evolved === "A") {
+        cost += mastery.evolution_a?.maestry_points_value ?? 2;
+      }
+      if (entry.evolved === "B") {
+        cost += mastery.evolution_b?.maestry_points_value ?? 2;
+      }
+      spent += cost;
+    }
+  }
+}
+
+s.masteryPoints.total = s.player_level * 3;
+s.masteryPoints.spent = spent;
+s.masteryPoints.remaining = s.masteryPoints.total - spent;
+
+
+
 }
 
 // temporario

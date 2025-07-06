@@ -233,7 +233,7 @@ if (hit) {
   let elementalRoll = null, elementalDamage = 0, elementalLabel = null;
   let resist = 0; // ✅ aqui
   
-  if (elementalRaw && hit && resultLabel !== "Catastrófica" && resultLabel !== "Crítica" && resultLabel !== "Comum") {
+  if (elementalRaw && hit && resultLabel !== "Catastrófica" && resultLabel !== "Crítica") {
 
   const match = elementalRaw.match(/^\+?(\d+d\d+)\s*\(([^)]+)\)/);
   if (match) {

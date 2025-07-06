@@ -141,7 +141,8 @@ if (rawPhysical < 1) rawPhysical = 1;
 let elementalRoll = null, elementalDamage = 0, elementalLabel = null;
 let resist = 0, elementalKeyRaw = "";
 
-if (elementalRaw && hit && resultLabel !== "Catastrófica" && resultLabel !== "Crítica" && resultLabel !== "Comum") {
+if (elementalRaw && hit && resultLabel !== "Catastrófica" && resultLabel !== "Crítica") {
+
 
   const match = elementalRaw.match(/^\+?(\d+d\d+)\s*\(([^)]+)\)/);
   if (match) {

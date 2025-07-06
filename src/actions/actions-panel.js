@@ -164,11 +164,23 @@ export class ActionsPanel {
 
     for (const domain in trees) {
       for (const level in trees[domain]) {
-        for (const id of trees[domain][level]) {
-          const source = game.tm?.DomainsDB?.[domain]?.find(m => m.id === id);
-          
-          if (source) entries.push({ ...source, level, actor });
-        }
+
+
+        for (const entry of trees[domain][level]) {
+  const base = game.tm?.DomainsDB?.[domain]?.find(m => m.id === entry.id);
+  if (!base) continue;
+
+  const evolved = entry.evolved;
+  if (evolved === "A" && base.evolution_a) {
+    entries.push({ ...base.evolution_a, level, actor });
+  } else if (evolved === "B" && base.evolution_b) {
+    entries.push({ ...base.evolution_b, level, actor });
+  } else {
+    entries.push({ ...base, level, actor });
+  }
+}
+
+
       }
     }
 

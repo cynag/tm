@@ -148,7 +148,7 @@ if (activeButton.length) activeButton.addClass("active");
 
 
 
-  activateListeners(html) {
+ activateListeners(html) {
     super.activateListeners(html);
 
     // 🖱️ Drag & Drop
@@ -252,10 +252,14 @@ const actionsPanel = html.find(".tab[data-tab='actions']")[0];
 if (actionsPanel) {
   game.tm.ActionsPanel.render($(actionsPanel), this.actor);
 }
+
 const domainsPanel = html.find(".tab[data-tab='domains']")[0];
 if (domainsPanel) {
+  this.actor.prepareData(); // 🔁 força recalcular os pontos antes de renderizar
   game.tm.DomainsPanel.render($(domainsPanel), this.actor);
 }
+
+
 
 
 
