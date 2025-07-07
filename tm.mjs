@@ -61,6 +61,7 @@ import { templateMagic } from "./src/mastery/data/template-magic-db.js";
 import { MasteryMeleeAttackRoll } from "./src/roll/mastery-melee-attack-roll.js";
 import { MasteryMeleeDialog } from "./src/ui/mastery-melee-dialog.js";
 
+import { MasteryParser } from "./src/mastery/mastery-parser.js";
 // === INIT ===
 
 Hooks.once("init", async function () {
@@ -179,6 +180,7 @@ Hooks.once("ready", () => {
 
     MasteryMeleeAttackRoll,
     MasteryMeleeDialog,
+    MasteryParser,
 
   };
 
