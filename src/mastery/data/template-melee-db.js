@@ -86,8 +86,8 @@ export const TemplateMeleeDB = [
     { subtype: ["spear", "sword"] }
   ],
 
-  //weapon_attack_bonus: "1d4",
-  //weapon_attack_bonus_2: "+2",
+  weapon_attack_bonus: "1d4",
+  weapon_attack_bonus_2: "+2",
   weapon_damage_bonus: "+1d10",
   weapon_damage_bonus_2: "+3", 
   weapon_extra: "target.reflex = -1",

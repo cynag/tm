@@ -195,7 +195,18 @@ export class ActionsPanel {
     <img class="talent-icon" src="${m.mastery_img}" width="40" height="40"/>
     <div class="talent-info">
       <div class="talent-name">${m.mastery_name}</div>
-      <div class="talent-tags"><span class="tag">ND${m.level}</span></div>
+      <div class="talent-tags" style="display: flex; justify-content: space-between; width: 100%;">
+  <div>
+    <span class="tag">ND${m.mastery_nd ?? m.level}</span>
+    <span class="tag">${m.mastery_cost ?? "?"} PA</span>
+    <span class="tag">CD ${m.mastery_cd ?? "?"}</span>
+  </div>
+  <div>
+    <span class="tag" style="opacity: 0.5;">${m.mastery_domain ?? "?"}</span>
+  </div>
+</div>
+
+
     </div>
   </div>
 `);
