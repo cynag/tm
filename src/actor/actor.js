@@ -16,6 +16,8 @@ const elemTypes = ["fire", "ice", "eletric", "poison", "acid", "psychic", "radia
 
 
   const s = this.system;
+// === MANTÉM COOLDOWNS
+s.masteryCooldowns ??= {};
 
   // === GEAR SLOTS ===
   this.system.gearSlots = foundry.utils.mergeObject({
@@ -463,6 +465,9 @@ for (const domainKey in trees) {
 s.masteryPoints.total = s.player_level * 3;
 s.masteryPoints.spent = spent;
 s.masteryPoints.remaining = s.masteryPoints.total - spent;
+
+// === COOLDOWN DAS MAESTRIAS ===
+s.masteryCooldowns ??= {};
 
 
 

@@ -5296,3 +5296,30 @@ h4.dice-total {
   object-fit: cover;
   border-radius: 4px;
 }
+
+.cooldown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.cooldown-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.cooldown-active {
+  opacity: 0.4;
+  pointer-events: none;
+}

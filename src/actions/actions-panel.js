@@ -157,7 +157,9 @@ export class ActionsPanel {
   }
 
   static #renderMasteryPanel(actor) {
-    const trees = actor.system.masteryTrees;
+    const trees = foundry.utils.duplicate(actor.system.masteryTrees || {});
+
+
     if (!trees) return null;
 
     const entries = [];
@@ -172,12 +174,40 @@ export class ActionsPanel {
 
   const evolved = entry.evolved;
   if (evolved === "A" && base.evolution_a) {
-    entries.push({ ...base.evolution_a, level, actor });
-  } else if (evolved === "B" && base.evolution_b) {
-    entries.push({ ...base.evolution_b, level, actor });
-  } else {
-    entries.push({ ...base, level, actor });
-  }
+  entries.push({
+    ...base.evolution_a,
+    id: base.id,
+    level,
+    actor,
+    mastery_name: base.mastery_name,
+    mastery_nd: base.mastery_nd,
+    mastery_domain: domain,
+    system: { domain }
+  });
+} else if (evolved === "B" && base.evolution_b) {
+  entries.push({
+    ...base.evolution_b,
+    id: base.id,
+    level,
+    actor,
+    mastery_name: base.mastery_name,
+    mastery_nd: base.mastery_nd,
+    mastery_domain: domain,
+    system: { domain }
+  });
+} else {
+  entries.push({
+    ...base,
+    id: base.id,
+    level,
+    actor,
+    mastery_name: base.mastery_name,
+    mastery_nd: base.mastery_nd,
+    mastery_domain: domain,
+    system: { domain }
+  });
+}
+
 }
 
 
@@ -190,53 +220,63 @@ export class ActionsPanel {
     const tbody = block.find("tbody");
 
     for (const m of entries) {
-      const row = $(`
-  <div class="talent-row mastery-row" data-id="${m.id}">
-    <img class="talent-icon" src="${m.mastery_img}" width="40" height="40"/>
+
+
+
+const cdTurns = game.tm.MasteryCooldown.getRemaining(actor, m);
+
+const isOnCooldown = cdTurns > 0;
+
+
+
+const row = $(`  
+  <div class="talent-row mastery-row ${isOnCooldown ? 'cooldown-active' : ''}" data-id="${m.id}">
+    <div class="cooldown-wrapper">
+      <img class="talent-icon" src="${m.mastery_img}" width="40" height="40"/>
+      ${isOnCooldown ? `<div class="cooldown-overlay">${cdTurns}</div>` : ""}
+    </div>
     <div class="talent-info">
       <div class="talent-name">${m.mastery_name}</div>
       <div class="talent-tags" style="display: flex; justify-content: space-between; width: 100%;">
-  <div>
-    <span class="tag">ND${m.mastery_nd ?? m.level}</span>
-    <span class="tag">${m.mastery_cost ?? "?"} PA</span>
-    <span class="tag">CD ${m.mastery_cd ?? "?"}</span>
-  </div>
-  <div>
-    <span class="tag" style="opacity: 0.5;">${m.mastery_domain ?? "?"}</span>
-  </div>
-</div>
+        <div>
+          <span class="tag">ND${m.mastery_nd ?? m.level}</span>
+          <span class="tag">${m.mastery_cost ?? "?"} PA</span>
+          <span class="tag">CD ${m.mastery_cd ?? "?"}</span>
 
 
+        </div>
+        <div>
+          <span class="tag" style="opacity: 0.5;">${m.mastery_domain ?? "?"}</span>
+        </div>
+      </div>
     </div>
   </div>
 `);
 
 
-      row.on("mouseenter", e => game.tm?.CardTooltip?.show?.(m, e));
-row.on("mouseleave", () => game.tm?.CardTooltip?.close?.());
+  row.on("mouseenter", e => game.tm?.CardTooltip?.show?.(m, e));
+  row.on("mouseleave", () => game.tm?.CardTooltip?.close?.());
 
-row.on("click", async () => {
-  const actor = m.actor;
-
-  if (!actor) {
-    ui.notifications.warn("Ator não encontrado para esta maestria.");
-    return;
-  }
-
-  const type = m.mastery_type?.toLowerCase();
-  const cls = m.mastery_class?.toLowerCase();
-
-  if (type === "action" && cls === "melee") {
-    await game.tm.MasteryMeleeDialog.show({ actor, mastery: m });
-  } else {
-    ui.notifications.info("Esse tipo de maestria ainda não é suportado.");
-  }
-});
-
-
-
-      tbody.append(row);
+  row.on("click", async () => {
+    const actor = m.actor;
+    if (!actor) {
+      ui.notifications.warn("Ator não encontrado para esta maestria.");
+      return;
     }
+
+    const type = m.mastery_type?.toLowerCase();
+    const cls = m.mastery_class?.toLowerCase();
+
+    if (type === "action" && cls === "melee") {
+      await game.tm.MasteryMeleeDialog.show({ actor, mastery: m });
+    } else {
+      ui.notifications.info("Esse tipo de maestria ainda não é suportado.");
+    }
+  });
+
+  tbody.append(row);
+}
+
 
     return block;
   }

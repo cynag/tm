@@ -62,6 +62,7 @@ import { MasteryMeleeAttackRoll } from "./src/roll/mastery-melee-attack-roll.js"
 import { MasteryMeleeDialog } from "./src/ui/mastery-melee-dialog.js";
 
 import { MasteryParser } from "./src/mastery/mastery-parser.js";
+import { MasteryCooldown } from "./src/mastery/cooldown.js";
 // === INIT ===
 
 Hooks.once("init", async function () {
@@ -181,6 +182,7 @@ Hooks.once("ready", () => {
     MasteryMeleeAttackRoll,
     MasteryMeleeDialog,
     MasteryParser,
+    MasteryCooldown
 
   };
 
@@ -189,6 +191,51 @@ Hooks.once("ready", () => {
   if (!container) return;
   game.tm.CardPanel.render(data.actor, container);
 });
+
+  Hooks.on("updateCombat", async (combat, changes) => {
+  console.log("[HOOK] updateCombat chamado", combat, changes);
+
+  // ⛔ Só reage quando o turno muda
+  if (!("turn" in changes)) return;
+
+  const currentCombatant = combat.combatants.get(combat.current.combatantId);
+  const actor = currentCombatant?.actor;
+  if (!actor) return;
+
+  console.log("[CD] Reduzindo cooldowns do ator:", actor.name);
+
+  // 🔻 Reduz todos os cooldowns
+  await game.tm.MasteryCooldown.reduceAllCooldowns(actor);
+  await actor.update({});
+
+  // 🔁 Re-renderiza painel de ações (evita refresh completo)
+  if (actor.sheet?.rendered) {
+  await actor.sheet.render(false); // Força rerender da ficha inteira, com novo cooldown
+}
+
+});
+
+Hooks.on("deleteCombat", async (combat) => {
+  console.log("[CD] Combate encerrado, resetando cooldowns.");
+
+  for (const combatant of combat.combatants) {
+    const actor = combatant.actor;
+    if (!actor) continue;
+
+    await game.tm.MasteryCooldown.resetAll(actor);
+
+    if (actor.sheet?.rendered) {
+      const html = $(actor.sheet.element);
+      await game.tm.ActionsPanel.render(html, actor);
+    }
+  }
+});
+
+
+
+
+
+
 
 
 

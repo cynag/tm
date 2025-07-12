@@ -10,7 +10,7 @@ export class MasteryMeleeDialog {
         <div style="display: flex; align-items: center; gap: 10px;">
           <img src="${mastery.mastery_img}" width="48" height="48" style="border:1px solid #555; border-radius:4px;" />
           <div>
-            <h2 style="margin:0; font-size: 16px;">${mastery.name}</h2>
+            <h2 style="margin:0; font-size: 16px;">${mastery.mastery_name}</h2>
             <div style="margin-top:4px;">
               <span class="tag">${mastery.mastery_cost || "–"} PA</span>
               <span class="tag">CD ${mastery.mastery_cd || "–"}</span>
@@ -38,7 +38,8 @@ export class MasteryMeleeDialog {
     `;
 
     const dialog = new Dialog({
-      title: mastery.name,
+      title: mastery.mastery_name,
+
       content: html,
       buttons: {
         cancel: { label: "Cancelar" },
@@ -56,6 +57,22 @@ export class MasteryMeleeDialog {
               ui.notifications.warn("Você precisa equipar uma arma");
               return;
             }
+// 🔒 Verifica se está em cooldown
+const cdKey = {
+  mastery_domain: mastery.mastery_domain ?? mastery.system?.domain ?? "unknown",
+  mastery_name: mastery.mastery_name ?? mastery.name ?? "unnamed",
+  mastery_nd: mastery.mastery_nd ?? mastery.system?.nd ?? "nd0"
+};
+
+console.log("[CD DEBUG] Verificando chave de cooldown:", cdKey);
+console.log("[CD DEBUG] Cooldowns atuais:", foundry.utils.duplicate(actor.system.masteryCooldowns));
+
+if (game.tm.MasteryCooldown.isOnCooldown(actor, cdKey)) {
+  const turns = game.tm.MasteryCooldown.getRemaining(actor, cdKey);
+  ui.notifications.warn(`"${cdKey.mastery_name}" ainda está em recarga por ${turns} turno(s).`);
+  return;
+}
+
 
             const subtype = item?.system?.subtype?.toLowerCase();
             const damage = item?.system?.weapon_subtypes_2?.toLowerCase();
@@ -82,14 +99,31 @@ export class MasteryMeleeDialog {
               return;
             }
 
-            await game.tm.MasteryMeleeAttackRoll.roll({
+  await game.tm.MasteryMeleeAttackRoll.roll({
   attacker: actor,
   target,
   mastery,
   item,
-  hand: selectedHand, // 👈 ISSO AQUI FALTAVA
+  hand: selectedHand,
   forcedDice: diceCountRef.value
 });
+
+// 🔒 Cooldown após uso
+const cd = mastery.mastery_cd ?? 0;
+if (cd > 0 && mastery.id && game.combat?.started) {
+  game.tm.MasteryCooldown.setCooldown(actor, mastery, cd);
+} else {
+  console.log(`[CD] Cooldown ignorado (sem combate ativo) para ${mastery.mastery_name}`);
+}
+
+// 🔁 Atualiza painel de ações após uso
+const sheet = actor.sheet;
+if (sheet?.rendered) {
+  const html = $(sheet.element);
+  await game.tm.ActionsPanel.render(html, actor);
+}
+
+
 
           }
         }
