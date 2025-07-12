@@ -60,9 +60,13 @@ import { templateMagic } from "./src/mastery/data/template-magic-db.js";
 
 import { MasteryMeleeAttackRoll } from "./src/roll/mastery-melee-attack-roll.js";
 import { MasteryMeleeDialog } from "./src/ui/mastery-melee-dialog.js";
-
 import { MasteryParser } from "./src/mastery/mastery-parser.js";
 import { MasteryCooldown } from "./src/mastery/cooldown.js";
+
+import { EffectsPanel } from "./src/effects/effects-panel.js";
+import { EffectsDB } from "./src/effects/effects-db.js";
+import { EffectParser } from "./src/effects/effect-parser.js";
+
 // === INIT ===
 
 Hooks.once("init", async function () {
@@ -182,7 +186,11 @@ Hooks.once("ready", () => {
     MasteryMeleeAttackRoll,
     MasteryMeleeDialog,
     MasteryParser,
-    MasteryCooldown
+    MasteryCooldown,
+
+    EffectsPanel,
+    EffectsDB,
+    EffectParser,
 
   };
 
@@ -190,6 +198,11 @@ Hooks.once("ready", () => {
   const container = html[0].querySelector(".card-panel-container");
   if (!container) return;
   game.tm.CardPanel.render(data.actor, container);
+});
+
+  Hooks.on("renderTMActorSheet", (app, html, data) => {
+    const container = html[0].querySelector("#effects-panel-container");
+    if (container) game.tm.EffectsPanel.render($(html), data.actor);
 });
 
   Hooks.on("updateCombat", async (combat, changes) => {
@@ -230,15 +243,6 @@ Hooks.on("deleteCombat", async (combat) => {
     }
   }
 });
-
-
-
-
-
-
-
-
-
 
 game.tm.DomainsDB = {
   template_melee: templateMelee,

@@ -1,6 +1,9 @@
 import { CardsDB } from "../cards/cards-db.js";
 import { SkillsDB } from "../talents/skills-db.js";
 import { KnowledgesDB } from "../talents/knowledges-db.js";
+import { EffectParser } from "../effects/effect-parser.js";
+import { EffectsDB } from "../effects/effects-db.js";
+
 
 export class TMActor extends Actor {
  async prepareBaseData() {
@@ -18,6 +21,10 @@ const elemTypes = ["fire", "ice", "eletric", "poison", "acid", "psychic", "radia
   const s = this.system;
 // === MANTÉM COOLDOWNS
 s.masteryCooldowns ??= {};
+
+// === ATIVA EFEITOS 
+s.activeEffects ??= [];
+
 
   // === GEAR SLOTS ===
   this.system.gearSlots = foundry.utils.mergeObject({
@@ -52,6 +59,9 @@ s.masteryCooldowns ??= {};
   s.player_arcana     = s.base_arcana;
   s.player_erudition  = s.base_erudition;
   s.player_virtue     = s.base_virtue;
+
+
+
 
 
   // === SECUNDÁRIOS / INICIAIS ===
@@ -158,6 +168,7 @@ if (subrace) {
 // === SABEDORIA FINAL ===
 const erud = s.player_erudition;
 s.player_knowledge = 14 + erud;
+
 
 
 // === MODIFICADORES DE ATRIBUTO ===
@@ -469,6 +480,29 @@ s.masteryPoints.remaining = s.masteryPoints.total - spent;
 // === COOLDOWN DAS MAESTRIAS ===
 s.masteryCooldowns ??= {};
 
+  // === APLICAÇÃO DE EFEITOS ATIVOS ===
+this.flags ??= {};
+this.flags.tm ??= {};
+this.flags.tm.appliedEffects = {};
+
+const effects = s.activeEffects || [];
+for (let i = 0; i < effects.length; i++) {
+  const effect = effects[i];
+  const fullData = EffectsDB.find(e => e.id === effect.id);
+  if (!fullData) continue;
+
+  const commands = Array.isArray(fullData.effects)
+    ? fullData.effects
+    : [fullData.effect];
+
+  for (const fx of commands) {
+    try {
+      EffectParser.apply(this, fx);
+    } catch (err) {
+      console.warn(`[EFFECT ERROR] ${fullData.name} → ${fx}`, err);
+    }
+  }
+}
 
 
 }
@@ -492,7 +526,6 @@ async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
       if (existing) await existing.delete();
     }
   }
-
   return true;
 }
 

@@ -365,33 +365,38 @@
 </div>
 
 
-  <!-- ABA 💢 Condições -->
+<!-- ABA 💢 Efeitos e Traços -->
 <div class="tab" data-group="main-tabs" data-tab="conditions">
-  
-    <div class="trait-list">
-      {{#each actor.items as |item|}}
-        {{#if (eq item.type "trait")}}
-          <div class="trait-row" data-item-id="{{item._id}}">
-            <img class="trait-icon" src="{{item.img}}" width="40" height="40" />
-            <div class="trait-info">
-              <div class="trait-name">{{item.name}}</div>
-              <div class="trait-tags">
-                {{#each item.system.tags as |tag|}}
-                  <span class="trait-tag" {{#if tag.tag_description}}data-tooltip="{{tag.tag_description}}"{{/if}}>
-                    {{tag.tag_name}}
-                  </span>
-                {{/each}}
-              </div>
+
+  <!-- 🎭 Traços Permanentes -->
+  <div class="trait-list">
+    {{#each actor.items as |item|}}
+      {{#if (eq item.type "trait")}}
+        <div class="trait-row" data-item-id="{{item._id}}">
+          <img class="trait-icon" src="{{item.img}}" width="40" height="40" />
+          <div class="trait-info">
+            <div class="trait-name">{{item.name}}</div>
+            <div class="trait-tags">
+              {{#each item.system.tags as |tag|}}
+                <span class="trait-tag" {{#if tag.tag_description}}data-tooltip="{{tag.tag_description}}"{{/if}}>
+                  {{tag.tag_name}}
+                </span>
+              {{/each}}
             </div>
-            <button type="button" class="item-delete trait-remove" title="{{localize 'TM.RemoveTrait'}}">
-              <i class="fas fa-times"></i>
-            </button>
           </div>
-        {{/if}}
-      {{/each}}
-    </div>
+          <button type="button" class="item-delete trait-remove" title="{{localize 'TM.RemoveTrait'}}">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+
+  <!-- 💢 Efeitos Temporários -->
+  <div id="effects-panel-container" style="margin-top: 15px;"></div>
 
 </div>
+
 
 <!-- ABA 🎒 Inventário -->
 <div class="tab" data-group="main-tabs" data-tab="inventory">
