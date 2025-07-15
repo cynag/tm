@@ -490,7 +490,7 @@ if (masteryDmgRoll) {
 
 <hr />
 
-<div style="margin-top: 10px; font-size: 13px; color: #ccc; display: flex; flex-direction: column; gap: 6px;">
+<div class="details-attack" style="margin-top: 10px; font-size: 13px; color: #ccc; display: flex; flex-direction: column; gap: 6px;">
 
   <div style="display: flex; justify-content: space-between; padding: 2px 0;">
 
@@ -529,7 +529,7 @@ if (masteryDmgRoll) {
     <hr style="border: 0; border-top: 1px solid #444; margin: 6px 0 4px 0;" />
 
     ${hit ? `
-    <div style="font-size: 12px; color: #ccc; display: flex; flex-direction: column; gap: 4px;">
+    <div class="details-damage" style="font-size: 12px; color: #ccc; display: flex; flex-direction: column; gap: 4px;">
       <div style="display: flex; justify-content: space-between; padding: 2px 0;">
 
         <span>Dados de Dano:</span>
@@ -704,7 +704,7 @@ console.log("🧪 atkBonus - fixed1 - fixed2:", atkBonus - fixed1 - fixed2);
     const msgContent = `
   <div class="chat-roll" style="font-family: var(--font-primary); font-size: 1.1em;">
       <div class="chat-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-        <img class="chat-img" src="${mastery.mastery_img}" width="48" height="48" style="border:1px solid #555; border-radius:4px;" />
+        <img class="chat-img" src="${mastery.mastery_img}" width="35" height="35" style="border:1px solid #555; border-radius:4px;" />
         <div>
         <h2 class="chat-roll-name" style="margin: 0 0 4px 0; font-size: 16px;">${mastery.mastery_name} <span style="font-weight: normal;">(${item.name})</span></h2>
         

@@ -38,9 +38,15 @@
     "path": "lang/pt-BR.json"
   }
 ],
+  "template": "template.json",
 
   "styles": [
     "styles/tm.css"
   ],
-  "primaryTokenAttribute": "system.hp"
+  "primaryTokenAttribute": "system.hp",
+  "secondaryTokenAttribute": "system.pa",
+
+  "initiative": "3d6 + @system.initiative"
+
+
 }

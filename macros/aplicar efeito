@@ -1,0 +1,52 @@
+const token = canvas.tokens.controlled[0];
+if (!token) return ui.notifications.warn("Selecione um token.");
+
+const actor = token.actor;
+if (!actor) return ui.notifications.warn("Token sem ator vinculado.");
+
+const conditions = game.tm?.EffectsDB;
+if (!conditions || !conditions.length) return ui.notifications.warn("Nenhuma condição registrada no sistema.");
+
+const options = conditions.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+
+new Dialog({
+  title: "Teste de Resistência",
+  content: `
+    <form>
+      <div class="form-group">
+        <label>Condição:</label>
+        <select id="effectId" name="effectId">${options}</select>
+      </div>
+      <div class="form-group">
+        <label><input type="radio" name="mode" value="normal" checked> Normal</label>
+        <label><input type="radio" name="mode" value="advantage"> Vantagem</label>
+        <label><input type="radio" name="mode" value="disadvantage"> Desvantagem</label>
+      </div>
+    </form>
+  `,
+  buttons: {
+    cancelar: {
+      icon: '<i class="fas fa-times"></i>',
+      label: "Cancelar"
+    },
+    rolar: {
+      icon: '<i class="fas fa-dice"></i>',
+      label: "Rolar",
+      callback: html => {
+        const effectId = html.find("[name=effectId]").val();
+        const mode = html.find("[name=mode]:checked").val();
+const isAdvantage = mode === "advantage";
+const isDisadvantage = mode === "disadvantage";
+
+game.tm.rollEffectResistance({
+  target: token,
+  effectId,
+  isAdvantage,
+  isDisadvantage
+});
+
+      }
+    }
+  },
+  default: "rolar"
+}).render(true);

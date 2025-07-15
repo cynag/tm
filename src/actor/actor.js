@@ -84,6 +84,8 @@ s.activeEffects ??= [];
   if (s.player_hp > s.player_hp_max) s.player_hp = s.player_hp_max;
   s.player_pa = Math.min(s.player_pa, s.player_pa_max);
 
+
+
   // === TALENTOS ===
 s.talents ??= {};
 s.talents.skills ??= {};
@@ -192,8 +194,8 @@ s.mod_protection = Math.floor(s.player_protection / 2); // ⚠️ PROT segue ló
 s.player_reflex = 9 + s.mod_dexterity;
 
 s.player_maneuver = s.mod_impulse > 0 ? s.mod_impulse * 3 : 0;
-s.player_resistance_phys = s.mod_impulse > 0 ? s.mod_impulse * 4 : 0;
-s.player_resistance_mental = s.mod_virtue > 0 ? s.mod_virtue * 4 : 0;
+s.player_resistance_phys = s.mod_impulse > 0 ? s.mod_impulse * 7 : 0;
+s.player_resistance_mental = s.mod_virtue > 0 ? s.mod_virtue * 7 : 0;
 s.player_initiative = s.mod_dexterity;
 
 //console.log("[CALCULOS AUTO] Reflex:", s.player_reflex, "| Manobra:", s.player_maneuver, "| RF:", s.player_resistance_phys, "| RM:", s.player_resistance_mental, "| Iniciativa:", s.player_initiative);
@@ -504,6 +506,18 @@ for (let i = 0; i < effects.length; i++) {
   }
 }
 
+s.initiative = s.player_initiative;
+
+// Sincroniza com recursos do token
+s.hp = {
+  value: Number(s.player_hp) || 0,
+  max: Number(s.player_hp_max) || 0
+};
+
+s.pa = {
+  value: Number(s.player_pa) || 0,
+  max: Number(s.player_pa_max) || 0
+};
 
 }
 
@@ -528,6 +542,7 @@ async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
   }
   return true;
 }
+
 
 
 

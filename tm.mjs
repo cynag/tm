@@ -66,6 +66,13 @@ import { MasteryCooldown } from "./src/mastery/cooldown.js";
 import { EffectsPanel } from "./src/effects/effects-panel.js";
 import { EffectsDB } from "./src/effects/effects-db.js";
 import { EffectParser } from "./src/effects/effect-parser.js";
+import { EffectRender } from "./src/effects/effect-render.js";
+import { EffectApply } from "./src/effects/effect-apply.js";
+import { EffectDuration } from "./src/effects/effect-apply.js";
+
+import { rollEffectResistance } from "./src/roll/effect-roll.js";
+
+
 
 // === INIT ===
 
@@ -191,6 +198,10 @@ Hooks.once("ready", () => {
     EffectsPanel,
     EffectsDB,
     EffectParser,
+    EffectRender,
+    EffectApply,
+    EffectDuration,
+    rollEffectResistance,
 
   };
 
@@ -219,6 +230,8 @@ Hooks.once("ready", () => {
 
   // 🔻 Reduz todos os cooldowns
   await game.tm.MasteryCooldown.reduceAllCooldowns(actor);
+  await game.tm.EffectDuration.reduceAll(actor);
+
   await actor.update({});
 
   // 🔁 Re-renderiza painel de ações (evita refresh completo)
@@ -248,6 +261,9 @@ game.tm.DomainsDB = {
   template_melee: templateMelee,
   template_magic: templateMagic
 };
+
+// ✅ Ativa os hooks internos para efeitos visuais
+EffectRender.bindHooks();
 
   console.log("Terras Malditas | Sistema pronto");
 });

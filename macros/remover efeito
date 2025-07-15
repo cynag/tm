@@ -1,0 +1,53 @@
+const token = canvas.tokens.controlled[0];
+if (!token) return ui.notifications.warn("Selecione um token.");
+
+const actor = token.actor;
+if (!actor) return ui.notifications.warn("Token sem ator vinculado.");
+
+// Filtra apenas os efeitos do sistema
+const effects = actor.effects.contents.filter(e => e.getFlag("tm", "source") === "resistance-roll");
+if (!effects.length) return ui.notifications.warn("Este ator não possui efeitos ativos do sistema.");
+
+// Lista para o dialog
+const options = effects.map(e => `<option value="${e.id}">${e.name}</option>`).join("");
+
+new Dialog({
+  title: "🧹 Remover Efeito Ativo",
+  content: `
+    <form>
+      <div class="form-group">
+        <label>Efeito a remover:</label>
+        <select id="effectId" style="width:100%">${options}</select>
+      </div>
+    </form>
+  `,
+  buttons: {
+    cancelar: {
+      icon: '<i class="fas fa-times"></i>',
+      label: "Cancelar"
+    },
+    aplicar: {
+      icon: '<i class="fas fa-trash"></i>',
+      label: "Remover",
+      callback: async html => {
+        const id = html.find("#effectId").val();
+        const effect = actor.effects.get(id);
+        if (!effect) return ui.notifications.warn("Efeito não encontrado.");
+
+        // Remove da lógica da ficha
+        const logic = actor.system.activeEffects ?? [];
+        const updated = logic.filter(e => e.id !== id);
+        await actor.update({ "system.activeEffects": updated });
+
+        // Remove o ActiveEffect visual
+        await actor.deleteEmbeddedDocuments("ActiveEffect", [id]);
+
+        // Atualiza os overlays do token
+        await game.tm.EffectRender.update(actor);
+
+        ui.notifications.info(`🧼 Efeito "${effect.name}" removido de ${actor.name}.`);
+      }
+    }
+  },
+  default: "aplicar"
+}).render(true);

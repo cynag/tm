@@ -1,0 +1,18 @@
+{
+  "Actor": {
+    "types": ["actor"],
+    "actor": {
+      "prototypeToken": {
+        "displayBars": 40,
+        "bar1": { "attribute": "system.hp" },
+        "bar2": { "attribute": "system.pa" }
+      },
+      "system": {
+        "player_hp": 10,
+        "player_hp_max": 10,
+        "player_pa": 8,
+        "player_pa_max": 8
+      }
+    }
+  }
+}

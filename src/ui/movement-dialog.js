@@ -44,7 +44,7 @@ export class MovementDialog {
             const chatHTML = `
               <div class="tm-chat-card" style="padding: 5px 8px;">
                 <div class="card-header" style="display: flex; gap: 8px; align-items: flex-start; margin-bottom: 4px;">
-                  <img src="${entry.img}" width="32" height="32" style="border:1px solid #555; border-radius:4px;" />
+                  <img src="${entry.img}" width="35" height="35" style="border:1px solid #555; border-radius:4px;" />
                   <div style="display: flex; flex-direction: column;">
                     <strong>${entry.name}</strong>
                     <div style="display: flex; gap: 6px; margin-top: 2px;">

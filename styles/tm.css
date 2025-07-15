@@ -5137,6 +5137,25 @@ h4.dice-total {
 .tm-details{
   width:100%;
 }
+
+.dice-tray{
+  margin-bottom:14px !important; 
+  margin-top:4% !important; 
+}
+
+.details-attack,
+.details-damage{
+  color:#bcbcbc !important;
+  font-size:12px !important;
+  padding:2px;
+}
+.details-effect{
+  color:#bcbcbc !important;
+  font-size:12px !important;
+  padding-top:6px;
+
+}
+
 .dice-icon {
   width: 32px;
   height: 32px;
@@ -5323,3 +5342,20 @@ h4.dice-total {
   opacity: 0.4;
   pointer-events: none;
 }
+.tm-overlay-stack {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #222;
+  color: white;
+  font-size: 12px;
+  border: 1px solid #aaa;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+}
+

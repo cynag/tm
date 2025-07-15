@@ -128,7 +128,7 @@ if (!hit) {
   earlyFailMsgContent = `
     <div class="chat-attack" style="font-family: var(--font-primary); font-size: 1.1em;">
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-        <img src="${actionData?.[`img_${subtype}`] || item?.img || actionData?.img_default || "icons/svg/sword.svg"}" width="48" height="48" style="border:1px solid #555; border-radius:4px;" />
+        <img src="${actionData?.[`img_${subtype}`] || item?.img || actionData?.img_default || "icons/svg/sword.svg"}" width="35" height="35" style="border:1px solid #555; border-radius:4px;" />
 
         <div>
           <h2 style="margin: 0 0 4px 0; font-size: 16px;">${isUnarmed ? "Ataque Desarmado" : `Atacar com ${item.name?.trim() || "arma"}`}</h2>
@@ -324,9 +324,8 @@ const elementalKey = elementMap[rawKey] || rawKey;
 /////////////////
     const tmDetailsHTML = `
   <div class="tm-details" style="display: none; margin-top: 6px; font-size: 12px; color: #aaa; padding: 6px; background: #111; border: 1px solid #333; border-radius: 6px;">
-  <strong>Detalhes:</strong><br>
 
-    <div style="display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 14px; font-weight: bold; margin: 6px 0;">
+    <div class="dice-tray" style="display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 14px; font-weight: bold; margin: 6px 0;">
 
   <!-- REFLEXO -->
   <div style="
@@ -362,8 +361,6 @@ const elementalKey = elementMap[rawKey] || rawKey;
 
   </div>
 
-
-
   <!-- Dados de ataque -->
   <div style="
     display: flex;
@@ -389,19 +386,7 @@ const elementalKey = elementMap[rawKey] || rawKey;
       `;
     }).join("")}
 
-
-
-
-
 </div>
-
-
-
-
-
-
-
-
 
 <!-- Dados de dano + elementais juntos -->
 <div style="
@@ -444,7 +429,7 @@ const elementalKey = elementMap[rawKey] || rawKey;
 
 <hr />
 
-<div style="margin-top: 10px; font-size: 13px; color: #ccc; display: flex; flex-direction: column; gap: 6px;">
+<div class="details-attack" style="margin-top: 10px; font-size: 12px; color: #ccc; display: flex; flex-direction: column; gap: 6px;">
 
   <div style="display: flex; justify-content: space-between; padding: 2px 0;">
 
@@ -458,29 +443,25 @@ const elementalKey = elementMap[rawKey] || rawKey;
     <span>Acréscimos:</span>
     <span>${atkBonus > 0 ? "+" + atkBonus : atkBonus}</span>
   </div>
-` : ""}
-
+  ` : ""}
 
   <div style="display: flex; justify-content: space-between; font-weight: bold;">
     <span>Valor Final:</span>
     <span>${atkTotal}</span>
   </div>
-</div>
+  </div>
 
-
-<hr style="border: 0; border-top: 1px solid #444; margin: 6px 0 4px 0;" />
+  <hr style="border: 0; border-top: 1px solid #444; margin: 6px 0 4px 0;" />
 
 ${hit ? `
-<div style="font-size: 12px; color: #ccc; display: flex; flex-direction: column; gap: 4px;">
+<div class="details-damage" style="font-size: 11px; color: #ccc; display: flex; flex-direction: column; gap: 4px;">
   <div style="display: flex; justify-content: space-between; padding: 2px 0;">
 
     <span>Dados de Dano:</span>
     <span>
   ${(baseDmg * critMult)}
-  ${critMult > 1 ? `<span style="font-weight: normal; color: #888;">(${baseDmg}x${critMult})</span>` : ""}
-</span>
-
-
+    ${critMult > 1 ? `<span style="font-weight: normal; color: #888;">(${baseDmg}x${critMult})</span>` : ""}
+  </span>
 
   </div>
 
@@ -491,7 +472,6 @@ ${hit ? `
       <span>${dmgBonus > 0 ? "+" + dmgBonus : dmgBonus}</span>
     </div>`
   : ""}
-
 
   ${(() => {
   const typeMap = {
@@ -533,10 +513,10 @@ ${hit ? `
        <span>A armadura foi transpassada.</span>
        <span></span>
      </div>`
-}
+  }
 
 
-${elementalRoll ? `
+  ${elementalRoll ? `
   <div style="display: flex; justify-content: space-between; padding: 2px 0;">
     <span>Dano Elemental (${elementalKeyRaw}):</span>
     <span>
@@ -551,22 +531,16 @@ ${elementalRoll ? `
       <span>${resist < 0 ? "+" + Math.abs(resist) : "-" + resist}</span>
     </div>
   ` : ""}
-` : ""}
+  `  : ""}
 
 
-
-
-
-
-
-
-  <div style="display: flex; justify-content: space-between; align-items: center; padding: 2px 0; color: white;">
+  <div class"details-damage-final" style="display: flex; justify-content: space-between; align-items: center; padding: 2px 0; color: white;">
     <span>Dano Final:</span>
     <span>${dmgFinal}</span>
   </div>
-` : ""}
-`;
-/////////////////
+  ` : ""}
+  `;
+  /////////////////
   const outcomeHTML = `
 <div class="tm-outcome">
 
@@ -644,7 +618,7 @@ ${elementalRoll ? `
   ${earlyFailMsgContent || `
     <div class="chat-attack" style="font-family: var(--font-primary); font-size: 1.1em;">
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-        <img src="${actionImg}" width="48" height="48" style="border:1px solid #555; border-radius:4px;" />
+        <img src="${actionImg}" width="35" height="35" style="border:1px solid #555; border-radius:4px;" />
         <div>
           <h2 style="margin: 0 0 4px 0; font-size: 16px;">${actionName}</h2>
           <div style="margin-bottom: 2px;">
