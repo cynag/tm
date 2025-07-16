@@ -1,14 +1,18 @@
 export class EffectRender {
   static async update(actor) {
-    if (!actor) return;
+  if (!actor || !actor.token) {
+    console.log("[EffectRender] Ignorado — ator sem token ativo.");
+    return;
+  }
 
-    const token = canvas.tokens.get(actor.token?.id) 
-  ?? canvas.tokens.placeables.find(t => t.document.actor?.id === actor.id);
+  const token = canvas.tokens.get(actor.token?.id) 
+    ?? canvas.tokens.placeables.find(t => t.document.actor?.id === actor.id);
 
-    if (!token || !token.object) {
-      console.warn("[EffectRender] Token não encontrado ou não renderizado");
-      return;
-    }
+  if (!token || !token.object || !token.visible) {
+    console.log(`[EffectRender] Ignorado — token ausente ou invisível (${actor.name})`);
+    return;
+  }
+
 
     const logicalEffects = actor.system.activeEffects ?? [];
     const logicalIds = logicalEffects.map(e => e.id);
@@ -67,15 +71,16 @@ export class EffectRender {
 
   static bindHooks() {
     Hooks.on("updateActor", (actor, changes) => {
-      if (!(actor instanceof CONFIG.Actor.documentClass)) return;
+  if (!(actor instanceof CONFIG.Actor.documentClass)) return;
+  if (!actor.token) return; // só tokens ativos
 
-      const afChanged = foundry.utils.hasProperty(changes, "system.activeEffects");
-      if (afChanged) {
-        console.log("[EffectRender] system.activeEffects alterado — forçando update visual");
-      }
+  const afChanged = foundry.utils.hasProperty(changes, "system.activeEffects");
+  if (afChanged) {
+    console.log("[EffectRender] system.activeEffects alterado — forçando update visual");
+    EffectRender.update(actor);
+  }
+});
 
-      EffectRender.update(actor);
-    });
 
     Hooks.on("createActiveEffect", (effect) => {
       const actor = effect.parent;

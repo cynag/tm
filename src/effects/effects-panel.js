@@ -38,33 +38,68 @@ export class EffectsPanel {
         "mod_virtue": "VIR",
         "player_pa_max": "PA",
         "player_reflex": "REF",
-        "player_movement": "MOV"
+        "player_movement": "MOV",
+        "token_vision": "VISÃO"
+
       };
 
       // Coletar efeitos e somar acumulados
-      const rawEffects = fullData.effects ?? (Array.isArray(fullData.effect) ? fullData.effect : [fullData.effect])
-      .filter(e => typeof e === "string")
-      .map(e => e.trim())
-      .filter(Boolean);
+      const rawEffects = (Array.isArray(fullData.effect) ? fullData.effect : [fullData.effect])
+  .filter(e => typeof e === "string")
+  .map(e => e.trim())
+  .filter(Boolean);
+
 
       const effectSumMap = {};
 
       for (const raw of rawEffects) {
         const parts = raw.split(",").map(p => p.trim());
-        for (const part of parts) {
-          const match = part.match(/^([+\-]?\d+)\s*@\{(.+?)\}$/);
-          if (!match) continue;
-          const value = parseInt(match[1]);
-          const key = match[2];
-          effectSumMap[key] = (effectSumMap[key] || 0) + (value * count);
-        }
-      }
+        
+          for (const part of parts) {
+  // Match tipo MOD: -1 @{player_reflex}
+  const matchMod = part.match(/^([+\-]?\d+)\s*@\{(.+?)\}$/);
+
+  // Match tipo SET: @{player_reflex}==@{player_reflex}/2
+  const matchSet = part.match(/^@{(.+?)}==@{.+?}\/(\d+)$/);
+
+  if (matchMod) {
+    const value = parseInt(matchMod[1]);
+    const key = matchMod[2];
+    effectSumMap[key] = (effectSumMap[key] || 0) + (value * count);
+  }
+
+  if (matchSet) {
+    const key = matchSet[1];
+    const divisor = parseInt(matchSet[2]);
+    const percent = Math.round((1 - 1 / divisor) * -100); // Ex: /2 = -50%
+    effectSumMap[key] = (effectSumMap[key] || 0) + (percent * count);
+  }
+  // SET fixo: @{chave}==2
+const matchSetFixed = part.match(/^@{(.+?)}==\s*(\d+)$/);
+if (matchSetFixed) {
+  const key = matchSetFixed[1];
+  const value = parseInt(matchSetFixed[2]);
+  // usamos "v=" como flag interna pra mostrar como SET
+  effectSumMap[key] = `v=${value}`;
+    }
+  }
+}
 
       const effectTags = Object.entries(effectSumMap).map(([key, val]) => {
-        const label = labelMap[key] || key;
-        const sign = val > 0 ? "+" : "";
-        return `<span class="tag">${sign}${val} ${label}</span>`;
-      });
+  const label = labelMap[key] || key;
+
+  if (typeof val === "string" && val.startsWith("v=")) {
+    const fixed = val.slice(2);
+    return `<span class="tag">${label} = ${fixed}</span>`;
+  }
+
+  const isPercent = Math.abs(val) < 100 && val % 10 === 0;
+  const sign = val > 0 ? "+" : "";
+  const valueText = isPercent ? `${sign}${val}%` : `${sign}${val}`;
+  return `<span class="tag">${valueText} ${label}</span>`;
+});
+
+
 
       const row = $(`
         <div class="talent-row effect-row" data-id="${id}">

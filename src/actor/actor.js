@@ -210,13 +210,17 @@ s.player_initiative = s.mod_dexterity;
   VIR: s.mod_virtue
 });*/
 
-  // === PROTEÇÃO E TRAÇOS POR ARMADURA EQUIPADA ===
+// === PROTEÇÃO E TRAÇOS POR ARMADURA EQUIPADA ===
+s.player_protection = 0;
+s.mod_protection = 0;
+
 let totalProt     = 0;
 let metalSum      = 0;
 let noisySum      = 0;
 let reforcedSum   = 0;
 let heavySum      = 0;
 let thermicSum    = 0;
+
 
 for (const [slotId, slot] of Object.entries(s.gearSlots)) {
   const itemId = slot.itemId;
@@ -505,6 +509,16 @@ for (let i = 0; i < effects.length; i++) {
     }
   }
 }
+// === MARCADORES DE EFEITOS FÍSICOS / MENTAIS ===
+s.has_physical_effect = false;
+s.has_mental_effect = false;
+
+for (const effect of s.activeEffects ?? []) {
+  const data = EffectsDB.find(e => e.id === effect.id);
+  if (!data) continue;
+  if (data.effect_type === "rf") s.has_physical_effect = true;
+  if (data.effect_type === "rm") s.has_mental_effect = true;
+}
 
 s.initiative = s.player_initiative;
 
@@ -520,6 +534,9 @@ s.pa = {
 };
 
 }
+
+
+
 
 // temporario
 async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
@@ -544,6 +561,10 @@ async _preCreateEmbeddedDocuments(embeddedName, data, options, userId) {
 }
 
 
+prepareDerivedData() {
+  super.prepareDerivedData();
+  this.prepareBaseData(); // Garante que prepareBaseData seja chamado de novo no momento certo
+}
 
 
 

@@ -21,8 +21,9 @@ export const EffectsDB = [
   },
   {
     id: "atordoado",
-    name: "Atordoado",
-    effect: "/2 @{player_pa_max}, /2 @{player_reflex}",
+    name: "Atordoado", 
+    effect: ["@{player_pa_max}==@{player_pa_max}/2",
+            "@{player_reflex}==@{player_reflex}/2"],
     description: "PA e REF pela metade. Não pode fazer reações.",
     duration: 1,
     effect_type: "rf",
@@ -40,7 +41,7 @@ export const EffectsDB = [
   {
     id: "apavorado",
     name: "Apavorado",
-    effect: "/2 @{player_movement}",
+    effect: "@{player_movement}==@{player_movement}/2",
     description: "MOV pela metade. –1d6 em ataques. Resistências com desvantagem. Se falhar de novo, vira Pânico.",
     duration: null,
     effect_type: "rm",
@@ -49,7 +50,7 @@ export const EffectsDB = [
   {
     id: "panico",
     name: "Pânico",
-    effect: "@{player_movement}=2",
+    effect: "@{player_movement}==2",
     description: "MOV 2m. –1d6 em ataques. Resistências com desvantagem. Não se aproxima da fonte do medo. Essa fonte tem vantagem.",
     duration: null,
     effect_type: "rm",
@@ -58,7 +59,10 @@ export const EffectsDB = [
   {
     id: "sufocado",
     name: "Sufocado",
-    effect: "-3 @{player_movement}, -3 @{player_reflex}, token_vision=8",
+    effect: [
+  "-3 @{player_movement}",
+  "-3 @{player_reflex}",
+  "@{token_vision}==8"],
     description: "–3 MOV e REF. Visão reduzida a 8m. Se falhar de novo, vira Asfixiado.",
     duration: 1,
     effect_type: "rf",
@@ -67,7 +71,10 @@ export const EffectsDB = [
   {
     id: "asfixiado",
     name: "Asfixiado",
-    effect: "-6 @{player_movement}, -6 @{player_reflex}, token_vision=3",
+    effect: [
+    "-6 @{player_movement}",
+    "-6 @{player_reflex}",
+    "@{token_vision}==3"],
     description: "–6 MOV e REF. Resistências com desvantagem. Visão a 3m. –1d6 em ataques. Se falhar de novo, desmaia.",
     duration: 1,
     effect_type: "rf",
@@ -76,7 +83,7 @@ export const EffectsDB = [
   {
     id: "inconsciente",
     name: "Inconsciente",
-    effect: "@{player_reflex}=0",
+    effect: "@{player_reflex}==0",
     description: "Desacordado. REF = 0. +3d6 em ataques sofridos. Críticos causam mutilação.",
     duration: null,
     effect_type: "rf",
@@ -85,7 +92,7 @@ export const EffectsDB = [
   {
     id: "prostrado",
     name: "Prostrado",
-    effect: "@{player_reflex}=2",
+    effect: "@{player_reflex}==2",
     description: "Caído. REF = 2. –1d6 em ataques. +1d6 em ataques recebidos. Levantar custa 6 PA.",
     duration: null,
     effect_type: "rf",
@@ -103,7 +110,7 @@ export const EffectsDB = [
   {
     id: "imobilizado",
     name: "Imobilizado",
-    effect: "/2 @{mod_reflex}",
+    effect: "@{player_reflex}==@{player_reflex}/2",
     description: "Sem movimento. REF pela metade. +2d6 em ataques sofridos.",
     duration: null,
     effect_type: "rf",
@@ -112,7 +119,7 @@ export const EffectsDB = [
   {
     id: "paralisado",
     name: "Paralisado",
-    effect: "@{player_reflex}=0",
+    effect: "@{player_reflex}==0",
     description: "Não pode agir nem mover. REF = 0. +4d6 em ataques sofridos.",
     duration: null,
     effect_type: "rf",
@@ -139,7 +146,10 @@ export const EffectsDB = [
   {
     id: "desgastado",
     name: "Desgastado",
-    effect: "-1 @{mod_arcana}, -1 @{mod_erudition}, -1 @{mod_virtue}",
+    effect: [
+    "-1 @{mod_arcana}",
+    "-1 @{mod_erudition}",
+    "-1 @{mod_virtue}"],
     description: "–1 em ARC, ERU e VIR.",
     duration: null,
     effect_type: "rm",

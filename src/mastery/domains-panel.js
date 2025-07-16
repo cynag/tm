@@ -1,10 +1,6 @@
-import { templateMelee } from "./data/template-melee-db.js";
-import { templateMagic } from "./data/template-magic-db.js";
+import { DomainsDB } from "./data/domains-index.js";
+const DOMAINS = DomainsDB;
 
-const DOMAINS = {
-  template_melee: templateMelee,
-  template_magic: templateMagic
-};
 
 export class DomainsPanel {
   static render(container, actor) {
@@ -13,13 +9,14 @@ export class DomainsPanel {
 
     panel.html(`
       <select id="domain-select" style="margin-bottom: 10px;">
-        <option value="template_melee">Domínio: Corpo</option>
-        <option value="template_magic">Domínio: Magia</option>
+        <option value="hierophant">Domínio: Hierofante</option>
+
       </select>
       <div id="domain-tree"></div>
     `);
 
-    this.renderTree("template_melee", panel, actor);
+    this.renderTree("hierophant", panel, actor);
+
 
     panel.find("#domain-select").on("change", function () {
       DomainsPanel.renderTree(this.value, panel, actor);

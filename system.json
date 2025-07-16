@@ -38,7 +38,6 @@
     "path": "lang/pt-BR.json"
   }
 ],
-  "template": "template.json",
 
   "styles": [
     "styles/tm.css"

@@ -431,6 +431,18 @@
 {{#if isGM}}
 <div class="tab" data-group="main-tabs" data-tab="config">
   <h2>⚙️ CFG: Parâmetros Internos</h2>
+  <div class="pinned-box">
+  <h4>📌 Efeitos Ativos</h4>
+  <div>
+    <strong>Penalidade Física:</strong>
+    {{#if actor.system.has_physical_effect}}✅{{else}}—{{/if}}
+  </div>
+  <div>
+    <strong>Penalidade Mental:</strong>
+    {{#if actor.system.has_mental_effect}}✅{{else}}—{{/if}}
+  </div>
+</div>
+
   <hr>
 
   <!-- 🎲 Dados de Ação -->

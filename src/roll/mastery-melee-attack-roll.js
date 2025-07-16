@@ -402,7 +402,8 @@ if (masteryDmgRoll) {
   text-shadow: 1px 1px 2px black;">
   ${(() => {
   const base = targetSystem.mod_protection ?? 0;
-  const fromExtra = extraEffects?.protection ?? 0;
+  const fromExtra = extraEffects?.prot ?? 0;
+
 
 
 
@@ -501,7 +502,8 @@ if (masteryDmgRoll) {
     ${(atkBonus !== 0 || masteryFixedAtkBonus !== 0)
 ? `<div style="display: flex; justify-content: space-between; padding: 2px 0;">
     <span>Acréscimos:</span>
-    <span>+${atkBonus + fixed1 + fixed2}</span>
+    <span>${(atkBonus + fixed1 + fixed2) >= 0 ? "+" : ""}${atkBonus + fixed1 + fixed2}</span>
+
   </div>`
 : ""}
 
@@ -550,7 +552,8 @@ if (masteryDmgRoll) {
         ${(dmgBonus + masteryFixedDmgBonus !== 0)
   ? `<div style="display: flex; justify-content: space-between; padding: 2px 0;">
       <span>Acréscimos:</span>
-      <span>+${dmgBonus + masteryFixedDmgBonus}</span>
+      <span>${(dmgBonus + masteryFixedDmgBonus) >= 0 ? "+" : ""}${dmgBonus + masteryFixedDmgBonus}</span>
+
     </div>`
   : ""}
 
