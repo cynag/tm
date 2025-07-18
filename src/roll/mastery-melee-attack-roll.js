@@ -32,46 +32,25 @@ const masteryAtkResult2 = await MasteryParser.evaluate(
 );
 console.log("🔍 masteryAtkResult2:", masteryAtkResult2);
 
-
-
-
 const modeAtk = mastery.weapon_attack_bonus?.includes("d") ? "roll" : "number";
 const masteryAtkResult = await MasteryParser.evaluate(masteryAtkRaw, attacker, targetActor, modeAtk, mastery.mastery_domain);
 console.log("🎯 Detecção do tipo de bônus de ataque:", modeAtk);
 
 const masteryAtkRoll = typeof masteryAtkResult === "object" ? masteryAtkResult.roll : null;
-
-
-
-
-
-
-
-
 const isFixedBonus = mastery.weapon_damage_bonus?.match(/^[+−-]?\s*\d+(\/\/ND[p|i]?)?$/i);
 
 let masteryDmgBonus = 0;
 let masteryDmgRoll = null;
 let masteryFixedDmgBonus = 0;
 
-
-
-
   const extraDice = (attackerSystem.player_extra_dice?.[subtype] ?? 0)
     + (attackerSystem.player_extra_dice?.[damageType] ?? 0);
 
   const actionDiceBase = Number(attackerSystem?.player_action_dice) || 3;
-
-
   const atkBase = forcedDice ?? actionDiceBase;
-
-
-
-
-  
   const atkDiceBase = atkBase + extraDice;
-const atkRollBase = new Roll(`${atkDiceBase}d6`, {}, { async: true });
-await atkRollBase.evaluate();
+  const atkRollBase = new Roll(`${atkDiceBase}d6`, {}, { async: true });
+  await atkRollBase.evaluate();
 
 let atkRoll = atkRollBase;
 if (masteryAtkRoll) {
@@ -79,14 +58,10 @@ if (masteryAtkRoll) {
   atkRoll._total += masteryAtkRoll.total;
 }
 
-
-
-
   const atkBonus = (attackerSystem.mod_dexterity ?? 0)
     + (attackerSystem.player_attack_bonus?.[subtype] ?? 0)
     + (attackerSystem.player_attack_bonus?.[damageType] ?? 0)
     + (attackerSystem.player_attack_bonus?.[size] ?? 0);
-
 
 const masteryAtkBonusTemp = typeof masteryAtkResult === "number"
   ? masteryAtkResult
@@ -108,15 +83,12 @@ if (!masteryAtkRaw2?.includes("d")) {
   }
 }
 
-
 console.log("🧪 fixed1:", fixed1);
 console.log("🧪 fixed2:", fixed2);
 console.log("🧪 atkBonus - fixed1 - fixed2:", atkBonus - fixed1 - fixed2);
 
-
 const masteryFixedAtkBonus = fixed1 + fixed2;
 const masteryAtkBonus = atkBonus + masteryFixedAtkBonus;
-
 
 console.log("🎯 masteryDmgRaw:", masteryDmgRaw);
 console.log("🎯 mastery object completo:", mastery);
@@ -129,11 +101,7 @@ console.log("🧪 atkBonus Base:", atkBonus);
 console.log("🧪 masteryFixedAtkBonus:", masteryFixedAtkBonus);
 console.log("🎯 masteryAtkBonus TOTAL:", masteryAtkBonus);
 
-
 const atkTotal = atkRoll.total + atkBonus + masteryFixedAtkBonus;
-
-
-
 
   const weaponDamage = isUnarmed ? "1d2" : (item.system.weapon_damage || "1d2");
 
@@ -171,26 +139,20 @@ const dmgResult1 = await MasteryParser.evaluate(mastery.weapon_damage_bonus, att
 const mode2 = mastery.weapon_damage_bonus_2?.includes("d") ? "roll" : "number";
 const dmgResult2 = await MasteryParser.evaluate(mastery.weapon_damage_bonus_2, attacker, targetActor, mode2, mastery.mastery_domain);
 
-
 console.log("🎯 masteryDmgRaw:", mastery.weapon_damage_bonus);
 console.log("🎯 masteryDmgResult:", dmgResult1);
 console.log("🎯 mastery object completo:", mastery);
 
-
 masteryDmgBonus = (typeof dmgResult1 === "object" ? dmgResult1.value : dmgResult1) +
                   (typeof dmgResult2 === "object" ? dmgResult2.value : dmgResult2);
-
-
 masteryDmgRoll = dmgResult1.roll;
 if (dmgResult2.roll) {
   masteryDmgRoll.terms.push(...dmgResult2.roll.terms);
 }
 
-
 const fullFormula = [baseFormula].filter(Boolean).join(" + ");
 baseRoll = new Roll(fullFormula, {}, { async: true });
 await baseRoll.evaluate();
-
 
   masteryFixedDmgBonus = (typeof dmgResult1.value === "number" && !mastery.weapon_damage_bonus.includes("d")) ? dmgResult1.value : 0;
  
@@ -216,16 +178,8 @@ dmgBonus = (attackerSystem.mod_letality ?? 0)
 
 }
 
-
-
-
-
-  
   let finalDmg = hit ? baseDmg + dmgBonus : 0;
 
-
-
-  
 // === CRÍTICO, RESISTÊNCIA, PROTEÇÃO, DANO FINAL ===
 const atkDiceObjs = [];
 let dieCount = 0;
@@ -260,29 +214,13 @@ if (count6 === 3 || (count6 === 2 && traits.weapon_trait_desc > 0 && first3Dice.
   resultLabel = "Comum";
 }
 
-
 let protFinal = targetSystem.mod_protection ?? 0;
-
-
-
-
-
-
-
-
-
-
-
-
-//const protBase = getProperty(targetActor, "system.mod_protection") ?? 0;
-
 
 const armorIsMetal = !!targetSystem.player_armor_is_metal;
 
 if (traits.weapon_trait_ironbreaker || (damageType === "perfurante" && !armorIsMetal)) {
   protFinal = Math.floor(protFinal / 2);
 }
-
 
 const typeMap = {
   cortante: "slashing",
@@ -351,10 +289,6 @@ if (masteryDmgRoll) {
   }
 }
 
-
-
-
-
   // === VISUAL DO CHAT IGUAL AO ATTACK-ROLL.JS ===
   const traitLabels = [];
   if (traits.weapon_trait_desc) traitLabels.push(`DES 6.6.${traits.weapon_trait_desc}`);
@@ -362,8 +296,6 @@ if (masteryDmgRoll) {
   if (traits.weapon_trait_ironbreaker) traitLabels.push(`QBF`);
   if (traits.weapon_trait_vulnerable) traitLabels.push(`VUL`);
 
-
-  
   /////////////////////////
   const tmDetailsHTML = `
   <div class="tm-details" style="display: none; margin-top: 6px; font-size: 12px; color: #aaa; padding: 6px; background: #111; border: 1px solid #333; border-radius: 6px;">
@@ -507,26 +439,11 @@ if (masteryDmgRoll) {
   </div>`
 : ""}
 
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
   <div style="display: flex; justify-content: space-between; font-weight: bold;">
     <span>Valor Final:</span>
     <span>${atkTotal}</span>
   </div>
 </div>
-
 
     <hr style="border: 0; border-top: 1px solid #444; margin: 6px 0 4px 0;" />
 
@@ -544,9 +461,6 @@ if (masteryDmgRoll) {
 
 </span>
 
-
-
-
       </div>
 
         ${(dmgBonus + masteryFixedDmgBonus !== 0)
@@ -556,12 +470,6 @@ if (masteryDmgRoll) {
 
     </div>`
   : ""}
-
-
-
-
-
-
 
   ${(() => {
   const typeMap = {
@@ -623,13 +531,6 @@ ${elementalRoll ? `
     </div>
   ` : ""}
 ` : ""}
-
-
-
-
-
-
-
 
   <div style="display: flex; justify-content: space-between; align-items: center; padding: 2px 0; color: white;">
     <span>Dano Final:</span>
@@ -780,8 +681,6 @@ console.log("🧪 atkBonus - fixed1 - fixed2:", atkBonus - fixed1 - fixed2);
       ${outcomeHTML}
     </div>
   `;
-
-
 
   await ChatMessage.create({
     user: game.user.id,

@@ -7,13 +7,18 @@ export class DomainsPanel {
     const panel = container.find("#domain-panel");
     if (!panel.length) return;
 
-    panel.html(`
-      <select id="domain-select" style="margin-bottom: 10px;">
-        <option value="hierophant">Domínio: Hierofante</option>
+    const selectHtml = Object.keys(DOMAINS).map(domainKey => {
+  const label = domainKey.charAt(0).toUpperCase() + domainKey.slice(1);
+  return `<option value="${domainKey}">Domínio: ${label}</option>`;
+}).join("");
 
-      </select>
-      <div id="domain-tree"></div>
-    `);
+panel.html(`
+  <select id="domain-select" style="margin-bottom: 10px;">
+    ${selectHtml}
+  </select>
+  <div id="domain-tree"></div>
+`);
+
 
     this.renderTree("hierophant", panel, actor);
 

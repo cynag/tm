@@ -57,6 +57,8 @@ import { AttackRoll } from "./src/roll/attack-roll.js";
 import {DomainsPanel} from "./src/mastery/domains-panel.js";
 import { DomainsDB } from "./src/mastery/data/domains-index.js";
 
+import { MasteryMagicAttackRoll } from "./src/roll/mastery-magic-attack-roll.js";
+import { MasteryMagicDialog } from "./src/ui/mastery-magic-dialog.js";
 
 
 import { MasteryMeleeAttackRoll } from "./src/roll/mastery-melee-attack-roll.js";
@@ -195,6 +197,9 @@ Hooks.once("ready", () => {
     MasteryMeleeDialog,
     MasteryParser,
     MasteryCooldown,
+    MasteryMagicAttackRoll,
+    MasteryMagicDialog,
+
 
     EffectsPanel,
     EffectsDB,

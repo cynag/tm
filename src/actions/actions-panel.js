@@ -267,11 +267,14 @@ const row = $(`
     const type = m.mastery_type?.toLowerCase();
     const cls = m.mastery_class?.toLowerCase();
 
-    if (type === "action" && cls === "melee") {
-      await game.tm.MasteryMeleeDialog.show({ actor, mastery: m });
-    } else {
-      ui.notifications.info("Esse tipo de maestria ainda não é suportado.");
-    }
+    if (cls === "melee") {
+  await game.tm.MasteryMeleeDialog.show({ actor, mastery: m });
+} else if (cls === "magic") {
+  await game.tm.MasteryMagicDialog.show({ actor, mastery: m });
+} else {
+  ui.notifications.info("Esse tipo de maestria ainda não é suportado.");
+}
+
   });
 
   tbody.append(row);
