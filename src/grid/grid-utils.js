@@ -169,6 +169,8 @@ canStackItems(itemA, itemB) {
 },
 
 getAmmoSprite(item) {
+  if (!item || !item.system) return "";
+
   const sprites = item.system.ammo_sprites;
   const qty = item.system.ammo_quantity ?? 0;
   const max = item.system.stack_value ?? 1;
@@ -186,6 +188,7 @@ getAmmoSprite(item) {
 
   return item.img;
 },
+
 
 async tryStackItem(actor, item) {
   const isAmmo = item.type === "consumable" && item.system.category === "ammo";

@@ -11,6 +11,17 @@
 
   <!-- BODY -->
   <section class="sheet-body" style="padding: 10px; display: flex; flex-direction: column; gap: 16px;">
+<hr />
+<!-- SPRIT QUEBRADO -->
+<div style="display: flex; flex-direction: column; gap: 4px;">
+  <label>Sprite Quebrado:</label>
+  <div style="display: flex; align-items: center; gap: 6px;">
+    <input type="text" name="system.broken_sprite" value="{{item.system.broken_sprite}}" style="width: 100%;" />
+    <button type="button" class="file-picker" data-type="imagevideo" data-target="system.broken_sprite">
+      <i class="fas fa-file-image"></i>
+    </button>
+  </div>
+</div>
 
     <!-- GRID SIZE -->
     <div style="display: flex; gap: 20px;">
@@ -180,7 +191,8 @@
     <div>
       <label>Description:</label>
       <textarea name="system.description" rows="4">{{item.system.description}}</textarea>
-    </div>
+      </div>
+      
 {{#if (eq item.system.gear_type "armor")}}
   <hr />
   <h3>Armadura</h3>

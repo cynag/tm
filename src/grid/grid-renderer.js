@@ -160,7 +160,10 @@ if (pickup) {
         e.preventDefault();
         const slotId = slotEl.dataset.slotId;
         const actor = game.actors.get(pickup.actorId);
-        const item = actor.items.get(pickup.itemId);
+if (!actor) return; // ✅ evita erro fatal
+
+const item = actor.items.get(pickup.itemId);
+
         if (!actor || !item) return;
 
         const valid = game.tm.GearUtils.isValidForSlot(item, slotId);

@@ -25,6 +25,7 @@ export class TMObject extends Item {
       if (!gearTypes.includes(data.gear_type)) data.gear_type = "weapon";
 
       if (typeof data.subtype !== "string") data.subtype = "";
+      this.system.broken_sprite ??= "";
     }
 
     if (this.type === "gear" && this.system.gear_type === "armor") {
@@ -135,9 +136,20 @@ if (this.type === "trait") {
 }
 
 
+// Sprite quebrado (gear)
+if (this.type === "gear") {
+  const isBroken = this.system.armor_broken || this.system.weapon_broken;
+  const brokenSprite = this.system.broken_sprite;
+
+  if (isBroken && brokenSprite) {
+    this.img = brokenSprite;
+  }
+}
 
 
   }
+
+  
   async _preCreate(data, options, user) {
   const actor = this.parent;
   if (!actor) return super._preCreate(data, options, user);

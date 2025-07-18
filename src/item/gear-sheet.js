@@ -17,6 +17,8 @@ export class GearSheet extends foundry.appv1.sheets.ItemSheet {
     context.armorSubtypes = ["head", "torso", "legs", "foots", "shoulder", "hands"];
     context.accessorySubtypes = ["ring", "neck", "waist", "back"];
 
+    context.filePicker = true;
+
     return context;
   }
 
