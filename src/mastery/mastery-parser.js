@@ -43,10 +43,15 @@ export const MasteryParser = {
     // Remove anotação de multiplicador
     parsed = parsed.split("//")[0].trim();
 
-    // Substitui ND, NDp, NDi por valores reais dentro da fórmula
+// Substitui s.player_level por valor real do ator
+const playerLevel = actor.system?.player_level ?? 1;
+parsed = parsed.replace(/\bs\.player_level\b/g, playerLevel);
+
+// Substitui ND, NDp, NDi por valores reais dentro da fórmula
 parsed = parsed.replace(/\bNDp\b/g, ndp);
 parsed = parsed.replace(/\bNDi\b/g, ndi);
 parsed = parsed.replace(/\bND\b/g, nd);
+
 
 // ⚠️ Protege contra divisão por zero
 parsed = parsed.replace(/\/\s*0+/g, "/1");

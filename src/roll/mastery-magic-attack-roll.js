@@ -1,9 +1,6 @@
 import { MasteryParser } from "../mastery/mastery-parser.js";
 
 export async function rollMagicMastery({ attacker, targets = [], mastery, forcedDice }) {
-console.log("🧪 DEBUG ATTACKER:", attacker);
-console.log("🧪 DEBUG TARGETS:", targets);
-
 
   if (!attacker) {
   ui.notifications.warn("Você precisa selecionar um atacante.");
@@ -15,15 +12,11 @@ if (!Array.isArray(targets) || targets.length === 0) {
   return;
 }
 
-
-
-
   const actorSystem = attacker.system;
 
 for (const target of targets) {
   const targetSystem = target.actor?.system;
   if (!targetSystem) continue;
-
 
   const DieTerm = foundry.dice.terms.Die;
   const attackFormula = mastery.mastery_attack_formula || "direct";
@@ -68,6 +61,30 @@ let resultLabel = "Direto";
 let atkBonusTotal = 0;
 let dmgBonusTotal = 0;
 
+// 🎯 Avalia bônus das maestrias
+const bonusAtkRaw1 = await MasteryParser.evaluate(mastery.spell_attack_bonus, attacker, target.actor, "number", mastery.mastery_domain);
+const bonusAtkRaw2 = await MasteryParser.evaluate(mastery.spell_attack_bonus_2, attacker, target.actor, "number", mastery.mastery_domain);
+const bonusDmgRaw1 = await MasteryParser.evaluate(
+  mastery.spell_damage_bonus,
+  attacker,
+  target.actor,
+  mastery.spell_damage_bonus?.includes("d") ? "roll" : "number",
+  mastery.mastery_domain
+);
+const bonusDmgRaw2 = await MasteryParser.evaluate(
+  mastery.spell_damage_bonus_2,
+  attacker,
+  target.actor,
+  mastery.spell_damage_bonus_2?.includes("d") ? "roll" : "number",
+  mastery.mastery_domain
+);
+
+// ✅ Garante que são valores numéricos simples
+const bonusAtk = (bonusAtkRaw1?.value ?? 0) + (bonusAtkRaw2?.value ?? 0);
+const bonusDmg = (bonusDmgRaw1?.value ?? 0) + (bonusDmgRaw2?.value ?? 0);
+const bonusDmgRoll = [bonusDmgRaw1?.roll, bonusDmgRaw2?.roll].filter(r => r instanceof Roll);
+
+
 if (attackFormula === "default") {
   if (mastery.mastery_auto_hit === true) {
     hit = true;
@@ -84,11 +101,12 @@ if (attackFormula === "default") {
 
     const modDex = actorSystem.mod_dexterity ?? 0;
     const atkBonusElement = actorSystem.player_attack_bonus?.[selectedElement] ?? 0;
-    atkBonusTotal = modDex + atkBonusElement;
 
     const modArc = actorSystem.mod_arcana ?? 0;
     const dmgBonusElement = actorSystem.player_damage_bonus?.[selectedElement] ?? 0;
-    dmgBonusTotal = modArc + dmgBonusElement;
+
+atkBonusTotal = modDex + atkBonusElement + bonusAtk;
+dmgBonusTotal = modArc + dmgBonusElement + bonusDmg;
 
     atkTotal = atkRoll.total + atkBonusTotal;
     const ref = targetSystem.player_reflex ?? 10;
@@ -138,6 +156,19 @@ if (hit) {
   const dmgDiceObjs = [];
 if (dmgRoll) {
   for (const term of dmgRoll.terms) {
+    if (term instanceof DieTerm) {
+      for (const r of term.results) {
+        dmgDiceObjs.push({
+          result: r.result,
+          faces: term.faces,
+          type: "elemental"
+        });
+      }
+    }
+  }
+}
+for (const roll of bonusDmgRoll) {
+  for (const term of roll.terms) {
     if (term instanceof DieTerm) {
       for (const r of term.results) {
         dmgDiceObjs.push({
