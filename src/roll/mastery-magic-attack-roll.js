@@ -96,16 +96,25 @@ if (attackFormula === "default") {
   else resultLabel = hit ? "Comum" : "Falha";
 }
 
-    const dmgResult = await MasteryParser.evaluate(damageFormula, attacker, target.actor, "roll", mastery.mastery_domain);
-    const dmgBase = dmgResult?.value ?? 0;
-    const dmgRoll = dmgResult?.roll;
-    const resist = targetSystem.resistances?.[selectedElement] ?? 0;
-    let rawDamage = dmgBase + dmgBonusTotal - resist;
-let finalDamage = hit
-  ? (targetSystem.mod_protection >= rawDamage
-      ? Math.max(1, Math.floor(rawDamage / 2))
-      : Math.max(1, Math.floor(rawDamage)))
-  : 0;
+let dmgResult = null;
+let dmgBase = 0;
+let dmgRoll = null;
+let resist = 0;
+let rawDamage = 0;
+let finalDamage = 0;
+
+if (hit) {
+  dmgResult = await MasteryParser.evaluate(damageFormula, attacker, target.actor, "roll", mastery.mastery_domain);
+  dmgBase = dmgResult?.value ?? 0;
+  dmgRoll = dmgResult?.roll;
+  resist = targetSystem.resistances?.[selectedElement] ?? 0;
+  rawDamage = dmgBase + dmgBonusTotal - resist;
+
+  finalDamage = (targetSystem.mod_protection >= rawDamage)
+    ? Math.max(1, Math.floor(rawDamage / 2))
+    : Math.max(1, Math.floor(rawDamage));
+}
+
 
 
 
@@ -190,7 +199,7 @@ const tmDetailsHTML = `
 </div>
 
 <!-- Dados de dano -->
-${dmgRoll ? `
+${hit && dmgRoll ? `
   <div class="dice-tray" style="display: flex; justify-content: center; gap: 6px; margin: 4px 0 6px 0; flex-wrap: wrap; max-width: 320px; margin-left: auto; margin-right: auto;">
     ${dmgDiceObjs.map(die => {
       const eleClass = `dice-${elementClass}`;
@@ -308,25 +317,30 @@ ${dmgRoll ? `
       </span>
     </div>
 
-    <div class="tm-row tm-damage" style="gap: 8px; justify-content: center;">
-      <span style="font-weight: bold;">Dano</span>
-      <div style="
-        position: relative;
-        width: 32px;
-        height: 32px;
-        background-image: url('systems/tm/styles/assets/ui/hex-2.svg');
-        background-size: cover;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        text-shadow: 1px 1px 2px black;
-        font-weight: bold;
-      ">
-        ${finalDamage}
-      </div>
-      <span style="text-transform: lowercase;">${selectedElement}</span>
-    </div>
+    
+    
+
+    ${hit ? `
+<div class="tm-row tm-damage" style="gap: 8px; justify-content: center;">
+  <span style="font-weight: bold;">Dano</span>
+  <div style="
+    position: relative;
+    width: 32px;
+    height: 32px;
+    background-image: url('systems/tm/styles/assets/ui/hex-2.svg');
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+    font-weight: bold;
+  ">
+    ${finalDamage}
+  </div>
+  <span style="text-transform: capitalize;">${elementClass}</span>
+
+</div>` : ""}
 
     ${tmDetailsHTML}
   </div>`;
@@ -334,36 +348,46 @@ ${dmgRoll ? `
 
   // 🧾 Mensagem final
   const msgContent = `
-  <div class="chat-roll" style="font-family: var(--font-primary); font-size: 1.1em;">
-    <div class="chat-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-      <img class="chat-img" src="${mastery.mastery_img}" width="35" height="35" style="border:1px solid #555; border-radius:4px;" />
-      <div>
-        <h2 class="chat-roll-name" style="margin: 0 0 4px 0; font-size: 16px;">${mastery.mastery_name}</h2>
-        <div class="chat-tags" style="text-align: right;">
-          <div style="margin-bottom: 2px;"><span class="tag">${{
-            action: "AÇÃO", conjuration: "CONJURAÇÃO", reaction: "REAÇÃO", stance: "POSTURA", passive: "PASSIVA"
-          }[mastery.mastery_type] || mastery.mastery_type}</span></div>
-          <div style="margin-bottom: 2px;">
-            <span class="tag">${mastery.mastery_cost || "–"} PA</span>
-            <span class="tag">CD ${mastery.mastery_cd || "–"}</span>
-          </div>
-          <div style="margin-bottom: 2px;"><span class="tag">${damageFormula} ${selectedElement}</span></div>
-          <div style="margin-bottom: 2px;"><span class="tag">${mastery.mastery_range || "–"}m</span></div>
-          <div style="margin-bottom: 2px;"><span class="tag">🎯 ${target.name}</span></div>
-        </div>
+<div class="chat-roll" style="font-family: var(--font-primary); font-size: 1.1em;">
+  <div class="chat-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+    <img class="chat-img" src="${mastery.mastery_img}" width="35" height="35" style="border:1px solid #555; border-radius:4px;" />
+    <div>
+      <h2 class="chat-roll-name" style="margin: 0 0 4px 0; font-size: 16px;">${mastery.mastery_name}</h2>
+
+      <!-- Linha 1: Tipo, PA, CD -->
+      <div class="chat-tags" style="display: flex; gap: 4px; justify-content: flex-end; margin-bottom: 2px;">
+        <span class="tag">${{
+          action: "AÇÃO", conjuration: "CONJURAÇÃO", reaction: "REAÇÃO", stance: "POSTURA", passive: "PASSIVA"
+        }[mastery.mastery_type] || mastery.mastery_type}</span>
+        <span class="tag">${mastery.mastery_cost || "–"} PA</span>
+        <span class="tag">CD ${mastery.mastery_cd || "–"}</span>
+        <span class="tag">${mastery.mastery_range || "–"}m</span>
       </div>
+
+      <!-- Linha 2: Dano e Alcance -->
+      <div  class="chat-tags" style="display: flex; gap: 4px; justify-content: flex-end; margin-bottom: 2px;">
+        <span class="tag">${damageFormula} ${elementMap[selectedElement] || selectedElement}</span>
+        <span class="tag">🎯 ${target.name}</span>
+      </div>
+  
     </div>
-    <div class="chat-description" style="font-size: 13px; color: var(--color-text-light); margin-bottom: 8px;">
-      ${mastery.mastery_description || "<i>Sem descrição</i>"}
-    </div>
-    ${outcomeHTML}
-  </div>`;
+  </div>
+
+
+  <div class="chat-description" style="font-size: 13px; color: var(--color-text-light); margin-bottom: 8px;">
+    ${mastery.mastery_description || "<i>Sem descrição</i>"}
+  </div>
+  
+  ${outcomeHTML}
+</div>`;
+
 
   await ChatMessage.create({
     user: game.user.id,
     speaker: ChatMessage.getSpeaker({ actor: attacker }),
     flavor: msgContent,
-    rolls: [atkRoll, dmgRoll].filter(Boolean)
+    rolls: hit ? [atkRoll, dmgRoll].filter(Boolean) : [atkRoll]
+
 
   });
 

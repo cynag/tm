@@ -612,27 +612,26 @@ console.log("🧪 atkBonus - fixed1 - fixed2:", atkBonus - fixed1 - fixed2);
         <div>
         <h2 class="chat-roll-name" style="margin: 0 0 4px 0; font-size: 16px;">${mastery.mastery_name} <span style="font-weight: normal;">(${item.name})</span></h2>
         
-  <div class="chat-tags"style="text-align: right;">
-
-    <!-- Linha 1: Tipo da Maestria -->
-    <div style="margin-bottom: 2px;">
-    <span class="tag">
-     ${{
+  <div class="chat-tags" style="text-align: right; display: flex; flex-direction: column; gap: 2px;">
+  
+  <!-- Linha 1: Tipo, PA, CD -->
+  <div style="display: flex; gap: 4px; justify-content: flex-end;">
+    <span class="tag">${
+      {
         action: "AÇÃO",
         reaction: "REAÇÃO",
         conjuration: "CONJURAÇÃO",
         stance: "POSTURA",
         passive: "PASSIVA"
-        }[mastery.mastery_type] || mastery.mastery_type}
-      </span>
-    </div>
+      }[mastery.mastery_type] || mastery.mastery_type
+    }</span>
+    <span class="tag">${mastery.mastery_cost || "–"} PA</span>
+    <span class="tag">CD ${mastery.mastery_cd || "–"}</span>
+    <span class="tag">${item.system.weapon_range || "–"}m</span>
+  </div>
 
-    <div style="margin-bottom: 2px;">
-  <span class="tag">${mastery.mastery_cost || "–"} PA</span>
-  <span class="tag">CD ${mastery.mastery_cd || "–"}</span>
-</div>  
-    <!-- Linha 2: Dano -->
-    <div style="margin-bottom: 2px;">
+  <!-- Linha 2: Dano base + dano elemental -->
+  <div style="display: flex; gap: 4px; justify-content: flex-end;">
     ${(() => {
       const raw = item.system.weapon_damage || "1d2";
       const match = raw.match(/^(.+?)\{\{(.+?)\}\}$/);
@@ -654,23 +653,11 @@ console.log("🧪 atkBonus - fixed1 - fixed2:", atkBonus - fixed1 - fixed2);
 
       return tags.join(" ");
     })()}
-    </div>
+    <span class="tag">🎯 ${target.name}</span>
+  </div>
 
-    <!-- Linha 3: Alcance -->
-    <div style="margin-bottom: 2px;">
-      <span class="tag">${item.system.weapon_range || "–"}m</span>
-    </div>
+</div>
 
-    <!-- Linha 4: Traços -->
-    <div style="margin-bottom: 2px;">
-      ${traitLabels.map(t => `<span class="tag">${t}</span>`).join(" ")}
-    </div>
-
-    <!-- Linha 5: Alvo -->
-    <div style="margin-bottom: 2px;">
-      <span class="tag">🎯 ${target.name}</span>
-    </div>
-    </div>
 
 
         </div>

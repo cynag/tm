@@ -5359,3 +5359,27 @@ h4.dice-total {
   z-index: 99;
 }
 
+.chat-tags {
+  width:225px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 3px !important;
+  justify-content: flex-end !important;
+  margin-bottom: 2px !important;
+}
+
+.chat-tags .tag {
+  border-radius: 4px !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  max-height:24px !important;
+  padding-bottom:20px !important;
+}
+
+.chat-description{
+  color:#650f0f !important;
+  font-style:italic !important;
+  text-align: justify !important;
+  text-justify: inter-word !important;
+  line-height: 14px;
+}
