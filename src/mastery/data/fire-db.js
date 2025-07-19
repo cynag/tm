@@ -66,10 +66,10 @@ const FireDB = [
     mastery_attack_formula: "default",
     mastery_damage_formula: "1d4",
     mastery_element: "fire",
-    spell_attack_bonus: "+1d2/NDi", 
-    spell_attack_bonus_2: "+1d2/NDi",
-    spell_damage_bonus: "+1d2/NDi", 
-    spell_damage_bonus_2: "+1d2/NDi", 
+    spell_attack_bonus: "+1d2/NP", 
+    spell_attack_bonus_2: "+1d2/NP",
+    spell_damage_bonus: "+1d2/NP", 
+    spell_damage_bonus_2: "+1d2/NP", 
     spell_extra: ""
   },
       {

@@ -60,14 +60,6 @@ export async function rollMagicMastery({ attacker, targets = [], mastery, forced
 
 
 
-if (mastery.spell_attack_bonus?.includes("d")) {
-  const r = await MasteryParser.evaluate(mastery.spell_attack_bonus, attacker, target.actor, "roll", mastery.mastery_domain);
-  if (r?.roll) bonusAtkRolls.push(r.roll);
-}
-if (mastery.spell_attack_bonus_2?.includes("d")) {
-  const r = await MasteryParser.evaluate(mastery.spell_attack_bonus_2, attacker, target.actor, "roll", mastery.mastery_domain);
-  if (r?.roll) bonusAtkRolls.push(r.roll);
-}
 
 if (mastery.spell_damage_bonus?.includes("d")) {
   const r = await MasteryParser.evaluate(mastery.spell_damage_bonus, attacker, target.actor, "roll", mastery.mastery_domain);
@@ -167,8 +159,40 @@ atkDiceTotal = atkRoll.total + atkBonusRollTotal;
     isCrit = false;
   }
 
-    else resultLabel = hit ? "Comum" : "Falha";
+    else resultLabel = hit ? "Comum" : "Comum";
   }
+}
+if (hit) {
+  if (mastery.spell_attack_bonus?.includes("d")) {
+    const r = await MasteryParser.evaluate(mastery.spell_attack_bonus, attacker, target.actor, "roll", mastery.mastery_domain);
+    if (r?.roll) bonusAtkRolls.push(r.roll);
+  }
+  if (mastery.spell_attack_bonus_2?.includes("d")) {
+    const r = await MasteryParser.evaluate(mastery.spell_attack_bonus_2, attacker, target.actor, "roll", mastery.mastery_domain);
+    if (r?.roll) bonusAtkRolls.push(r.roll);
+  }
+
+  // 🔢 Recalcula soma dos dados de ataque com os bônus agora
+  const atkBonusRollTotal = bonusAtkRolls.reduce((sum, r) => sum + (r.total ?? 0), 0);
+  atkDiceTotal = atkRoll.total + atkBonusRollTotal;
+
+  // Lê os dados para exibição
+  for (const roll of bonusAtkRolls) {
+    if (!roll) continue;
+    for (const term of roll.terms) {
+      if (term instanceof DieTerm) {
+        for (const r of term.results) {
+          atkBonusDiceObjs.push({
+            result: r.result,
+            faces: term.faces,
+            isExtra: true
+          });
+        }
+      }
+    }
+  }
+
+  atkTotal = atkDiceTotal + atkBonusTotal;
 }
 
 
