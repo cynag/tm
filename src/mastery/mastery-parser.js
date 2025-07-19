@@ -57,21 +57,26 @@ export const MasteryParser = {
     parsed = parsed.replace(/\bNPi\b/g, npi);
     parsed = parsed.replace(/\bNP\b/g, np);
 
-    // Proteção contra /0
-    parsed = parsed.replace(/\/\s*0+/g, "/1");
+
 
     // ROLAGEM
     if (mode === "roll" && parsed.includes("d")) {
       const formula = parsed.replace(/(\+|-)?\s*(\d*)d(\d+)\s*\/\s*(NDp|NDi|ND|NPp|NPi|NP|\d+)/g, (_, sign, qtd, faces, divisorKey) => {
       const base = Number(qtd || 1);
-      const divValue = {
-        NDp: ndp, NDi: ndi, ND: nd,
-        NPp: npp, NPi: npi, NP: np
-      }[divisorKey] ?? Number(divisorKey || 1);
+      let divValue = {
+      NDp: ndp, NDi: ndi, ND: nd,
+      NPp: npp, NPi: npi, NP: np
+    }[divisorKey];
 
-      const total = base * divValue;
-      if (total <= 0) return "";
-      return `${sign || ""}${total}d${faces}`;
+    if (divValue === undefined) {
+      const num = Number(divisorKey);
+      divValue = isNaN(num) ? 1 : num; // só usa número se válido
+    }
+
+
+    if (!divValue || divValue <= 0) return ""; // 🔒 ND ainda não libera dado
+    const total = base * divValue;
+    return `${sign || ""}${total}d${faces}`;
     });
 
 

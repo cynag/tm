@@ -50,6 +50,8 @@ export async function rollMagicMastery({ attacker, targets = [], mastery, forced
     let atkBonusTotal = 0;
     let dmgBonusTotal = 0;
     let atkDiceTotal = 0;
+    let isCrit = false;
+    let isMutilation = false;
 
     const bonusAtkRolls = [];
     const bonusDmgRolls = [];
@@ -149,10 +151,22 @@ atkDiceTotal = atkRoll.total + atkBonusRollTotal;
     const count6 = first3.filter(d => d.result === 6).length;
     const count1 = first3.filter(d => d.result === 1).length;
 
-    if (count6 === 3) resultLabel = "MUTILAÇÃO!";
-    else if (count6 === 2) resultLabel = "Crítico";
-    else if (count1 === 3) resultLabel = "Catastrófica";
-    else if (count1 === 2) resultLabel = "Crítica";
+  if (count6 === 3) {
+    resultLabel = "MUTILAÇÃO!";
+    isMutilation = true;
+    isCrit = true;
+  } else if (count6 === 2) {
+    resultLabel = "Crítico";
+    isCrit = true;
+  }
+  else if (count1 === 3) {
+    resultLabel = "Catastrófica";
+    isCrit = false;
+  } else if (count1 === 2) {
+    resultLabel = "Crítica";
+    isCrit = false;
+  }
+
     else resultLabel = hit ? "Comum" : "Falha";
   }
 }
@@ -173,7 +187,15 @@ dmgBase = (dmgResult?.value ?? 0) + dmgBonusRollTotal;
 
   dmgRoll = dmgResult?.roll;
   resist = targetSystem.resistances?.[selectedElement] ?? 0;
-  rawDamage = dmgBase + dmgBonusTotal - resist;
+  if (isMutilation) {
+  rawDamage = dmgBase * 3 + dmgBonusTotal - resist;
+  } else if (isCrit) {
+    rawDamage = dmgBase * 2 + dmgBonusTotal - resist;
+  } else {
+    rawDamage = dmgBase + dmgBonusTotal - resist;
+  }
+
+
 
   finalDamage = (targetSystem.mod_protection >= rawDamage)
     ? Math.max(1, Math.floor(rawDamage / 2))
@@ -331,7 +353,13 @@ ${dmgRoll ? `
     <div style="display: flex; justify-content: space-between;">
       <span>Dados de Dano (${elementClass}):</span>
 
-      <span>${dmgBase}</span>
+      <span>${
+  isMutilation ? `${dmgBase} × 3 = ${dmgBase * 3}` :
+  isCrit ? `${dmgBase} × 2 = ${dmgBase * 2}` :
+  dmgBase
+}</span>
+
+
 
     </div>
 
