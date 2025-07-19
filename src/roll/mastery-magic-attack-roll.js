@@ -1,77 +1,62 @@
 import { MasteryParser } from "../mastery/mastery-parser.js";
 
 export async function rollMagicMastery({ attacker, targets = [], mastery, forcedDice }) {
-console.log("🧪 DEBUG ATTACKER:", attacker);
-console.log("🧪 DEBUG TARGETS:", targets);
 
+  const DieTerm = foundry.dice.terms.Die;
 
   if (!attacker) {
-  ui.notifications.warn("Você precisa selecionar um atacante.");
-  return;
-}
+    ui.notifications.warn("Você precisa selecionar um atacante.");
+    return;
+  }
 
-if (!Array.isArray(targets) || targets.length === 0) {
-  ui.notifications.warn("Você precisa selecionar ao menos um alvo.");
-  return;
-}
-
-
-
+  if (!Array.isArray(targets) || targets.length === 0) {
+    ui.notifications.warn("Você precisa selecionar ao menos um alvo.");
+    return;
+  }
 
   const actorSystem = attacker.system;
 
-for (const target of targets) {
-  const targetSystem = target.actor?.system;
-  if (!targetSystem) continue;
+  for (const target of targets) {
+    const targetSystem = target.actor?.system;
+    if (!targetSystem) continue;
+
+    const attackFormula = mastery.mastery_attack_formula || "direct";
+    const damageFormula = mastery.mastery_damage_formula || "0";
+    const rawElement = mastery.mastery_element?.toLowerCase() || "fire";
+
+    const elementMap = {
+      fire: "fogo", ice: "gelo", electric: "eletrico", poison: "veneno",
+      acid: "acido", psychic: "mental", radiant: "radiante",
+      necrotic: "necrotico", chaotic: "caotico"
+    };
+
+    const elementOptions = rawElement.split("||").map(e => e.trim());
+    let selectedElement = elementOptions[0];
+    let highestBonus = -999;
+    for (let elem of elementOptions) {
+      const bonus = actorSystem.player_damage_bonus?.[elem] ?? 0;
+      if (bonus > highestBonus) {
+        highestBonus = bonus;
+        selectedElement = elem;
+      }
+    }
+
+    const elementClass = elementMap[selectedElement] || selectedElement;
+
+    let hit = true;
+    let atkRoll = null;
+    let atkTotal = "–";
+    let resultLabel = "Direto";
+    let atkBonusTotal = 0;
+    let dmgBonusTotal = 0;
+    let atkDiceTotal = 0;
+
+    const bonusAtkRolls = [];
+    const bonusDmgRolls = [];
+
+    const atkBonusDiceObjs = []; // 
 
 
-  const DieTerm = foundry.dice.terms.Die;
-  const attackFormula = mastery.mastery_attack_formula || "direct";
-  const damageFormula = mastery.mastery_damage_formula || "0";
-  
-  const rawElement = mastery.mastery_element?.toLowerCase() || "fire";
-
-// 🧪 Tabela de tradução de banco de dados → classe CSS
-const elementMap = {
-  fire: "fogo",
-  ice: "gelo",
-  electric: "eletrico",
-  poison: "veneno",
-  acid: "acido",
-  psychic: "mental",
-  radiant: "radiante",
-  necrotic: "necrotico",
-  chaotic: "caotico"
-};
-
-// 🧪 Escolhe o melhor bônus elemental disponível
-const elementOptions = rawElement.split("||").map(e => e.trim());
-let selectedElement = elementOptions[0];
-let highestBonus = -999;
-for (let elem of elementOptions) {
-  const bonus = actorSystem.player_damage_bonus?.[elem] ?? 0;
-  if (bonus > highestBonus) {
-    highestBonus = bonus;
-    selectedElement = elem;
-  }
-}
-
-// 🔥 Corrige para a classe CSS correspondente
-const elementClass = elementMap[selectedElement] || selectedElement;
-
-
-  // 🎲 Avalia dano
-  let hit = true;
-let atkRoll = null;
-let atkTotal = "–";
-let resultLabel = "Direto";
-let atkBonusTotal = 0;
-let dmgBonusTotal = 0;
-let atkDiceTotal = 0;
-
-// 🎯 Avalia bônus em dados das maestrias (apenas rolagens)
-const bonusAtkRolls = [];
-const bonusDmgRolls = [];
 
 if (mastery.spell_attack_bonus?.includes("d")) {
   const r = await MasteryParser.evaluate(mastery.spell_attack_bonus, attacker, target.actor, "roll", mastery.mastery_domain);
@@ -106,22 +91,49 @@ if (attackFormula === "default") {
     atkRoll = baseRoll;
 // 🔢 Soma dos dados extras de ataque
 const atkBonusRollTotal = bonusAtkRolls.reduce((sum, r) => sum + (r.total ?? 0), 0);
-const atkFixed1 = (await MasteryParser.evaluate(mastery.spell_attack_bonus, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0;
-const atkFixed2 = (await MasteryParser.evaluate(mastery.spell_attack_bonus_2, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0;
+const atkFixed1 = !mastery.spell_attack_bonus?.includes("d") 
+  ? (await MasteryParser.evaluate(mastery.spell_attack_bonus, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0 
+  : 0;
+
+const atkFixed2 = !mastery.spell_attack_bonus_2?.includes("d") 
+  ? (await MasteryParser.evaluate(mastery.spell_attack_bonus_2, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0 
+  : 0;
 
     const modDex = actorSystem.mod_dexterity ?? 0;
     const atkBonusElement = actorSystem.player_attack_bonus?.[selectedElement] ?? 0;
     atkBonusTotal = modDex + atkBonusElement + (atkFixed1 || 0) + (atkFixed2 || 0);
 
-    const dmgFixed1 = (await MasteryParser.evaluate(mastery.spell_damage_bonus, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0;
-    const dmgFixed2 = (await MasteryParser.evaluate(mastery.spell_damage_bonus_2, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0;
+const dmgFixed1 = !mastery.spell_damage_bonus?.includes("d") 
+  ? (await MasteryParser.evaluate(mastery.spell_damage_bonus, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0 
+  : 0;
+
+const dmgFixed2 = !mastery.spell_damage_bonus_2?.includes("d") 
+  ? (await MasteryParser.evaluate(mastery.spell_damage_bonus_2, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0 
+  : 0;
 
     const modArc = actorSystem.mod_arcana ?? 0;
     const dmgBonusElement = actorSystem.player_damage_bonus?.[selectedElement] ?? 0;
     dmgBonusTotal = modArc + dmgBonusElement + (dmgFixed1 || 0) + (dmgFixed2 || 0);
 
 
-    atkDiceTotal = atkRoll.total + atkBonusRollTotal;
+    // Força leitura dos dados dos bonusAtkRolls
+for (const roll of bonusAtkRolls) {
+  if (!roll) continue;
+  for (const term of roll.terms) {
+    if (term instanceof DieTerm) {
+      for (const r of term.results) {
+        atkBonusDiceObjs.push({
+          result: r.result,
+          faces: term.faces,
+          isExtra: true
+        });
+      }
+    }
+  }
+}
+
+atkDiceTotal = atkRoll.total + atkBonusRollTotal;
+
 
     atkTotal = atkDiceTotal + atkBonusTotal;
 
@@ -129,7 +141,6 @@ const atkFixed2 = (await MasteryParser.evaluate(mastery.spell_attack_bonus_2, at
     const ref = targetSystem.player_reflex ?? 10;
     hit = atkTotal > ref;
 
-    const DieTerm = foundry.dice.terms.Die;
     const first3 = atkRoll.terms
       .filter(t => t instanceof DieTerm)
       .flatMap(t => t.results)
@@ -186,22 +197,7 @@ if (dmgRoll) {
     }
   }
 }
-// 🎲 Dados visuais bônus de ataque
-const atkBonusDiceObjs = [];
-for (const roll of bonusAtkRolls) {
-  if (!roll) continue;
-  for (const term of roll.terms) {
-    if (term instanceof DieTerm) {
-      for (const r of term.results) {
-        atkBonusDiceObjs.push({
-          result: r.result,
-          faces: term.faces,
-          isExtra: true // força visual laranja
-        });
-      }
-    }
-  }
-}
+
 
 // 🔁 Renderiza dados bônus de dano
 for (const roll of bonusDmgRolls) {
