@@ -1,6 +1,9 @@
 import { MasteryParser } from "../mastery/mastery-parser.js";
 
 export async function rollMagicMastery({ attacker, targets = [], mastery, forcedDice }) {
+console.log("🧪 DEBUG ATTACKER:", attacker);
+console.log("🧪 DEBUG TARGETS:", targets);
+
 
   if (!attacker) {
   ui.notifications.warn("Você precisa selecionar um atacante.");
@@ -12,11 +15,15 @@ if (!Array.isArray(targets) || targets.length === 0) {
   return;
 }
 
+
+
+
   const actorSystem = attacker.system;
 
 for (const target of targets) {
   const targetSystem = target.actor?.system;
   if (!targetSystem) continue;
+
 
   const DieTerm = foundry.dice.terms.Die;
   const attackFormula = mastery.mastery_attack_formula || "direct";
@@ -60,30 +67,29 @@ let atkTotal = "–";
 let resultLabel = "Direto";
 let atkBonusTotal = 0;
 let dmgBonusTotal = 0;
+let atkDiceTotal = 0;
 
-// 🎯 Avalia bônus das maestrias
-const bonusAtkRaw1 = await MasteryParser.evaluate(mastery.spell_attack_bonus, attacker, target.actor, "number", mastery.mastery_domain);
-const bonusAtkRaw2 = await MasteryParser.evaluate(mastery.spell_attack_bonus_2, attacker, target.actor, "number", mastery.mastery_domain);
-const bonusDmgRaw1 = await MasteryParser.evaluate(
-  mastery.spell_damage_bonus,
-  attacker,
-  target.actor,
-  mastery.spell_damage_bonus?.includes("d") ? "roll" : "number",
-  mastery.mastery_domain
-);
-const bonusDmgRaw2 = await MasteryParser.evaluate(
-  mastery.spell_damage_bonus_2,
-  attacker,
-  target.actor,
-  mastery.spell_damage_bonus_2?.includes("d") ? "roll" : "number",
-  mastery.mastery_domain
-);
+// 🎯 Avalia bônus em dados das maestrias (apenas rolagens)
+const bonusAtkRolls = [];
+const bonusDmgRolls = [];
 
-// ✅ Garante que são valores numéricos simples
-const bonusAtk = (bonusAtkRaw1?.value ?? 0) + (bonusAtkRaw2?.value ?? 0);
-const bonusDmg = (bonusDmgRaw1?.value ?? 0) + (bonusDmgRaw2?.value ?? 0);
-const bonusDmgRoll = [bonusDmgRaw1?.roll, bonusDmgRaw2?.roll].filter(r => r instanceof Roll);
+if (mastery.spell_attack_bonus?.includes("d")) {
+  const r = await MasteryParser.evaluate(mastery.spell_attack_bonus, attacker, target.actor, "roll", mastery.mastery_domain);
+  if (r?.roll) bonusAtkRolls.push(r.roll);
+}
+if (mastery.spell_attack_bonus_2?.includes("d")) {
+  const r = await MasteryParser.evaluate(mastery.spell_attack_bonus_2, attacker, target.actor, "roll", mastery.mastery_domain);
+  if (r?.roll) bonusAtkRolls.push(r.roll);
+}
 
+if (mastery.spell_damage_bonus?.includes("d")) {
+  const r = await MasteryParser.evaluate(mastery.spell_damage_bonus, attacker, target.actor, "roll", mastery.mastery_domain);
+  if (r?.roll) bonusDmgRolls.push(r.roll);
+}
+if (mastery.spell_damage_bonus_2?.includes("d")) {
+  const r = await MasteryParser.evaluate(mastery.spell_damage_bonus_2, attacker, target.actor, "roll", mastery.mastery_domain);
+  if (r?.roll) bonusDmgRolls.push(r.roll);
+}
 
 if (attackFormula === "default") {
   if (mastery.mastery_auto_hit === true) {
@@ -98,17 +104,28 @@ if (attackFormula === "default") {
     const baseRoll = new Roll(`${totalDice}d6`);
     await baseRoll.evaluate();
     atkRoll = baseRoll;
+// 🔢 Soma dos dados extras de ataque
+const atkBonusRollTotal = bonusAtkRolls.reduce((sum, r) => sum + (r.total ?? 0), 0);
+const atkFixed1 = (await MasteryParser.evaluate(mastery.spell_attack_bonus, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0;
+const atkFixed2 = (await MasteryParser.evaluate(mastery.spell_attack_bonus_2, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0;
 
     const modDex = actorSystem.mod_dexterity ?? 0;
     const atkBonusElement = actorSystem.player_attack_bonus?.[selectedElement] ?? 0;
+    atkBonusTotal = modDex + atkBonusElement + (atkFixed1 || 0) + (atkFixed2 || 0);
+
+    const dmgFixed1 = (await MasteryParser.evaluate(mastery.spell_damage_bonus, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0;
+    const dmgFixed2 = (await MasteryParser.evaluate(mastery.spell_damage_bonus_2, attacker, target.actor, "number", mastery.mastery_domain))?.value ?? 0;
 
     const modArc = actorSystem.mod_arcana ?? 0;
     const dmgBonusElement = actorSystem.player_damage_bonus?.[selectedElement] ?? 0;
+    dmgBonusTotal = modArc + dmgBonusElement + (dmgFixed1 || 0) + (dmgFixed2 || 0);
 
-atkBonusTotal = modDex + atkBonusElement + bonusAtk;
-dmgBonusTotal = modArc + dmgBonusElement + bonusDmg;
 
-    atkTotal = atkRoll.total + atkBonusTotal;
+    atkDiceTotal = atkRoll.total + atkBonusRollTotal;
+
+    atkTotal = atkDiceTotal + atkBonusTotal;
+
+
     const ref = targetSystem.player_reflex ?? 10;
     hit = atkTotal > ref;
 
@@ -140,7 +157,9 @@ let finalDamage = 0;
 
 if (hit) {
   dmgResult = await MasteryParser.evaluate(damageFormula, attacker, target.actor, "roll", mastery.mastery_domain);
-  dmgBase = dmgResult?.value ?? 0;
+  const dmgBonusRollTotal = bonusDmgRolls.reduce((sum, r) => sum + (r.total ?? 0), 0);
+dmgBase = (dmgResult?.value ?? 0) + dmgBonusRollTotal;
+
   dmgRoll = dmgResult?.roll;
   resist = targetSystem.resistances?.[selectedElement] ?? 0;
   rawDamage = dmgBase + dmgBonusTotal - resist;
@@ -167,7 +186,25 @@ if (dmgRoll) {
     }
   }
 }
-for (const roll of bonusDmgRoll) {
+// 🎲 Dados visuais bônus de ataque
+const atkBonusDiceObjs = [];
+for (const roll of bonusAtkRolls) {
+  if (!roll) continue;
+  for (const term of roll.terms) {
+    if (term instanceof DieTerm) {
+      for (const r of term.results) {
+        atkBonusDiceObjs.push({
+          result: r.result,
+          faces: term.faces,
+          isExtra: true // força visual laranja
+        });
+      }
+    }
+  }
+}
+
+// 🔁 Renderiza dados bônus de dano
+for (const roll of bonusDmgRolls) {
   for (const term of roll.terms) {
     if (term instanceof DieTerm) {
       for (const r of term.results) {
@@ -239,7 +276,7 @@ const tmDetailsHTML = `
       }
     }
   }
-    return atkDiceObjs.map(die => `
+    return [...atkDiceObjs, ...atkBonusDiceObjs].map(die => `
       <div class="dice-icon${die.isExtra ? ' dice-extra' : ''}">
         <div class="dice-bg" style="background-image: url('systems/tm/styles/assets/dices/d${die.faces}.svg');"></div>
         <div class="dice-number${die.isExtra ? ' dice-extra' : ''}">${die.result}</div>
@@ -269,7 +306,9 @@ ${atkRoll ? `
 
   <div style="display: flex; justify-content: space-between;">
     <span>Dados de Ataque:</span>
-    <span>${atkRoll.total}</span>
+<span>${atkDiceTotal}</span>
+
+
   </div>
 
   ${atkBonusTotal !== 0 ? `
@@ -296,7 +335,8 @@ ${dmgRoll ? `
     <div style="display: flex; justify-content: space-between;">
       <span>Dados de Dano (${elementClass}):</span>
 
-      <span>${dmgRoll.total}</span>
+      <span>${dmgBase}</span>
+
     </div>
 
       ${dmgBonusTotal !== 0 ? `
