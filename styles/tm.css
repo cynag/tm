@@ -5140,7 +5140,7 @@ h4.dice-total {
 
 .dice-tray{
   margin-bottom:14px !important; 
-  margin-top:4% !important; 
+  margin-top:-4% !important; 
 }
 
 .details-attack,

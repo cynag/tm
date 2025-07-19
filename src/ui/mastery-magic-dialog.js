@@ -38,42 +38,52 @@ export class MasteryMagicDialog {
         confirm: {
           icon: '<i class="fas fa-fire"></i>',
           label: "Conjurar Maestria",
+
           callback: async () => {
-            const target = Array.from(game.user.targets)[0];
-            if (!target) {
-              ui.notifications.warn("Você precisa selecionar um alvo.");
-              return;
-            }
+  const selectedTargets = Array.from(game.user.targets);
+  const maxTargets = mastery.mastery_targets;
 
-            const cdKey = {
-              mastery_domain: mastery.mastery_domain ?? "unknown",
-              mastery_name: mastery.mastery_name ?? "unnamed",
-              mastery_nd: mastery.mastery_nd ?? "nd0"
-            };
+  if (!selectedTargets.length) {
+    ui.notifications.warn("Você precisa selecionar ao menos um alvo.");
+    return;
+  }
 
-            if (game.tm.MasteryCooldown.isOnCooldown(actor, cdKey)) {
-              const turns = game.tm.MasteryCooldown.getRemaining(actor, cdKey);
-              ui.notifications.warn(`"${cdKey.mastery_name}" ainda está em recarga por ${turns} turno(s).`);
-              return;
-            }
+  if (maxTargets !== "all" && selectedTargets.length > maxTargets) {
+    ui.notifications.warn(`Essa maestria permite no máximo ${maxTargets} alvo(s).`);
+    return;
+  }
 
-            await MasteryMagicAttackRoll.roll({
-              attacker: actor,
-              target,
-              mastery,
-              forcedDice: diceCountRef.value
-            });
+  const cdKey = {
+    mastery_domain: mastery.mastery_domain ?? "unknown",
+    mastery_name: mastery.mastery_name ?? "unnamed",
+    mastery_nd: mastery.mastery_nd ?? "nd0"
+  };
 
-            const cd = mastery.mastery_cd ?? 0;
-            if (cd > 0 && mastery.id && game.combat?.started) {
-              game.tm.MasteryCooldown.setCooldown(actor, mastery, cd);
-            }
+  if (game.tm.MasteryCooldown.isOnCooldown(actor, cdKey)) {
+    const turns = game.tm.MasteryCooldown.getRemaining(actor, cdKey);
+    ui.notifications.warn(`"${cdKey.mastery_name}" ainda está em recarga por ${turns} turno(s).`);
+    return;
+  }
 
-            if (actor.sheet?.rendered) {
-              const html = $(actor.sheet.element);
-              await game.tm.ActionsPanel.render(html, actor);
-            }
-          }
+  await MasteryMagicAttackRoll.roll({
+    attacker: actor,
+    targets: selectedTargets,
+    mastery,
+    forcedDice: diceCountRef.value
+  });
+
+  const cd = mastery.mastery_cd ?? 0;
+  if (cd > 0 && mastery.id && game.combat?.started) {
+    game.tm.MasteryCooldown.setCooldown(actor, mastery, cd);
+  }
+
+  if (actor.sheet?.rendered) {
+    const html = $(actor.sheet.element);
+    await game.tm.ActionsPanel.render(html, actor);
+  }
+}
+
+
         }
       },
       default: "confirm"

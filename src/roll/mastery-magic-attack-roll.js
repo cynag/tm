@@ -1,15 +1,29 @@
 import { MasteryParser } from "../mastery/mastery-parser.js";
 
-export async function rollMagicMastery({ attacker, target, mastery, forcedDice }) {
+export async function rollMagicMastery({ attacker, targets = [], mastery, forcedDice }) {
+console.log("🧪 DEBUG ATTACKER:", attacker);
+console.log("🧪 DEBUG TARGETS:", targets);
 
-  if (!attacker || !target) {
-    ui.notifications.warn("Você precisa selecionar atacante e alvo.");
-    return;
-  }
+
+  if (!attacker) {
+  ui.notifications.warn("Você precisa selecionar um atacante.");
+  return;
+}
+
+if (!Array.isArray(targets) || targets.length === 0) {
+  ui.notifications.warn("Você precisa selecionar ao menos um alvo.");
+  return;
+}
+
+
+
 
   const actorSystem = attacker.system;
+
+for (const target of targets) {
   const targetSystem = target.actor?.system;
-  if (!targetSystem) return;
+  if (!targetSystem) continue;
+
 
   const DieTerm = foundry.dice.terms.Die;
   const attackFormula = mastery.mastery_attack_formula || "direct";
@@ -55,46 +69,49 @@ let atkBonusTotal = 0;
 let dmgBonusTotal = 0;
 
 if (attackFormula === "default") {
-  const baseDice = Number(actorSystem.player_action_dice ?? 3);
-  const extraDice = (actorSystem.player_extra_dice?.[selectedElement] ?? 0);
-  const totalDice = forcedDice ?? (baseDice + extraDice);
+  if (mastery.mastery_auto_hit === true) {
+    hit = true;
+    resultLabel = "Automático";
+    atkTotal = "✔️";
+    atkBonusTotal = 0;
+  } else {
+    const baseDice = Number(actorSystem.player_action_dice ?? 3);
+    const extraDice = (actorSystem.player_extra_dice?.[selectedElement] ?? 0);
+    const totalDice = forcedDice ?? (baseDice + extraDice);
+    const baseRoll = new Roll(`${totalDice}d6`);
+    await baseRoll.evaluate();
+    atkRoll = baseRoll;
 
-  const baseRoll = new Roll(`${totalDice}d6`);
-  await baseRoll.evaluate();
-  atkRoll = baseRoll;
+    const modDex = actorSystem.mod_dexterity ?? 0;
+    const atkBonusElement = actorSystem.player_attack_bonus?.[selectedElement] ?? 0;
+    atkBonusTotal = modDex + atkBonusElement;
 
+    const modArc = actorSystem.mod_arcana ?? 0;
+    const dmgBonusElement = actorSystem.player_damage_bonus?.[selectedElement] ?? 0;
+    dmgBonusTotal = modArc + dmgBonusElement;
 
-  const modDex = actorSystem.mod_dexterity ?? 0;
-  const atkBonusElement = actorSystem.player_attack_bonus?.[selectedElement] ?? 0;
-  atkBonusTotal = modDex + atkBonusElement;
+    atkTotal = atkRoll.total + atkBonusTotal;
+    const ref = targetSystem.player_reflex ?? 10;
+    hit = atkTotal > ref;
 
-  const modArc = actorSystem.mod_arcana ?? 0;
-  const dmgBonusElement = actorSystem.player_damage_bonus?.[selectedElement] ?? 0;
-  dmgBonusTotal = modArc + dmgBonusElement;
+    const DieTerm = foundry.dice.terms.Die;
+    const first3 = atkRoll.terms
+      .filter(t => t instanceof DieTerm)
+      .flatMap(t => t.results)
+      .slice(0, 3);
 
+    const count6 = first3.filter(d => d.result === 6).length;
+    const count1 = first3.filter(d => d.result === 1).length;
 
-
-  atkTotal = atkRoll.total + atkBonusTotal;
-
-  const ref = targetSystem.player_reflex ?? 10;
-
-  hit = atkTotal > ref;
-
-  // === Classificação do ataque
-  const first3 = atkRoll.terms
-  .filter(t => t instanceof DieTerm)
-  .flatMap(t => t.results)
-  .slice(0, 3);
-
-  const count6 = first3.filter(d => d.result === 6).length;
-  const count1 = first3.filter(d => d.result === 1).length;
-
-  if (count6 === 3) resultLabel = "MUTILAÇÃO!";
-  else if (count6 === 2) resultLabel = "Crítico";
-  else if (count1 === 3) resultLabel = "Catastrófica";
-  else if (count1 === 2) resultLabel = "Crítica";
-  else resultLabel = hit ? "Comum" : "Falha";
+    if (count6 === 3) resultLabel = "MUTILAÇÃO!";
+    else if (count6 === 2) resultLabel = "Crítico";
+    else if (count1 === 3) resultLabel = "Catastrófica";
+    else if (count1 === 2) resultLabel = "Crítica";
+    else resultLabel = hit ? "Comum" : "Falha";
+  }
 }
+
+
 
 let dmgResult = null;
 let dmgBase = 0;
@@ -179,7 +196,9 @@ const tmDetailsHTML = `
   ${(() => {
     const atkDiceObjs = [];
     let dieCount = 0;
-    for (const term of atkRoll.terms) {
+    if (atkRoll) {
+  for (const term of atkRoll.terms) {
+
       if (term instanceof DieTerm) {
         for (const r of term.results) {
           const isExtra = dieCount >= 3;
@@ -188,7 +207,7 @@ const tmDetailsHTML = `
         }
       }
     }
-
+  }
     return atkDiceObjs.map(die => `
       <div class="dice-icon${die.isExtra ? ' dice-extra' : ''}">
         <div class="dice-bg" style="background-image: url('systems/tm/styles/assets/dices/d${die.faces}.svg');"></div>
@@ -197,7 +216,6 @@ const tmDetailsHTML = `
     `).join("");
   })()}
 </div>
-
 <!-- Dados de dano -->
 ${hit && dmgRoll ? `
   <div class="dice-tray" style="display: flex; justify-content: center; gap: 6px; margin: 4px 0 6px 0; flex-wrap: wrap; max-width: 320px; margin-left: auto; margin-right: auto;">
@@ -214,17 +232,20 @@ ${hit && dmgRoll ? `
 
 <hr style="border: 0; border-top: 1px solid #444; margin: 6px 0 4px 0;" />
 
+${atkRoll ? `
 <!-- Texto de ataque refinado -->
 <div class="details-attack" style="font-size: 13px; color: #ccc; display: flex; flex-direction: column; gap: 4px;">
 
-  <div style="display: flex; justify-content: space-between;"><span>Dados de Ataque:</span><span>${atkRoll.total}</span></div>
+  <div style="display: flex; justify-content: space-between;">
+    <span>Dados de Ataque:</span>
+    <span>${atkRoll.total}</span>
+  </div>
 
-    ${atkBonusTotal !== 0 ? `
+  ${atkBonusTotal !== 0 ? `
   <div style="display: flex; justify-content: space-between;">
     <span>Acréscimos:</span>
     <span>${atkBonusTotal >= 0 ? "+" : ""}${atkBonusTotal}</span>
   </div>` : ""}
-
 
   <div style="display: flex; justify-content: space-between; font-weight: bold;">
     <span>Valor Final:</span>
@@ -233,6 +254,9 @@ ${hit && dmgRoll ? `
 
 </div>
 <hr style="border: 0; border-top: 1px solid #444; margin: 6px 0 4px 0;" />
+
+` : ""}
+
 
 <!-- Texto de dano refinado -->
 ${dmgRoll ? `
@@ -321,7 +345,7 @@ ${dmgRoll ? `
     
 
     ${hit ? `
-<div class="tm-row tm-damage" style="gap: 8px; justify-content: center;">
+  <div class="tm-row tm-damage" style="gap: 8px; justify-content: center;">
   <span style="font-weight: bold;">Dano</span>
   <div style="
     position: relative;
@@ -340,7 +364,7 @@ ${dmgRoll ? `
   </div>
   <span style="text-transform: capitalize;">${elementClass}</span>
 
-</div>` : ""}
+  </div>` : ""}
 
     ${tmDetailsHTML}
   </div>`;
@@ -348,7 +372,7 @@ ${dmgRoll ? `
 
   // 🧾 Mensagem final
   const msgContent = `
-<div class="chat-roll" style="font-family: var(--font-primary); font-size: 1.1em;">
+  <div class="chat-roll" style="font-family: var(--font-primary); font-size: 1.1em;">
   <div class="chat-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
     <img class="chat-img" src="${mastery.mastery_img}" width="35" height="35" style="border:1px solid #555; border-radius:4px;" />
     <div>
@@ -369,27 +393,24 @@ ${dmgRoll ? `
         <span class="tag">${damageFormula} ${elementMap[selectedElement] || selectedElement}</span>
         <span class="tag">🎯 ${target.name}</span>
       </div>
-  
     </div>
   </div>
-
-
   <div class="chat-description" style="font-size: 13px; color: var(--color-text-light); margin-bottom: 8px;">
     ${mastery.mastery_description || "<i>Sem descrição</i>"}
   </div>
   
   ${outcomeHTML}
-</div>`;
-
+  </div>`;
 
   await ChatMessage.create({
     user: game.user.id,
     speaker: ChatMessage.getSpeaker({ actor: attacker }),
     flavor: msgContent,
-    rolls: hit ? [atkRoll, dmgRoll].filter(Boolean) : [atkRoll]
-
+    rolls: [atkRoll, dmgRoll].filter(r => r instanceof Roll)
 
   });
+}
+}
 
   Hooks.on("renderChatMessage", (msg, html) => {
     if (html.hasClass("tm-processed")) return;
@@ -400,6 +421,6 @@ ${dmgRoll ? `
       if (details.length) details.slideToggle(150);
     });
   });
-}
+
 
 export const MasteryMagicAttackRoll = { roll: rollMagicMastery };

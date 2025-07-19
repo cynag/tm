@@ -11,15 +11,18 @@ const FireDB = [
     mastery_cost: 4,
     mastery_cd: 3,
     mastery_range: 6,
+    mastery_auto_hit: false,
+    mastery_targets: 2, //se for ilimitado colocar "all"
     mastery_img: "systems/tm/styles/assets/masterys/fire/1a.webp",
     mastery_description: `Você invoca uma labareda ascendente sob os pés do inimigo. O alvo sofre 1d6 + 1d6/NDp de dano mágico de fogo. Não exige teste de ataque.`,
     mastery_attack_formula: "default",
     mastery_damage_formula: "1d4",
     mastery_element: "fire",
-    weapon_attack_bonus: "0",
-    weapon_damage_bonus: "1d6",
-    weapon_damage_bonus_2: "1d6/NDp",
-    weapon_extra: ""
+    spell_attack_bonus: "+100",
+    spell_attack_bonus_2:"+1d6",
+    spell_damage_bonus: "+1d6",
+    spell_damage_bonus_2: "+999",
+    spell_extra: ""
   },
 
 ];
