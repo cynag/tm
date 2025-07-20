@@ -53,15 +53,41 @@ let masteryFixedDmgBonus = 0;
   await atkRollBase.evaluate();
 
 let atkRoll = atkRollBase;
-if (masteryAtkRoll) {
-  atkRoll.terms.push(...masteryAtkRoll.terms);
-  atkRoll._total += masteryAtkRoll.total;
+
+// Análise prévia dos primeiros 3 dados para detectar falha antes de aplicar bônus
+const atkDiceObjsPreview = [];
+let dieCountPreview = 0;
+for (const term of atkRollBase.terms) {
+  if (term instanceof DieTerm) {
+    for (const r of term.results) {
+      const isExtra = dieCountPreview >= 3;
+      atkDiceObjsPreview.push({ result: r.result, faces: term.faces, isExtra });
+      dieCountPreview++;
+    }
+  }
+}
+const first3Preview = atkDiceObjsPreview.slice(0, 3);
+const count6Preview = first3Preview.filter(d => d.result === 6).length;
+const count1Preview = first3Preview.filter(d => d.result === 1).length;
+
+let forcedMiss = false;
+if (count1Preview === 3 || count1Preview === 2) forcedMiss = true;
+
+// Aplica os dados bônus da maestria APENAS se não for falha
+if (!forcedMiss) {
+  if (masteryAtkRoll) {
+    atkRoll.terms.push(...masteryAtkRoll.terms);
+    atkRoll._total += masteryAtkRoll.total;
+  }
+
+  if (masteryAtkResult2?.roll) {
+    atkRoll.terms.push(...masteryAtkResult2.roll.terms);
+    atkRoll._total += masteryAtkResult2.roll.total;
+  }
+} else {
+  console.log("⛔ Falha detectada — dados bônus da maestria ignorados.");
 }
 
-if (masteryAtkResult2?.roll) {
-  atkRoll.terms.push(...masteryAtkResult2.roll.terms);
-  atkRoll._total += masteryAtkResult2.roll.total;
-}
 
 
   const atkBonus = (attackerSystem.mod_dexterity ?? 0)
@@ -160,7 +186,6 @@ const count1 = first3Dice.filter(d => d.result === 1).length;
 
 let critMult = 1;
 let resultLabel = "";
-let forcedMiss = false;
 
 if (count6 === 3 || (count6 === 2 && traits.weapon_trait_desc > 0 && first3Dice.some(d => d.result === traits.weapon_trait_desc))) {
   critMult = 3;
@@ -180,7 +205,6 @@ if (count6 === 3 || (count6 === 2 && traits.weapon_trait_desc > 0 && first3Dice.
 
 const refBase = targetSystem.player_reflex ?? 10;
 const ref = refBase + (extraEffects?.reflex ?? 0);
-
 const hit = !forcedMiss && atkTotal > ref;
 
 let baseRoll = null, baseDmg = 0, dmgBonus = 0;
@@ -483,13 +507,12 @@ if (masteryDmgRoll) {
 
         <span>Dados de Dano:</span>
         <span>
-      ${(baseDmg * critMult)}
-      ${critMult > 1
-      ? `<span style="font-weight: normal; color: #888;">(${baseDmg}x${critMult})</span>`
-      : ""
-    }
-
+  ${critMult > 1
+    ? `${baseDmg} × ${critMult} = ${baseDmg * critMult}`
+    : `${baseDmg}`
+  }
 </span>
+
 
       </div>
 

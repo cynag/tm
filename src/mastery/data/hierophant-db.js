@@ -86,7 +86,7 @@ const HierophantDB = [
     mastery_requirements: [
       { subtype: ["spear", "sword"] }
     ],
-    weapon_attack_bonus: "",
+    weapon_attack_bonus: "+1d12",
     weapon_attack_bonus_2: "",
     weapon_damage_bonus: "",
     weapon_damage_bonus_2: "",
