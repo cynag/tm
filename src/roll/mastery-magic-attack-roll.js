@@ -3,7 +3,7 @@ import { MasteryParser } from "../mastery/mastery-parser.js";
 export async function rollMagicMastery({ attacker, targets = [], mastery, forcedDice }) {
 
   const DieTerm = foundry.dice.terms.Die;
-
+   let extraEffects = {};
   if (!attacker) {
     ui.notifications.warn("Você precisa selecionar um atacante.");
     return;
@@ -20,6 +20,10 @@ export async function rollMagicMastery({ attacker, targets = [], mastery, forced
     const targetSystem = target.actor?.system;
     if (!targetSystem) continue;
 
+    
+  let protBase = 0;
+  let protIcon = "shield.svg"; // valor padrão
+  
     const attackFormula = mastery.mastery_attack_formula || "direct";
     const damageFormula = mastery.mastery_damage_formula || "0";
     const rawElement = mastery.mastery_element?.toLowerCase() || "fire";
@@ -131,8 +135,27 @@ atkDiceTotal = atkRoll.total + atkBonusRollTotal;
 
     atkTotal = atkDiceTotal + atkBonusTotal;
 
+// ⬇️ Aplica spell_extra antes de checar REF
+if (mastery.spell_extra) {
+  const lines = mastery.spell_extra.split(";").map(s => s.trim()).filter(Boolean);
 
-    const ref = targetSystem.player_reflex ?? 10;
+  for (let line of lines) {
+    try {
+      const match = line.match(/^target\.(\w+)\s*=\s*(.+)$/i);
+      if (!match) continue;
+      const key = match[1];
+      const formulaRaw = match[2];
+      const parsed = await MasteryParser.evaluate(formulaRaw, attacker, target.actor, "number", mastery.mastery_domain);
+      const value = typeof parsed === "object" ? parsed.value : parsed;
+      extraEffects[key] = value;
+      console.log(`🧪 [spell_extra] ${key} = ${value}`);
+    } catch (err) {
+      console.warn(`[spell_extra] Erro ao aplicar "${line}"`, err);
+    }
+  }
+}
+
+    const ref = (targetSystem.player_reflex ?? 10) + (extraEffects?.reflex ?? 0);
     hit = atkTotal > ref;
 
     const first3 = atkRoll.terms
@@ -163,6 +186,29 @@ atkDiceTotal = atkRoll.total + atkBonusRollTotal;
   }
 }
 if (hit) {
+// 🎯 Aplica efeitos extras (spell_extra) com suporte a ND, NP e target
+
+
+if (mastery.spell_extra) {
+  const lines = mastery.spell_extra.split(";").map(s => s.trim()).filter(Boolean);
+
+  for (let line of lines) {
+    try {
+      const match = line.match(/^target\.(\w+)\s*=\s*(.+)$/i);
+      if (!match) continue;
+      const key = match[1];
+      const formulaRaw = match[2];
+      const parsed = await MasteryParser.evaluate(formulaRaw, attacker, target.actor, "number", mastery.mastery_domain);
+      const value = typeof parsed === "object" ? parsed.value : parsed;
+      extraEffects[key] = value;
+      console.log(`🧪 [spell_extra] ${key} = ${value}`);
+    } catch (err) {
+      console.warn(`[spell_extra] Erro ao aplicar "${line}"`, err);
+    }
+  }
+}
+
+
   if (mastery.spell_attack_bonus?.includes("d")) {
     const r = await MasteryParser.evaluate(mastery.spell_attack_bonus, attacker, target.actor, "roll", mastery.mastery_domain);
     if (r?.roll) bonusAtkRolls.push(r.roll);
@@ -195,8 +241,6 @@ if (hit) {
   atkTotal = atkDiceTotal + atkBonusTotal;
 }
 
-
-
 let dmgResult = null;
 let dmgBase = 0;
 let dmgRoll = null;
@@ -204,30 +248,51 @@ let resist = 0;
 let rawDamage = 0;
 let finalDamage = 0;
 
+
 if (hit) {
+  // 🎲 Dano base
   dmgResult = await MasteryParser.evaluate(damageFormula, attacker, target.actor, "roll", mastery.mastery_domain);
   const dmgBonusRollTotal = bonusDmgRolls.reduce((sum, r) => sum + (r.total ?? 0), 0);
-dmgBase = (dmgResult?.value ?? 0) + dmgBonusRollTotal;
-
+  dmgBase = (dmgResult?.value ?? 0) + dmgBonusRollTotal;
   dmgRoll = dmgResult?.roll;
-  resist = targetSystem.resistances?.[selectedElement] ?? 0;
+
+  resist = (targetSystem.resistances?.[selectedElement] ?? 0) + (extraEffects?.resist ?? 0);
+
   if (isMutilation) {
-  rawDamage = dmgBase * 3 + dmgBonusTotal - resist;
+    rawDamage = dmgBase * 3 + dmgBonusTotal - resist;
   } else if (isCrit) {
     rawDamage = dmgBase * 2 + dmgBonusTotal - resist;
   } else {
     rawDamage = dmgBase + dmgBonusTotal - resist;
   }
 
+  // 🛡️ Proteção
+  protBase = (targetSystem.mod_protection ?? 0) + (extraEffects?.prot ?? 0);
+  protIcon = "shield.svg";
 
 
-  finalDamage = (targetSystem.mod_protection >= rawDamage)
-    ? Math.max(1, Math.floor(rawDamage / 2))
-    : Math.max(1, Math.floor(rawDamage));
+  if (mastery.mastery_damage_type === "piercing" && targetSystem.player_armor_is_metal === false) {
+    protBase = Math.floor(protBase / 2);
+    protIcon = "shield-broken.svg";
+  }
+
+  if (mastery.mastery_damage_type === "ironbreaker") {
+    protBase = Math.floor(protBase / 2);
+    protIcon = "shield-broken.svg";
+  }
+
+  console.log("🛠️ Proteção final após traço:", protBase);
+
+  // 💥 Cálculo final do dano
+const rawFinal = rawDamage - protBase;
+
+if (rawFinal <= 0) {
+  finalDamage = Math.max(1, Math.floor(rawFinal / 2)); // mitigou
+} else {
+  finalDamage = Math.max(1, rawFinal); // transpassou
 }
 
-
-
+}
 
   const dmgDiceObjs = [];
 if (dmgRoll) {
@@ -270,35 +335,46 @@ const tmDetailsHTML = `
 
   <!-- Reflexo e proteção -->
   <div class="dice-tray" style="display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 14px; font-weight: bold; margin: 6px 0;">
-    <!-- REF -->
-    <div style="
-      position: relative;
-      width: 32px;
-      height: 32px;
-      background-image: url('systems/tm/styles/assets/ui/hex-2.svg');
-      background-size: cover;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      text-shadow: 1px 1px 2px black;">
-      ${targetSystem.player_reflex >= 0 ? "+" + targetSystem.player_reflex : targetSystem.player_reflex}
-    </div>
+    
+  <!-- REF -->
+<div style="
+  position: relative;
+  width: 32px;
+  height: 32px;
+  background-image: url('systems/tm/styles/assets/ui/hex-2.svg');
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-shadow: 1px 1px 2px black;">
+  ${(() => {
+    const base = targetSystem.player_reflex ?? 0;
+    const bonus = extraEffects.reflex ?? 0;
+    const total = base + bonus;
+    return total >= 0 ? "+" + total : total;
+  })()}
+</div>
 
-    <!-- PROT -->
-    <div style="
-      position: relative;
-      width: 32px;
-      height: 32px;
-      background-image: url('systems/tm/styles/assets/ui/shield.svg');
-      background-size: cover;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      text-shadow: 1px 1px 2px black;">
-      ${(targetSystem.mod_protection ?? 0) >= 0 ? "+" + (targetSystem.mod_protection ?? 0) : (targetSystem.mod_protection ?? 0)}
-    </div>
+
+<!-- PROT -->
+<div style="
+  position: relative;
+  width: 32px;
+  height: 32px;
+  background-image: url('systems/tm/styles/assets/ui/${protIcon}');
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-shadow: 1px 1px 2px black;">
+  ${(() => {
+    return protBase >= 0 ? "+" + protBase : protBase;
+  })()}
+</div>
+
+
   </div>
 
   <!-- Dados de ataque -->
@@ -401,7 +477,7 @@ ${dmgRoll ? `
     <span>${resist < 0 ? "+" + Math.abs(resist) : "-" + resist}</span>
     </div>` : ""}
 
-    ${(targetSystem.mod_protection ?? 0) >= finalDamage ? `
+    ${protBase >= rawDamage ? `
       <div style="display: flex; justify-content: space-between;">
         <span>A armadura inimiga mitigou o dano:</span>
         <span>(${rawDamage}/2)</span>
@@ -529,6 +605,8 @@ ${dmgRoll ? `
 
   });
 }
+
+
 }
 
   Hooks.on("renderChatMessage", (msg, html) => {

@@ -6,8 +6,10 @@ export const MasteryParser = {
 
     raw = raw.trim();
 
+    const NP = actor.system?.player_level ?? 1;
     let nd = 0, ndp = 0, ndi = 0, np = 0, npp = 0, npi = 0;
     if (domain) {
+
       const field = `player_domain_${domain}_level`;
       nd = actor.system?.[field] ?? 0;
       ndp = Math.floor(nd / 2);
@@ -48,25 +50,33 @@ export const MasteryParser = {
     parsed = parsed.split("//")[0].trim();
 
     // Substituições simples
-    const playerLevel = actor.system?.player_level ?? 1;
+    const playerLevel = actor.system.player_level ?? 1;
     parsed = parsed.replace(/\bs\.player_level\b/g, playerLevel);
     parsed = parsed.replace(/\bNDp\b/g, ndp);
     parsed = parsed.replace(/\bNDi\b/g, ndi);
     parsed = parsed.replace(/\bND\b/g, nd);
     parsed = parsed.replace(/\bNPp\b/g, npp);
     parsed = parsed.replace(/\bNPi\b/g, npi);
-    parsed = parsed.replace(/\bNP\b/g, np);
+    parsed = parsed.replace(/\bNP\b/g, NP);
 
 
 
-    // ROLAGEM
+
+    // ROLAGEM (AINDA NAO ACEITA NP CORRETAMENTE)
     if (mode === "roll" && parsed.includes("d")) {
       const formula = parsed.replace(/(\+|-)?\s*(\d*)d(\d+)\s*\/\s*(NDp|NDi|ND|NPp|NPi|NP|\d+)/g, (_, sign, qtd, faces, divisorKey) => {
       const base = Number(qtd || 1);
       let divValue = {
-      NDp: ndp, NDi: ndi, ND: nd,
-      NPp: npp, NPi: npi, NP: np
+      NDp: ndp,
+      NDi: ndi,
+      ND: nd,
+      NPp: npp,
+      NPi: npi,
+      NP: NP // agora corretamente
     }[divisorKey];
+
+
+
 
     if (divValue === undefined) {
       const num = Number(divisorKey);
