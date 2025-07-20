@@ -184,15 +184,34 @@ const first3Dice = atkDiceObjs.slice(0, 3);
 const count6 = first3Dice.filter(d => d.result === 6).length;
 const count1 = first3Dice.filter(d => d.result === 1).length;
 
+// 🧠 Lógica combinada de Descomunal: menor valor entre arma e maestria, ignorando 0
+let descWeapon = traits.weapon_trait_desc ?? 0;
+let descMastery = mastery.mastery_desc ?? 0;
+let descFinal = 0;
+
+if (descWeapon > 0 && descMastery > 0) {
+  descFinal = Math.min(descWeapon, descMastery);
+} else if (descWeapon > 0) {
+  descFinal = descWeapon;
+} else if (descMastery > 0) {
+  descFinal = descMastery;
+}
+
 let critMult = 1;
 let resultLabel = "";
 
-if (count6 === 3 || (count6 === 2 && traits.weapon_trait_desc > 0 && first3Dice.some(d => d.result === traits.weapon_trait_desc))) {
+if (count6 === 3) {
   critMult = 3;
   resultLabel = "MUTILAÇÃO!";
-} else if (count6 === 2) {
-  critMult = 2;
-  resultLabel = "Crítico";
+} else if (count6 === 2 && descFinal > 0) {
+  const thirdDie = first3Dice.find(d => d.result !== 6);
+  if (thirdDie && thirdDie.result >= descFinal) {
+    critMult = 3;
+    resultLabel = "MUTILAÇÃO!";
+  } else {
+    critMult = 2;
+    resultLabel = "Crítico";
+  }
 } else if (count1 === 3) {
   resultLabel = "Catastrófica";
   forcedMiss = true;

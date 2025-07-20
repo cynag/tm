@@ -61,6 +61,10 @@ export async function rollMagicMastery({ attacker, targets = [], mastery, forced
     const bonusDmgRolls = [];
 
     const atkBonusDiceObjs = []; // 
+let customMutilationValue = null;
+if (typeof mastery.mastery_desc === "number" && mastery.mastery_desc > 0) {
+  customMutilationValue = mastery.mastery_desc;
+}
 
 
 
@@ -166,14 +170,31 @@ if (mastery.spell_extra) {
     const count6 = first3.filter(d => d.result === 6).length;
     const count1 = first3.filter(d => d.result === 1).length;
 
-  if (count6 === 3) {
+if (count6 === 3) {
+  resultLabel = "MUTILAÇÃO!";
+  isMutilation = true;
+  isCrit = true;
+} else if (count6 === 2) {
+  let thirdDieMatches = false;
+  if (customMutilationValue) {
+    const thirdDie = first3.filter(d => d.result !== 6)[0];
+    if (thirdDie?.result >= customMutilationValue) {
+      thirdDieMatches = true;
+    }
+  }
+
+  if (thirdDieMatches) {
     resultLabel = "MUTILAÇÃO!";
     isMutilation = true;
     isCrit = true;
-  } else if (count6 === 2) {
+  } else {
     resultLabel = "Crítico";
     isCrit = true;
   }
+}
+
+
+
   else if (count1 === 3) {
     resultLabel = "Catastrófica";
     isCrit = false;
