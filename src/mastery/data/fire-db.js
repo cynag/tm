@@ -18,10 +18,10 @@ const FireDB = [
     mastery_attack_formula: "default",
     mastery_damage_formula: "1d4",
     mastery_element: "fire",
-    spell_attack_bonus: "+999",
-    spell_attack_bonus_2:"+999",
-    spell_damage_bonus: "+999",
-    spell_damage_bonus_2: "+999",
+    spell_attack_bonus: "+1000/ND",
+    spell_attack_bonus_2:"",
+    spell_damage_bonus: "",
+    spell_damage_bonus_2: "",
     spell_extra: ""
   },
     {
@@ -42,10 +42,10 @@ const FireDB = [
     mastery_attack_formula: "default",
     mastery_damage_formula: "1d4",
     mastery_element: "fire",
-    spell_attack_bonus: "+1d12",
-    spell_attack_bonus_2:"+1d4",
-    spell_damage_bonus: "+1d8",
-    spell_damage_bonus_2: "+1d2",
+    spell_attack_bonus: "+1d12/NDi",
+    spell_attack_bonus_2:"+1d4/NDi",
+    spell_damage_bonus: "+1d8/NDi",
+    spell_damage_bonus_2: "+1d2/NDi",
     spell_extra: ""
   },
     {

@@ -105,11 +105,27 @@ export const MasteryParser = {
   }
 }
 if (mode === "number") {
-  const expr = parsed.replace(/(\+|-)?\s*(\d+)\s*\/\s*(\d+)/g, (_, sign, val, div) => {
-    const total = Math.floor(Number(val) / Number(div));
-    if (total === 0) return "";
+  const expr = parsed.replace(/(\+|-)?\s*(\d+)\s*\/\s*(NDp|NDi|ND|NPp|NPi|NP|\d+)/g, (_, sign, val, divKey) => {
+    const base = Number(val);
+    let divValue = {
+      NDp: ndp,
+      NDi: ndi,
+      ND: nd,
+      NPp: npp,
+      NPi: npi,
+      NP: NP
+    }[divKey];
+
+    if (divValue === undefined) {
+      const num = Number(divKey);
+      divValue = isNaN(num) ? 1 : num;
+    }
+
+    if (!divValue || divValue <= 0) return "";
+    const total = Math.floor(base * divValue);
     return `${sign || "+"}${total}`;
   });
+
 
   if (!expr || expr.trim() === "" || expr.trim() === "+") {
     console.warn("⚠️ Expressão numérica inválida:", raw, "→", expr);

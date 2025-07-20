@@ -58,6 +58,12 @@ if (masteryAtkRoll) {
   atkRoll._total += masteryAtkRoll.total;
 }
 
+if (masteryAtkResult2?.roll) {
+  atkRoll.terms.push(...masteryAtkResult2.roll.terms);
+  atkRoll._total += masteryAtkResult2.roll.total;
+}
+
+
   const atkBonus = (attackerSystem.mod_dexterity ?? 0)
     + (attackerSystem.player_attack_bonus?.[subtype] ?? 0)
     + (attackerSystem.player_attack_bonus?.[damageType] ?? 0)
@@ -118,67 +124,22 @@ const effectLines = mastery.weapon_extra?.split(";").map(s => s.trim()).filter(B
 const extraEffects = {};
 
 for (let line of effectLines) {
-  const match = line.match(/^target\.(\w+)\s*=\s*(.+)$/i);
+  const match = line.match(/^target\.(\w+)\s*=\s*([-+]?\s*\d+)(?:\s*\/\s*(ND|NP))?$/i);
+
   if (match) {
-    const key = match[1];
-    const formulaRaw = match[2];
-    const res = await MasteryParser.evaluate(formulaRaw, attacker, targetActor, "number", mastery.mastery_domain);
-    extraEffects[key] = typeof res === "object" ? res.value : res;
-    console.log(`🧪 weapon_extra aplicado: ${key} = ${extraEffects[key]}`);
-  }
+  const key = match[1];
+  const formulaRaw = match[2];
+  const scale = match[3];
+  let value = parseInt(formulaRaw);
+
+  if (scale === "ND") value *= mastery.mastery_nd;
+  if (scale === "NP") value *= Math.floor(mastery.mastery_nd / 2);
+
+  extraEffects[key] = (extraEffects[key] ?? 0) + value;
+  console.log(`🧪 weapon_extra aplicado: ${key} = ${extraEffects[key]}`);
 }
-const ref = (targetSystem.player_reflex ?? 10) + (extraEffects?.reflex ?? 0);
-const hit = atkTotal > ref;
-
-let baseRoll = null, baseDmg = 0, dmgBonus = 0;
-if (hit) {
-  const baseFormula = weaponDamageBase.trim();
-
-const mode1 = mastery.weapon_damage_bonus?.includes("d") ? "roll" : "number";
-const dmgResult1 = await MasteryParser.evaluate(mastery.weapon_damage_bonus, attacker, targetActor, mode1, mastery.mastery_domain);
-const mode2 = mastery.weapon_damage_bonus_2?.includes("d") ? "roll" : "number";
-const dmgResult2 = await MasteryParser.evaluate(mastery.weapon_damage_bonus_2, attacker, targetActor, mode2, mastery.mastery_domain);
-
-console.log("🎯 masteryDmgRaw:", mastery.weapon_damage_bonus);
-console.log("🎯 masteryDmgResult:", dmgResult1);
-console.log("🎯 mastery object completo:", mastery);
-
-masteryDmgBonus = (typeof dmgResult1 === "object" ? dmgResult1.value : dmgResult1) +
-                  (typeof dmgResult2 === "object" ? dmgResult2.value : dmgResult2);
-masteryDmgRoll = dmgResult1.roll;
-if (dmgResult2.roll) {
-  masteryDmgRoll.terms.push(...dmgResult2.roll.terms);
 }
 
-const fullFormula = [baseFormula].filter(Boolean).join(" + ");
-baseRoll = new Roll(fullFormula, {}, { async: true });
-await baseRoll.evaluate();
-
-  masteryFixedDmgBonus = (typeof dmgResult1.value === "number" && !mastery.weapon_damage_bonus.includes("d")) ? dmgResult1.value : 0;
- 
-  baseDmg = baseRoll.total;
-
-  // Separa bônus da maestria entre dados e fixo
-const masteryDmgBonusDice =
-  (mastery.weapon_damage_bonus?.includes("d") ? (typeof dmgResult1 === "number" ? dmgResult1 : dmgResult1?.value || 0) : 0) +
-  (mastery.weapon_damage_bonus_2?.includes("d") ? (typeof dmgResult2 === "number" ? dmgResult2 : dmgResult2?.value || 0) : 0);
-
-masteryFixedDmgBonus =
-  (!mastery.weapon_damage_bonus?.includes("d") ? (typeof dmgResult1 === "number" ? dmgResult1 : dmgResult1?.value || 0) : 0) +
-  (!mastery.weapon_damage_bonus_2?.includes("d") ? (typeof dmgResult2 === "number" ? dmgResult2 : dmgResult2?.value || 0) : 0);
-
-// Soma os dados da arma + dados bônus da maestria (críticos aplicam depois)
-baseDmg = baseRoll.total + masteryDmgBonusDice;
-
-// Dano bônus só do personagem (letalidade e afins)
-dmgBonus = (attackerSystem.mod_letality ?? 0)
-  + (attackerSystem.player_damage_bonus?.[subtype] ?? 0)
-  + (attackerSystem.player_damage_bonus?.[damageType] ?? 0)
-  + (attackerSystem.player_damage_bonus?.[size] ?? 0);
-
-}
-
-  let finalDmg = hit ? baseDmg + dmgBonus : 0;
 
 // === CRÍTICO, RESISTÊNCIA, PROTEÇÃO, DANO FINAL ===
 const atkDiceObjs = [];
@@ -193,13 +154,14 @@ for (const term of atkRoll.terms) {
     }
   }
 }
-
 const first3Dice = atkDiceObjs.slice(0, 3);
 const count6 = first3Dice.filter(d => d.result === 6).length;
 const count1 = first3Dice.filter(d => d.result === 1).length;
 
 let critMult = 1;
 let resultLabel = "";
+let forcedMiss = false;
+
 if (count6 === 3 || (count6 === 2 && traits.weapon_trait_desc > 0 && first3Dice.some(d => d.result === traits.weapon_trait_desc))) {
   critMult = 3;
   resultLabel = "MUTILAÇÃO!";
@@ -208,14 +170,81 @@ if (count6 === 3 || (count6 === 2 && traits.weapon_trait_desc > 0 && first3Dice.
   resultLabel = "Crítico";
 } else if (count1 === 3) {
   resultLabel = "Catastrófica";
+  forcedMiss = true;
 } else if (count1 === 2) {
   resultLabel = "Crítica";
+  forcedMiss = true;
 } else {
   resultLabel = "Comum";
 }
 
-let protFinal = targetSystem.mod_protection ?? 0;
+const refBase = targetSystem.player_reflex ?? 10;
+const ref = refBase + (extraEffects?.reflex ?? 0);
 
+const hit = !forcedMiss && atkTotal > ref;
+
+let baseRoll = null, baseDmg = 0, dmgBonus = 0;
+if (hit) {
+  const baseFormula = weaponDamageBase.trim();
+
+const mode1 = mastery.weapon_damage_bonus?.includes("d") ? "roll" : "number";
+const dmgResult1 = await MasteryParser.evaluate(mastery.weapon_damage_bonus, attacker, targetActor, mode1, mastery.mastery_domain);
+console.log("🎯 Result 1:", dmgResult1);
+
+const mode2 = mastery.weapon_damage_bonus_2?.includes("d") ? "roll" : "number";
+const dmgResult2 = await MasteryParser.evaluate(mastery.weapon_damage_bonus_2, attacker, targetActor, mode2, mastery.mastery_domain);
+
+console.log("🎯 masteryDmgRaw:", mastery.weapon_damage_bonus);
+console.log("🎯 masteryDmgResult:", dmgResult1);
+console.log("🎯 mastery object completo:", mastery);
+
+masteryDmgBonus = 0;
+if (typeof dmgResult1 === "object" && dmgResult1 !== null) masteryDmgBonus += dmgResult1.value ?? 0;
+else if (typeof dmgResult1 === "number") masteryDmgBonus += dmgResult1;
+
+if (typeof dmgResult2 === "object" && dmgResult2 !== null) masteryDmgBonus += dmgResult2.value ?? 0;
+else if (typeof dmgResult2 === "number") masteryDmgBonus += dmgResult2;
+
+masteryDmgRoll = dmgResult1.roll;
+if (dmgResult2?.roll && masteryDmgRoll?.terms) {
+  masteryDmgRoll.terms.push(...dmgResult2.roll.terms);
+} else if (dmgResult2?.roll) {
+  masteryDmgRoll = dmgResult2.roll;
+}
+
+
+const fullFormula = [baseFormula].filter(Boolean).join(" + ");
+baseRoll = new Roll(fullFormula, {}, { async: true });
+await baseRoll.evaluate();
+
+  masteryFixedDmgBonus = (typeof dmgResult1.value === "number" && !mastery.weapon_damage_bonus.includes("d")) ? dmgResult1.value : 0;
+ 
+  baseDmg = baseRoll.total;
+
+  // Separa bônus da maestria entre dados e fixo
+const masteryDmgBonusDice =
+  (mastery.weapon_damage_bonus?.includes("d") ? (typeof dmgResult1 === "number" ? dmgResult1 : dmgResult1?.value || 0) : 0) +
+  (mastery.weapon_damage_bonus_2?.includes("d") ? (typeof dmgResult2 === "number" ? dmgResult2 : dmgResult2?.value || 0) : 0);
+
+const dmgVal1 = (typeof dmgResult1 === "object") ? dmgResult1.value : dmgResult1;
+const dmgVal2 = (typeof dmgResult2 === "object") ? dmgResult2.value : dmgResult2;
+
+masteryFixedDmgBonus =
+  (!mastery.weapon_damage_bonus?.includes("d") ? dmgVal1 : 0) +
+  (!mastery.weapon_damage_bonus_2?.includes("d") ? dmgVal2 : 0);
+
+// Soma os dados da arma + dados bônus da maestria (críticos aplicam depois)
+baseDmg = baseRoll.total + masteryDmgBonusDice;
+
+// Dano bônus só do personagem (letalidade e afins)
+dmgBonus = (attackerSystem.mod_letality ?? 0)
+  + (attackerSystem.player_damage_bonus?.[subtype] ?? 0)
+  + (attackerSystem.player_damage_bonus?.[damageType] ?? 0)
+  + (attackerSystem.player_damage_bonus?.[size] ?? 0);
+
+}
+
+let protFinal = (targetSystem.mod_protection ?? 0) + (extraEffects?.prot ?? 0);
 const armorIsMetal = !!targetSystem.player_armor_is_metal;
 
 if (traits.weapon_trait_ironbreaker || (damageType === "perfurante" && !armorIsMetal)) {
@@ -265,6 +294,7 @@ if (elementalRaw && hit && resultLabel !== "Catastrófica" && resultLabel !== "C
     elementalKeyRaw = key;
   }
 }
+let finalDmg = hit ? rawPhysical + elementalDamage : 0;
 let dmgFinal = hit ? rawPhysical + elementalDamage : 0;
 finalDmg = dmgFinal;
 
@@ -500,18 +530,23 @@ if (masteryDmgRoll) {
     }
     return "";
   })()}
-  ${protFinal >= ((baseDmg * critMult) + dmgBonus - resistRaw)
-  ? `<div style="display: flex; justify-content: space-between; padding: 2px 0;">
-       <span>A armadura mitigou o dano.</span>
-       <span>
-        (${(baseDmg * critMult) + dmgBonus - resistRaw} / 2)
-       </span>
-     </div>`
-  : `<div style="display: flex; justify-content: space-between; padding: 2px 0;">
-       <span>A armadura foi transpassada.</span>
-       <span></span>
-     </div>`
-}
+${(() => {
+  const danoBase = (baseDmg * critMult) + masteryFixedDmgBonus + dmgBonus;
+  const valorMitigado = danoBase - resistRaw;
+
+  if (valorMitigado <= protFinal) {
+    return `<div style="display: flex; justify-content: space-between; padding: 2px 0;">
+      <span>A armadura mitigou o dano.</span>
+      <span>(${valorMitigado} / 2)</span>
+    </div>`;
+  } else {
+    return `<div style="display: flex; justify-content: space-between; padding: 2px 0;">
+      <span>A armadura foi transpassada.</span>
+      <span></span>
+    </div>`;
+  }
+})()}
+
 
 
 ${elementalRoll ? `
