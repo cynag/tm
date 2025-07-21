@@ -441,6 +441,20 @@
     <strong>Penalidade Mental:</strong>
     {{#if actor.system.has_mental_effect}}✅{{else}}—{{/if}}
   </div>
+  <hr>
+
+<div class="pinned-box">
+  <h4>🔮 Focos Arcanos Equipados</h4>
+  {{#each (lookup actor.system "arcaneFocus") as |focus type|}}
+    <div style="margin-bottom: 5px;">
+      <strong>{{capitalize type}}:</strong> {{focus.charges}} cargas ({{focus.items.length}} item{{#unless (eq focus.items.length 1)}}s{{/unless}})
+    </div>
+  {{else}}
+    <div>Nenhum foco arcano equipado.</div>
+  {{/each}}
+</div>
+
+
 </div>
 
   <hr>

@@ -84,6 +84,9 @@ s.activeEffects ??= [];
   if (s.player_hp > s.player_hp_max) s.player_hp = s.player_hp_max;
   s.player_pa = Math.min(s.player_pa, s.player_pa_max);
 
+// === FOCO ARCANO ATUAL (se equipado) ===
+calculateArcaneFocus(this);
+
 
 
   // === TALENTOS ===
@@ -229,8 +232,12 @@ for (const [slotId, slot] of Object.entries(s.gearSlots)) {
   const item = this.items.get(itemId);
   if (!item) continue;
   if (item.type !== "gear") continue;
-  if (item.system.gear_type !== "armor") continue;
 
+
+
+
+  if (item.system.gear_type !== "armor") continue;
+  
   const isBroken = item.system.armor_broken === true;
 
   const prot   = item.system.armor_protection   ?? 0;
@@ -275,8 +282,6 @@ if (isIncompetent) {
   heavy         = heavy * 2;
 }
 
-
-
   totalProt     += finalProt;
   metalSum      += metal;
   noisySum      += finalNoisy;
@@ -284,6 +289,8 @@ if (isIncompetent) {
   heavySum      += heavy;
   thermicSum    += finalThermic;
 }
+
+
 
 s.player_protection        += totalProt;
 s.mod_protection = s.player_protection > 0 ? Math.floor(s.player_protection / 2) : 0;
@@ -566,8 +573,34 @@ prepareDerivedData() {
   this.prepareBaseData(); // Garante que prepareBaseData seja chamado de novo no momento certo
 }
 
+}
 
 
+function calculateArcaneFocus(actor) {
+  const s = actor.system;
+  s.arcaneFocus = {};
 
-  
+  const seen = new Set();
+
+  for (const [slotId, slot] of Object.entries(s.gearSlots)) {
+    const itemId = slot.itemId;
+    if (!itemId || seen.has(itemId)) continue;
+
+    const item = actor.items.get(itemId);
+    if (!item || item.type !== "gear") continue;
+    seen.add(itemId);
+
+    if (item.system.gear_isArcane === true) {
+      const type = item.system.gear_arcaneType;
+      const charges = item.system.gear_arcaneCharges ?? 0;
+      if (!type) continue;
+
+      if (!s.arcaneFocus[type]) {
+        s.arcaneFocus[type] = { charges: 0, items: [] };
+      }
+
+      s.arcaneFocus[type].charges += charges;
+      s.arcaneFocus[type].items.push(item.id);
+    }
+  }
 }

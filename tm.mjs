@@ -116,7 +116,7 @@ Handlebars.registerPartial("tm.chat.roll-attack", templates[1]);
   Handlebars.registerHelper("array", (...args) => args.slice(0, -1));
   Handlebars.registerHelper("abs", value => Math.abs(value));
   Handlebars.registerHelper("multiply", (a, b) => a * b);
-
+  
   Handlebars.registerHelper("hasOrigin", (items) => {
   return items?.some?.(i => i.type === "origin");
 });
@@ -137,6 +137,10 @@ Handlebars.registerHelper("case", function(value, options) {
   }
 });
 
+Handlebars.registerHelper("capitalize", function (text) {
+  if (typeof text !== "string") return "";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+});
 
 
 
