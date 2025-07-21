@@ -146,7 +146,9 @@ if (this.type === "gear") {
   }
 }
 
-
+this.system.gear_isArcane ??= false;
+this.system.gear_arcaneType ??= "";
+this.system.gear_arcaneCharges ??= 0;
   }
 
   

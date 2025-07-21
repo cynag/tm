@@ -18,6 +18,7 @@ export class GearSheet extends foundry.appv1.sheets.ItemSheet {
     context.accessorySubtypes = ["ring", "neck", "waist", "back"];
 
     context.filePicker = true;
+    context.arcaneTypes = ["fire", "air", "water", "earth", "death"];
 
     return context;
   }

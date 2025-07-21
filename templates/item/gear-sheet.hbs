@@ -10,244 +10,198 @@
   </header>
 
   <!-- BODY -->
-  <section class="sheet-body" style="padding: 10px; display: flex; flex-direction: column; gap: 16px;">
-<hr />
-<!-- SPRIT QUEBRADO -->
-<div style="display: flex; flex-direction: column; gap: 4px;">
-  <label>Sprite Quebrado:</label>
-  <div style="display: flex; align-items: center; gap: 6px;">
-    <input type="text" name="system.broken_sprite" value="{{item.system.broken_sprite}}" style="width: 100%;" />
-    <button type="button" class="file-picker" data-type="imagevideo" data-target="system.broken_sprite">
-      <i class="fas fa-file-image"></i>
-    </button>
-  </div>
-</div>
+  <section class="sheet-body" style="padding: 10px; display: flex; flex-direction: column; gap: 20px;">
 
-    <!-- GRID SIZE -->
+    <!-- 🖼️ Sprite Quebrado + Grid -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <label>Sprite Quebrado:</label>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <input type="text" name="system.broken_sprite" value="{{item.system.broken_sprite}}" style="width: 100%;" />
+        <button type="button" class="file-picker" data-type="imagevideo" data-target="system.broken_sprite">
+          <i class="fas fa-file-image"></i>
+        </button>
+      </div>
+
+      <div style="display: flex; gap: 20px;">
+        <div>
+          <label>Width:</label>
+          <input type="number" name="system.grid.w" value="{{item.system.grid.w}}" min="1" style="width: 50px;" />
+        </div>
+        <div>
+          <label>Height:</label>
+          <input type="number" name="system.grid.h" value="{{item.system.grid.h}}" min="1" style="width: 50px;" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ⚙️ Tipo e Subtipo -->
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div>
+        <label>Tipo:</label>
+        <select name="system.gear_type">
+          {{#each gearTypes as |t|}}
+            <option value="{{t}}" {{#if (eq ../item.system.gear_type t)}}selected{{/if}}>{{t}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      {{#if (eq item.system.gear_type "weapon")}}
+        <div>
+          <label>Subtipo (Arma):</label>
+          <select name="system.subtype">
+            {{#each weaponSubtypes as |s|}}
+              <option value="{{s}}" {{#if (eq ../item.system.subtype s)}}selected{{/if}}>{{s}}</option>
+            {{/each}}
+          </select>
+        </div>
+      {{/if}}
+
+      {{#if (eq item.system.gear_type "armor")}}
+        <div>
+          <label>Subtipo (Armadura):</label>
+          <select name="system.subtype">
+            {{#each armorSubtypes as |s|}}
+              <option value="{{s}}" {{#if (eq ../item.system.subtype s)}}selected{{/if}}>{{s}}</option>
+            {{/each}}
+          </select>
+        </div>
+      {{/if}}
+
+      {{#if (eq item.system.gear_type "accessory")}}
+        <div>
+          <label>Subtipo (Acessório):</label>
+          <select name="system.subtype">
+            {{#each accessorySubtypes as |s|}}
+              <option value="{{s}}" {{#if (eq ../item.system.subtype s)}}selected{{/if}}>{{s}}</option>
+            {{/each}}
+          </select>
+        </div>
+      {{/if}}
+    </div>
+
+    <!-- ✨ Foco Arcano -->
+    <div>
+      <label>
+        <input type="checkbox" name="system.gear_isArcane" {{checked item.system.gear_isArcane}}>
+        Este item é um foco arcano?
+      </label>
+
+      {{#if item.system.gear_isArcane}}
+        <div style="display: flex; gap: 16px; margin-top: 8px;">
+          <div>
+            <label>Tipo Arcano:</label>
+            <select name="system.gear_arcaneType">
+              {{#each arcaneTypes as |type|}}
+                <option value="{{type}}" {{#if (eq ../item.system.gear_arcaneType type)}}selected{{/if}}>{{type}}</option>
+              {{/each}}
+            </select>
+          </div>
+          <div>
+            <label>Cargas:</label>
+            <input type="number" name="system.gear_arcaneCharges" value="{{item.system.gear_arcaneCharges}}" min="0" style="width: 80px;" />
+          </div>
+        </div>
+      {{/if}}
+    </div>
+
+    <!-- ⚔️ Campos de Arma -->
+    {{#if (eq item.system.gear_type "weapon")}}
+      <h3>Arma</h3>
+      <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <label>Tipo de Dano:</label>
+          <select name="system.weapon_subtypes_2">
+            <option value="cortante"   {{#if (eq item.system.weapon_subtypes_2 "cortante")}}selected{{/if}}>Cortante</option>
+            <option value="perfurante" {{#if (eq item.system.weapon_subtypes_2 "perfurante")}}selected{{/if}}>Perfurante</option>
+            <option value="impacto"    {{#if (eq item.system.weapon_subtypes_2 "impacto")}}selected{{/if}}>Impacto</option>
+          </select>
+        </div>
+        <div>
+          <label>Porte:</label>
+          <select name="system.weapon_subtypes_3">
+            <option value="leve"   {{#if (eq item.system.weapon_subtypes_3 "leve")}}selected{{/if}}>Leve</option>
+            <option value="pesada" {{#if (eq item.system.weapon_subtypes_3 "pesada")}}selected{{/if}}>Pesada</option>
+          </select>
+        </div>
+        <div>
+          <label>Dano:</label>
+          <input type="text" name="system.weapon_damage" value="{{item.system.weapon_damage}}" style="width: 120px;" />
+        </div>
+        <div>
+          <label>Alcance (m):</label>
+          <input type="number" name="system.weapon_range" value="{{item.system.weapon_range}}" style="width: 60px;" />
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <label>Quebrada:</label>
+          <input type="checkbox" name="system.weapon_broken" {{checked item.system.weapon_broken}} />
+        </div>
+      </div>
+
+      <h4>Traços</h4>
+      <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+        <div><label>Duas Mãos:</label><input type="checkbox" name="system.weapon_traits.weapon_trait_2h" {{checked item.system.weapon_traits.weapon_trait_2h}} /></div>
+        <div><label>Pomo:</label><input type="checkbox" name="system.weapon_traits.weapon_trait_pom" {{checked item.system.weapon_traits.weapon_trait_pom}} /></div>
+        <div><label>Pesada:</label><input type="number" name="system.weapon_traits.weapon_trait_heavy" value="{{item.system.weapon_traits.weapon_trait_heavy}}" /></div>
+        <div><label>Defensiva:</label><input type="number" name="system.weapon_traits.weapon_trait_defensive" value="{{item.system.weapon_traits.weapon_trait_defensive}}" /></div>
+        <div><label>Escudo:</label><input type="number" name="system.weapon_traits.weapon_trait_shield" value="{{item.system.weapon_traits.weapon_trait_shield}}" /></div>
+        <div><label>Descomunal:</label><input type="number" name="system.weapon_traits.weapon_trait_desc" value="{{item.system.weapon_traits.weapon_trait_desc}}" min="0" max="5" /></div>
+        <div><label>Quebra-Ferro:</label><input type="checkbox" name="system.weapon_traits.weapon_trait_ironbreaker" {{checked item.system.weapon_traits.weapon_trait_ironbreaker}} /></div>
+        <div><label>Vulnerável:</label><input type="checkbox" name="system.weapon_traits.weapon_trait_vulnerable" {{checked item.system.weapon_traits.weapon_trait_vulnerable}} /></div>
+        <div><label>Rápida:</label><input type="number" name="system.weapon_traits.weapon_trait_fast" value="{{item.system.weapon_traits.weapon_trait_fast}}" /></div>
+        <div>
+          <label>Recarga:</label>
+          <select name="system.weapon_traits.weapon_trait_recharge">
+            <option value="0" {{#if (eq item.system.weapon_traits.weapon_trait_recharge 0)}}selected{{/if}}>Nenhuma</option>
+            <option value="1" {{#if (eq item.system.weapon_traits.weapon_trait_recharge 1)}}selected{{/if}}>Recarga</option>
+            <option value="2" {{#if (eq item.system.weapon_traits.weapon_trait_recharge 2)}}selected{{/if}}>Recarga Lenta</option>
+          </select>
+        </div>
+      </div>
+    {{/if}}
+
+    <!-- 🛡️ Campos de Armadura -->
+    {{#if (eq item.system.gear_type "armor")}}
+      <h3>Armadura</h3>
+      <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+        <div><label>Proteção:</label><input type="number" name="system.armor_protection" value="{{item.system.armor_protection}}" /></div>
+        <div><label>Eficácia (%):</label><input type="number" name="system.armor_efficiency" value="{{item.system.armor_efficiency}}" /></div>
+        <div><label>Requisito (IMP):</label><input type="number" name="system.armor_requeriment" value="{{item.system.armor_requeriment}}" /></div>
+        <div style="display: flex; align-items: center; gap: 4px;"><label>Quebrada:</label><input type="checkbox" name="system.armor_broken" {{checked item.system.armor_broken}} /></div>
+      </div>
+      <h4>Traços</h4>
+      <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+        <div><label>Metal:</label><input type="number" name="system.armor_traits.trait_metal" value="{{item.system.armor_traits.trait_metal}}" /></div>
+        <div><label>Ruído:</label><input type="number" name="system.armor_traits.trait_noisy" value="{{item.system.armor_traits.trait_noisy}}" /></div>
+        <div><label>Ref.:</label><input type="number" name="system.armor_traits.trait_reinforced" value="{{item.system.armor_traits.trait_reinforced}}" /></div>
+        <div><label>Pesada:</label><input type="number" name="system.armor_traits.trait_heavy" value="{{item.system.armor_traits.trait_heavy}}" /></div>
+        <div><label>Térmica:</label><input type="number" name="system.armor_traits.trait_thermic" value="{{item.system.armor_traits.trait_thermic}}" /></div>
+      </div>
+    {{/if}}
+
+    <!-- 💰 Valor e Raridade -->
     <div style="display: flex; gap: 20px;">
       <div>
-        <label>Width:</label>
-        <input type="number" name="system.grid.w" value="{{item.system.grid.w}}" min="1" style="width: 50px;" />
+        <label>Valor:</label>
+        <input type="number" name="system.value" value="{{item.system.value}}" />
       </div>
       <div>
-        <label>Height:</label>
-        <input type="number" name="system.grid.h" value="{{item.system.grid.h}}" min="1" style="width: 50px;" />
-      </div>
-    </div>
-
-    <!-- GEAR TYPE -->
-    <div>
-      <label>Type:</label>
-      <select name="system.gear_type">
-        {{#each gearTypes as |t|}}
-          <option value="{{t}}" {{#if (eq ../item.system.gear_type t)}}selected{{/if}}>{{t}}</option>
-        {{/each}}
-      </select>
-    </div>
-
-    <!-- SUBTYPE -->
-    {{#if (eq item.system.gear_type "weapon")}}
-  <hr />
-
-  <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-    <div>
-      <label>Weapon Subtype:</label>
-      <select name="system.subtype">
-        {{#each weaponSubtypes as |s|}}
-          <option value="{{s}}" {{#if (eq ../item.system.subtype s)}}selected{{/if}}>{{s}}</option>
-        {{/each}}
-      </select>
-    </div>
-
-    <div>
-      <label>Tipo de Dano:</label>
-      <select name="system.weapon_subtypes_2">
-        <option value="cortante"   {{#if (eq item.system.weapon_subtypes_2 "cortante")}}selected{{/if}}>Cortante</option>
-        <option value="perfurante" {{#if (eq item.system.weapon_subtypes_2 "perfurante")}}selected{{/if}}>Perfurante</option>
-        <option value="impacto"    {{#if (eq item.system.weapon_subtypes_2 "impacto")}}selected{{/if}}>Impacto</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Porte:</label>
-      <select name="system.weapon_subtypes_3">
-        <option value="leve"   {{#if (eq item.system.weapon_subtypes_3 "leve")}}selected{{/if}}>Leve</option>
-        <option value="pesada" {{#if (eq item.system.weapon_subtypes_3 "pesada")}}selected{{/if}}>Pesada</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Dano:</label>
-      <input type="text" name="system.weapon_damage" value="{{item.system.weapon_damage}}" style="width: 120px;" />
-    </div>
-
-    <div>
-      <label>Alcance (m):</label>
-      <input type="number" name="system.weapon_range" value="{{item.system.weapon_range}}" style="width: 60px;" />
-    </div>
-  </div>
-  <div style="display: flex; align-items: center; gap: 4px;">
-  <label>Quebrada:</label>
-  <input type="checkbox" name="system.weapon_broken" {{checked item.system.weapon_broken}} />
-</div>
-
-  <hr></hr>
-
-  <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-    <div>
-  <label>Duas Mãos:</label>
-  <input type="checkbox" name="system.weapon_traits.weapon_trait_2h" {{checked item.system.weapon_traits.weapon_trait_2h}} />
-</div>
-    <div>
-      <label>Pomo:</label>
-      <input type="checkbox" name="system.weapon_traits.weapon_trait_pom" {{checked item.system.weapon_traits.weapon_trait_pom}} />
-    </div>
-    <div>
-      <label>Pesada:</label>
-      <input type="number" name="system.weapon_traits.weapon_trait_heavy" value="{{item.system.weapon_traits.weapon_trait_heavy}}" style="width: 60px;" />
-    </div>
-    <div>
-      <label>Defensiva:</label>
-      <input type="number" name="system.weapon_traits.weapon_trait_defensive" value="{{item.system.weapon_traits.weapon_trait_defensive}}" style="width: 60px;" />
-    </div>
-    <div>
-    <label>Escudo:</label>
-    <input type="number" name="system.weapon_traits.weapon_trait_shield" value="{{item.system.weapon_traits.weapon_trait_shield}}" style="width: 60px;" />
-    </div>
-    <div>
-    <label>Descomunal (1-5):</label>
-    <input type="number" name="system.weapon_traits.weapon_trait_desc" value="{{item.system.weapon_traits.weapon_trait_desc}}" min="0" max="5" style="width: 60px;" />
-    </div>
-    
-    <div>
-  <label>Quebra-Ferro:</label>
-  <input type="checkbox" name="system.weapon_traits.weapon_trait_ironbreaker" {{checked item.system.weapon_traits.weapon_trait_ironbreaker}} />
-</div>
-
-    <div>
-    <label>Vulnerável:</label>
-    <input type="checkbox" name="system.weapon_traits.weapon_trait_vulnerable" {{checked item.system.weapon_traits.weapon_trait_vulnerable}} />
-    </div>
-
-
-    <div>
-      <label>Rápida:</label>
-      <input type="number" name="system.weapon_traits.weapon_trait_fast" value="{{item.system.weapon_traits.weapon_trait_fast}}" style="width: 60px;" />
-    </div>
-    <div>
-      <label>Recarga:</label>
-  <select name="system.weapon_traits.weapon_trait_recharge">
-    <option value="0" {{#if (eq item.system.weapon_traits.weapon_trait_recharge 0)}}selected{{/if}}>Nenhuma</option>
-    <option value="1" {{#if (eq item.system.weapon_traits.weapon_trait_recharge 1)}}selected{{/if}}>Recarga</option>
-    <option value="2" {{#if (eq item.system.weapon_traits.weapon_trait_recharge 2)}}selected{{/if}}>Recarga Lenta</option>
-  </select>
-    </div>
-  </div>
-{{/if}}
-
-
-    {{#if (eq item.system.gear_type "armor")}}
-      <div>
-        <label>Armor Subtype:</label>
-        <select name="system.subtype">
-          {{#each armorSubtypes as |s|}}
-            <option value="{{s}}" {{#if (eq ../item.system.subtype s)}}selected{{/if}}>{{s}}</option>
-          {{/each}}
+        <label>Raridade:</label>
+        <select name="system.rarity">
+          <option value="common" {{#if (eq item.system.rarity "common")}}selected{{/if}}>Comum</option>
+          <option value="uncommon" {{#if (eq item.system.rarity "uncommon")}}selected{{/if}}>Incomum</option>
+          <option value="rare" {{#if (eq item.system.rarity "rare")}}selected{{/if}}>Rara</option>
+          <option value="epic" {{#if (eq item.system.rarity "epic")}}selected{{/if}}>Épica</option>
         </select>
       </div>
-    {{/if}}
-
-
-
-    {{#if (eq item.system.gear_type "accessory")}}
-      <div>
-        <label>Accessory Subtype:</label>
-        <select name="system.subtype">
-          {{#each accessorySubtypes as |s|}}
-            <option value="{{s}}" {{#if (eq ../item.system.subtype s)}}selected{{/if}}>{{s}}</option>
-          {{/each}}
-        </select>
-      </div>
-    {{/if}}
-
-    <!-- VALUE -->
-    <div>
-      <label>Value:</label>
-      <input type="number" name="system.value" value="{{item.system.value}}" />
     </div>
 
-    <!-- RARITY -->
+    <!-- 📖 Descrição -->
     <div>
-      <label>Rarity:</label>
-      <select name="system.rarity">
-        <option value="common" {{#if (eq item.system.rarity "common")}}selected{{/if}}>Common</option>
-        <option value="uncommon" {{#if (eq item.system.rarity "uncommon")}}selected{{/if}}>Uncommon</option>
-        <option value="rare" {{#if (eq item.system.rarity "rare")}}selected{{/if}}>Rare</option>
-        <option value="epic" {{#if (eq item.system.rarity "epic")}}selected{{/if}}>Epic</option>
-      </select>
-    </div>
-
-    <!-- DESCRIPTION -->
-    <div>
-      <label>Description:</label>
+      <label>Descrição:</label>
       <textarea name="system.description" rows="4">{{item.system.description}}</textarea>
-      </div>
-      
-{{#if (eq item.system.gear_type "armor")}}
-  <hr />
-  <h3>Armadura</h3>
-
-  <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-
-    <div>
-      <label>Proteção:</label>
-      <input type="number" name="system.armor_protection" value="{{item.system.armor_protection}}" style="width: 60px;" />
     </div>
-
-    <div>
-      <label>Eficácia (%):</label>
-      <input type="number" name="system.armor_efficiency" value="{{item.system.armor_efficiency}}" style="width: 60px;" />
-    </div>
-
-    <div>
-      <label>Requisito (IMP):</label>
-      <input type="number" name="system.armor_requeriment" value="{{item.system.armor_requeriment}}" style="width: 60px;" />
-    </div>
-
-    <div style="display: flex; align-items: center; gap: 4px;">
-      <label>Quebrada:</label>
-      <input type="checkbox" name="system.armor_broken" {{checked item.system.armor_broken}} />
-    </div>
-
-  </div>
-
-  <h4>Traços da Armadura</h4>
-
-  <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-    <div>
-      <label>Metal:</label>
-      <input type="number" name="system.armor_traits.trait_metal" value="{{item.system.armor_traits.trait_metal}}" style="width: 60px;" />
-    </div>
-    <div>
-      <label>Ruído:</label>
-      <input type="number" name="system.armor_traits.trait_noisy" value="{{item.system.armor_traits.trait_noisy}}" style="width: 60px;" />
-    </div>
-    <div>
-      <label>Ref.:</label>
-      <input type="number" name="system.armor_traits.trait_reinforced" value="{{item.system.armor_traits.trait_reinforced}}" style="width: 60px;" />
-    </div>
-    <div>
-      <label>Pesada:</label>
-      <input type="number" name="system.armor_traits.trait_heavy" value="{{item.system.armor_traits.trait_heavy}}" style="width: 60px;" />
-    </div>
-    <div>
-      <label>Térmica:</label>
-      <input type="number" name="system.armor_traits.trait_thermic" value="{{item.system.armor_traits.trait_thermic}}" style="width: 60px;" />
-    </div>
-  </div>
-{{/if}}
-
   </section>
+
 
 
 
