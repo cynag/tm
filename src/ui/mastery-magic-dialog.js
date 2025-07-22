@@ -38,9 +38,51 @@ export class MasteryMagicDialog {
         confirm: {
           icon: '<i class="fas fa-fire"></i>',
           label: "Conjurar Maestria",
+////////////////////////////////////////////////
+callback: async () => {
+  // === VERIFICA SE PRECISA DE FOCO ARCANO
+  const arcaneType = mastery.mastery_arcane_type;
+  let arcaneCost = mastery.mastery_arcane_charges ?? 0;
 
-          callback: async () => {
-  const selectedTargets = Array.from(game.user.targets);
+  if (arcaneType && arcaneCost > 0) {
+    const focus = actor.system.arcaneFocus?.[arcaneType];
+
+    if (!focus || focus.charges < arcaneCost) {
+      ui.notifications.warn(`⚠️ Você precisa de ${arcaneCost} carga(s) do foco arcano "${arcaneType}" para usar esta maestria.`);
+      return;
+    }
+
+    // === REMOVE AS CARGAS DE UM DOS ITENS EQUIPADOS
+    for (const itemId of focus.items) {
+      const item = actor.items.get(itemId);
+      const current = item.system.gear_arcaneCharges ?? 0;
+
+      if (current <= 0) continue;
+
+      const remove = Math.min(current, arcaneCost);
+      arcaneCost -= remove;
+
+      await item.update({ "system.gear_arcaneCharges": current - remove });
+
+      if (arcaneCost <= 0) break;
+    }
+  }
+
+// === VERIFICA SE TEM PA SUFICIENTE
+const paCost = mastery.mastery_cost ?? 0;
+const currentPA = actor.system.player_pa ?? 0;
+
+if (paCost > 0) {
+  if (currentPA < paCost) {
+    ui.notifications.warn(`⚠️ Você precisa de ${paCost} PA para usar essa maestria, mas só tem ${currentPA}.`);
+    return;
+  }
+
+  await actor.update({ "system.player_pa": currentPA - paCost });
+}
+
+// === VERIFICA ALVOS
+const selectedTargets = Array.from(game.user.targets);
   const maxTargets = mastery.mastery_targets;
 
   if (!selectedTargets.length) {
@@ -83,6 +125,7 @@ export class MasteryMagicDialog {
   }
 }
 
+/////////////////////////////////////////////////
 
         }
       },

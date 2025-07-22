@@ -12,6 +12,8 @@ const FireDB = [
     mastery_cost: 4,
     mastery_cd: 3,
     mastery_range: 6,
+    mastery_arcane_type: "fire",
+    mastery_arcane_charges: 2,
     mastery_auto_hit: false,
     mastery_targets: 2, //se for ilimitado colocar "all"
     mastery_img: "systems/tm/styles/assets/masterys/fire/1a.webp",
