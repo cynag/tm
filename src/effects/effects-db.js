@@ -141,7 +141,7 @@ export const EffectsDB = [
     description: "–1d6 em ataques. Perde concentrações.",
     duration: 1,
     effect_type: "rm",
-    img: "systems/tm/styles/assets/effects/perturbado.webp"
+    img: "systems/tm/styles/assets/effects/apavored.webp"
   },
   {
     id: "desgastado",

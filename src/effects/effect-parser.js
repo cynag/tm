@@ -125,4 +125,60 @@ export class EffectParser {
     return { value, key, raw };
   }
 
+  static toFoundryChanges(effectCommand) {
+  const commands = Array.isArray(effectCommand) ? effectCommand : [effectCommand];
+  const changes = [];
+
+  for (const raw of commands) {
+    const clean = raw.trim();
+    if (!clean) continue;
+
+    // SET fixo: @{key}==10
+    let match = clean.match(/^@{(.+?)}\s*==\s*(\d+)$/);
+    if (match) {
+      changes.push({
+        key: `system.${match[1].trim()}`,
+        mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+        value: match[2],
+        priority: 20
+      });
+      continue;
+    }
+
+    // SET por divisão: @{key}==@{key}/2
+    match = clean.match(/^@{(.+?)}\s*==\s*@{.+?}\/(\d+)$/);
+    if (match) {
+      const key = match[1].trim();
+      const divisor = parseInt(match[2]) || 1;
+      const value = (1 / divisor).toFixed(3);
+      changes.push({
+        key: `system.${key}`,
+        mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY,
+        value: value,
+        priority: 20
+      });
+      continue;
+    }
+
+    // MOD: +X @{key} ou -X @{key}
+    match = clean.match(/^([+\-]?\d+)\s*@{(.+?)}$/);
+    if (match) {
+      const value = match[1].trim();
+      const key = match[2].trim();
+      changes.push({
+        key: `system.${key}`,
+        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+        value: value,
+        priority: 20
+      });
+      continue;
+    }
+
+    // ⚠️ Não reconhecido
+    console.warn("[toFoundryChanges] Comando ignorado:", raw);
+  }
+
+  return changes;
+}
+
 }

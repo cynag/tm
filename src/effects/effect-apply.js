@@ -40,22 +40,24 @@ export class EffectApply {
     const currentCount = same.length + 1;
     const label = effect.stackable ? `${effect.name} (${currentCount})` : effect.name;
 
-    const effectData = {
-      id: effect.id,
-      name: label,
-      label: label,
-      icon: effect.img || "icons/svg/aura.svg",
-      origin: `Actor.${actor.id}`,
-      duration: { rounds: effect.duration || 1 },
-      flags: {
-        tm: {
-          source: "resistance-roll",
-          appliedFrom: "direct-apply",
-          effectId: effect.id,
-          stackCount: currentCount
-        }
-      }
-    };
+const effectData = {
+  id: effect.id,
+  name: label,
+  label: label,
+  icon: effect.img || "icons/svg/aura.svg",
+  origin: `Actor.${actor.id}`,
+  duration: { rounds: effect.duration || 1 },
+  changes: EffectParser.toFoundryChanges(effect.effect),
+  flags: {
+    tm: {
+      source: "resistance-roll",
+      appliedFrom: "direct-apply",
+      effectId: effect.id,
+      stackCount: currentCount
+    }
+  }
+};
+
 
     const existing = actor.effects.find(e => e.getFlag("tm", "effectId") === effect.id);
 
@@ -73,6 +75,37 @@ export class EffectApply {
 
     console.log(`[🧪] Efeito "${label}" aplicado a ${actor.name}`);
   }
+  
+  static async remove(actor, effectId) {
+  const effect = EffectsDB.find(e => e.id === effectId);
+  if (!effect) return;
+
+  // Remove modificadores aplicados manualmente
+  if (effect.effect) {
+    EffectParser.remove(actor, effect.effect);
+  }
+
+  // Remove da lista de efeitos ativos no system
+  const current = actor.system.activeEffects ?? [];
+  const updated = current.filter(e => e.id !== effectId);
+  await actor.update({ "system.activeEffects": updated });
+
+  // Remove ActiveEffect real
+  const real = actor.effects.find(e => e.getFlag("tm", "effectId") === effectId);
+  if (real) {
+    await actor.deleteEmbeddedDocuments("ActiveEffect", [real.id]);
+
+    const token = actor.getActiveTokens()[0];
+    if (token && token.document.overlayEffect === real.icon) {
+      await token.document.update({ overlayEffect: null });
+    }
+  }
+
+  // Atualiza visuais
+  await EffectRender.update(actor);
+  console.log(`[🧽] Efeito "${effect.name}" removido de ${actor.name}`);
+}
+
 }
 
 export class EffectDuration {

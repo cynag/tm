@@ -267,6 +267,43 @@ Hooks.on("deleteCombat", async (combat) => {
   }
 });
 
+Hooks.on("renderTokenHUD", async (hud, html, data) => {
+  const customEffects = game.tm.EffectsDB ?? [];
+  if (!customEffects.length) return;
+
+const effectList = html.querySelector(".status-effects");
+
+if (!effectList) return;
+
+
+effectList.innerHTML = "";
+
+
+  for (const effect of customEffects) {
+    const icon = effect.img || "icons/svg/aura.svg";
+    const isApplied = data.actor?.system?.activeEffects?.some(e => e.id === effect.id);
+
+    const div = $(`<img class="effect-control" src="${icon}" title="${effect.name}" data-id="${effect.id}"/>`);
+    if (isApplied) div.addClass("active");
+
+    div.on("click", async () => {
+      const actor = canvas.tokens.get(data._id)?.actor;
+      if (!actor) return;
+
+      const has = actor.system.activeEffects?.some(e => e.id === effect.id);
+      if (has) {
+        await game.tm.EffectApply.remove(actor, effect.id);
+      } else {
+        await game.tm.EffectApply.apply({ actor, effectId: effect.id });
+      }
+    });
+
+effectList.appendChild(div[0]); // div é jQuery, pegar o DOM puro
+
+  }
+});
+
+
 game.tm.DomainsDB = DomainsDB;
 
 
