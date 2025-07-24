@@ -1,6 +1,10 @@
 // src/effects/effects-panel.js
 import { EffectsDB } from "./effects-db.js";
 
+function isPersistentMastery(effect) {
+  return effect?.flags?.tm?.appliedFrom === "persistent-mastery";
+}
+
 export class EffectsPanel {
   static async render(html, actor) {
     const container = html.find("#effects-panel-container");
@@ -19,14 +23,30 @@ export class EffectsPanel {
       grouped[effect.id].push(effect);
     }
 
-    for (const [id, group] of Object.entries(grouped)) {
-      const fullData = EffectsDB.find(e => e.id === id) ?? {};
-      const baseEffect = group[0];
+for (const [id, group] of Object.entries(grouped)) {
+  const baseEffect = group[0];
+  const isCustomMastery = isPersistentMastery(baseEffect);
+
+let fullData = EffectsDB.find(e => e.id === id);
+if (!fullData) {
+  fullData = {
+    name: baseEffect.name || id,
+    img: baseEffect.img || baseEffect.icon || "icons/svg/aura.svg", // ← corrigido aqui
+    duration: baseEffect.duration?.rounds ?? null,
+    isMastery: isCustomMastery,
+    description: isCustomMastery ? "Efeito proveniente de uma maestria ativa." : "Sem descrição."
+  };
+}
+
+
+
+
       const count = group.length;
 
       const name = (baseEffect.name || fullData.name || id) + (count > 1 ? ` (${count})` : "");
       const description = fullData.description || "Sem descrição.";
-      const tagText = fullData.duration !== null ? `${fullData.duration} rodadas` : "Permanente";
+let tagText = fullData.isMastery ? "MAESTRIA" :
+              (fullData.duration !== null ? `${fullData.duration} rodadas` : "Permanente");
 
       // Traduções dos atributos para exibição
       const labelMap = {

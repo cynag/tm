@@ -65,6 +65,10 @@ import { MasteryMeleeAttackRoll } from "./src/roll/mastery-melee-attack-roll.js"
 import { MasteryMeleeDialog } from "./src/ui/mastery-melee-dialog.js";
 import { MasteryParser } from "./src/mastery/mastery-parser.js";
 import { MasteryCooldown } from "./src/mastery/cooldown.js";
+import { MasteryPersistent } from "./src/mastery/mastery-persistent.js";
+
+
+
 
 import { EffectsPanel } from "./src/effects/effects-panel.js";
 import { EffectsDB } from "./src/effects/effects-db.js";
@@ -203,6 +207,7 @@ Hooks.once("ready", () => {
     MasteryCooldown,
     MasteryMagicAttackRoll,
     MasteryMagicDialog,
+    MasteryPersistent,
 
 
     EffectsPanel,

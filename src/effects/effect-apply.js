@@ -77,8 +77,16 @@ const effectData = {
   }
   
   static async remove(actor, effectId) {
-  const effect = EffectsDB.find(e => e.id === effectId);
-  if (!effect) return;
+let effect = EffectsDB.find(e => e.id === effectId);
+const isCustom = !effect;
+
+if (isCustom) {
+  effect = {
+    id: effectId,
+    effect: [] // ← evita erro no parser
+  };
+}
+
 
   // Remove modificadores aplicados manualmente
   if (effect.effect) {
@@ -87,7 +95,19 @@ const effectData = {
 
   // Remove da lista de efeitos ativos no system
   const current = actor.system.activeEffects ?? [];
-  const updated = current.filter(e => e.id !== effectId);
+const updated = current.filter(e => {
+  const id = e?.id || "";
+  const eid = e?.effectId || "";
+
+  const same = id === effectId || eid === effectId;
+  const similar = id.includes(effectId) || effectId.includes(id);
+
+  return !same && !similar;
+});
+
+
+
+
   await actor.update({ "system.activeEffects": updated });
 
   // Remove ActiveEffect real
@@ -104,7 +124,88 @@ const effectData = {
   // Atualiza visuais
   await EffectRender.update(actor);
   console.log(`[🧽] Efeito "${effect.name}" removido de ${actor.name}`);
+
 }
+static async applyCustom({ actor, effectId, label, img, duration = null, commands = [] }) {
+  if (!actor || !effectId) return;
+
+  const current = actor.system.activeEffects ?? [];
+const alreadyHas = current.some(e => e.id === effectId);
+if (alreadyHas) return;
+
+// Tenta recuperar da DB se commands não foram passados
+if ((!commands || commands.length === 0) && game?.tm?.EffectsDB) {
+  const fromDB = game.tm.EffectsDB.find(e => e.id === effectId);
+  if (fromDB?.effect) {
+    commands = Array.isArray(fromDB.effect) ? fromDB.effect : [fromDB.effect];
+    console.log(`[📂] Efeito puxado da EffectsDB: ${effectId}`, commands);
+  }
+}
+
+
+// Aplica modificadores se houver
+if (commands.length > 0) {
+  for (const raw of commands) {
+    EffectParser.apply(actor, raw);
+  }
+}
+
+
+const updatedList = [...current, {
+  id: effectId,
+  name: label,
+  img: img,
+  isMastery: true
+}];
+await actor.update({ "system.activeEffects": updatedList });
+
+
+
+  // Corrige a duração para ser número ou undefined
+  const effectDuration = typeof duration === "number" ? { rounds: duration } : {};
+
+const effectData = {
+  _id: randomID(),
+  name: label || effectId,
+  label: label || effectId,
+  icon: img || "icons/svg/aura.svg",
+  origin: actor.uuid,
+  duration: effectDuration,
+  changes: EffectParser.toFoundryChanges(commands),
+  flags: {
+    core: {
+      statusId: effectId
+    },
+    tm: {
+      source: "resistance-roll",
+      appliedFrom: "persistent-mastery",
+      effectId: effectId,
+      isMastery: true
+    }
+  }
+};
+
+
+
+const created = await actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+
+if (created?.length > 0) {
+  await created[0].update({
+    name: label || effectId,
+    icon: img || "icons/svg/aura.svg"
+  });
+}
+
+  const token = actor.getActiveTokens()[0];
+  if (token) {
+    await EffectRender.update(actor);
+  } else {
+    console.warn("[EffectRender] Ignorado — sem token ativo.");
+  }
+
+  console.log(`[🌞] Efeito visual personalizado criado: ${label}`);
+}
+
 
 }
 

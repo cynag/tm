@@ -229,9 +229,11 @@ const isOnCooldown = cdTurns > 0;
 
 
 
-const row = $(`  
-  <div class="talent-row mastery-row ${isOnCooldown ? 'cooldown-active' : ''}" data-id="${m.id}">
-    <div class="cooldown-wrapper">
+const isActive = actor.flags?.tm?.persistentMasteryId === m.id;
+
+const row = $(`
+  <div class="talent-row mastery-row ${isOnCooldown ? 'cooldown-active' : ''} ${isActive ? 'mastery-active' : ''}" data-id="${m.id}">
+  <div class="cooldown-wrapper">
       <img class="talent-icon" src="${m.mastery_img}" width="40" height="40"/>
       ${isOnCooldown ? `<div class="cooldown-overlay">${cdTurns}</div>` : ""}
     </div>

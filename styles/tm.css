@@ -1519,3 +1519,8 @@ button.btn-cancel:hover {
   text-justify: inter-word !important;
   line-height: 14px;
 }
+.mastery-active {
+  outline: 2px solid gold;
+  box-shadow: 0 0 6px 2px rgba(255, 215, 0, 0.6);
+  border-radius: 6px;
+}
