@@ -175,7 +175,7 @@ export const EffectsDB = [
     description: "No início do turno: 1-2 age normal, 3-4 ataca o mais próximo, 5-6 perde o turno.",
     duration: 1,
     effect_type: "rm",
-    img: "systems/tm/styles/assets/effects/confused.webp"
+    img: "systems/tm/styles/assets/effects/placeholder.webp"
   },
   {
     id: "flanqueando",
@@ -184,7 +184,7 @@ export const EffectsDB = [
     description: "+1d6 no ataque contra alvo flanqueado.",
     duration: 1,
     effect_type: "rf",
-    img: "systems/tm/styles/assets/effects/flanqueando.webp"
+    img: "systems/tm/styles/assets/effects/placeholder.webp"
   },
   {
     id: "retaguarda",
@@ -193,7 +193,7 @@ export const EffectsDB = [
     description: "+2d6 no ataque contra alvo desprevenido por trás.",
     duration: 1,
     effect_type: "rf",
-    img: "systems/tm/styles/assets/effects/retaguarda.webp"
+    img: "systems/tm/styles/assets/effects/placeholder.webp"
   },
   {
     id: "preparado",

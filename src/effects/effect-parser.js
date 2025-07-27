@@ -22,14 +22,16 @@ export class EffectParser {
       actor.flags.tm.appliedEffects ??= {};
 
       const existing = actor.flags.tm.appliedEffects[key] ?? [];
-      const current = getProperty(actor.system, key) ?? 0;
-      const updated = isSet ? value : current + value;
+if (existing.includes(raw)) continue; // 🛑 já aplicado
 
-      setProperty(actor.system, key, updated);
-      actor.flags.tm.appliedEffects[key] = [...existing, raw];
+const current = foundry.utils.getProperty(actor.system, key) ?? 0;
+const updated = isSet ? value : current + value;
 
-      console.log(`[EffectParser] ${isSet ? "SET" : "MOD"} ${key}: ${current} → ${updated}`);
-    }
+foundry.utils.setProperty(actor.system, key, updated);
+actor.flags.tm.appliedEffects[key] = [...existing, raw];
+
+//console.log(`[EffectParser] ${isSet ? "SET" : "MOD"} ${key}: ${current} → ${updated}`);
+}
   }
 
     static remove(actor, effectCommand) {

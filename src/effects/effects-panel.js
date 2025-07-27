@@ -29,14 +29,17 @@ for (const [id, group] of Object.entries(grouped)) {
 
 let fullData = EffectsDB.find(e => e.id === id);
 if (!fullData) {
+  const custom = group[0]?.flags?.tm?.customEffect;
   fullData = {
     name: baseEffect.name || id,
-    img: baseEffect.img || baseEffect.icon || "icons/svg/aura.svg", // ← corrigido aqui
+    img: baseEffect.img || baseEffect.icon || "icons/svg/aura.svg",
     duration: baseEffect.duration?.rounds ?? null,
     isMastery: isCustomMastery,
+    effect: custom || [],
     description: isCustomMastery ? "Efeito proveniente de uma maestria ativa." : "Sem descrição."
   };
 }
+
 
 
 

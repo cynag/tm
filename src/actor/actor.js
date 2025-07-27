@@ -408,7 +408,6 @@ for (const [slotId, slot] of Object.entries(s.gearSlots)) {
       clone.weapon_traits.weapon_trait_fast = 0;
     }
 
-    //console.log(`[ARMA QUEBRADA] ${this.name} => efeitos aplicados`);
   }
 
   //console.log(`[WEAPON SLOT] ${this.name} => ${item.name} em ${slotId}`);
@@ -502,20 +501,29 @@ const effects = s.activeEffects || [];
 for (let i = 0; i < effects.length; i++) {
   const effect = effects[i];
   const fullData = EffectsDB.find(e => e.id === effect.id);
-  if (!fullData) continue;
+  
+  let commands = [];
 
-  const commands = Array.isArray(fullData.effects)
-    ? fullData.effects
-    : [fullData.effect];
+  if (fullData) {
+    commands = Array.isArray(fullData.effects)
+      ? fullData.effects
+      : [fullData.effect];
+  }
+
+  // Se for um efeito personalizado de maestria
+  if (effect.flags?.tm?.customEffect?.length) {
+    commands = commands.concat(effect.flags.tm.customEffect);
+  }
 
   for (const fx of commands) {
     try {
       EffectParser.apply(this, fx);
     } catch (err) {
-      console.warn(`[EFFECT ERROR] ${fullData.name} → ${fx}`, err);
+      console.warn(`[EFFECT ERROR] ${effect.id} → ${fx}`, err);
     }
   }
 }
+
 // === MARCADORES DE EFEITOS FÍSICOS / MENTAIS ===
 s.has_physical_effect = false;
 s.has_mental_effect = false;

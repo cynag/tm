@@ -125,7 +125,8 @@ const updated = current.filter(e => {
   await EffectRender.update(actor);
   console.log(`[🧽] Efeito "${effect.name}" removido de ${actor.name}`);
 
-}
+  }
+
 static async applyCustom({ actor, effectId, label, img, duration = null, commands = [] }) {
   if (!actor || !effectId) return;
 
@@ -144,19 +145,26 @@ if ((!commands || commands.length === 0) && game?.tm?.EffectsDB) {
 
 
 // Aplica modificadores se houver
-if (commands.length > 0) {
+if (commands.length > 0 && !alreadyHas) {
   for (const raw of commands) {
     EffectParser.apply(actor, raw);
   }
 }
 
 
+
 const updatedList = [...current, {
   id: effectId,
   name: label,
   img: img,
-  isMastery: true
+  isMastery: true,
+  flags: {
+    tm: {
+      customEffect: commands
+    }
+  }
 }];
+
 await actor.update({ "system.activeEffects": updatedList });
 
 
@@ -186,6 +194,7 @@ const effectData = {
 };
 
 
+effectData.flags.tm.customEffect = commands;
 
 const created = await actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
 
@@ -204,8 +213,7 @@ if (created?.length > 0) {
   }
 
   console.log(`[🌞] Efeito visual personalizado criado: ${label}`);
-}
-
+  }
 
 }
 
