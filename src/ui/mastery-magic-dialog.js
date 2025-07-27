@@ -1,45 +1,69 @@
 import { MasteryMagicAttackRoll } from "../roll/mastery-magic-attack-roll.js";
+import { MasteryPersistent } from "../mastery/mastery-persistent.js";
 
 export class MasteryMagicDialog {
   static async show({ actor, mastery }) {
+    const isPersistentActive = (await actor.getFlag("tm", "persistentMasteryId")) === mastery.id;
     const diceCountRef = { value: 3 };
     let dialogHtml = null;
 
-    const html = `
-      <div class="attack-roll-dialog" style="display: flex; flex-direction: column; gap: 8px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <img src="${mastery.mastery_img}" width="48" height="48" style="border:1px solid #555; border-radius:4px;" />
-          <div>
-            <h2 style="margin:0; font-size: 16px;">${mastery.mastery_name}</h2>
-            <div style="margin-top:4px;">
-              <span class="tag">${mastery.mastery_cost || "–"} PA</span>
-              <span class="tag">CD ${mastery.mastery_cd || "–"}</span>
-              <span class="tag">${mastery.mastery_range || "–"}m</span>
-            </div>
+const html = isPersistentActive
+  ? `<div style="padding: 10px; font-size: 14px;">
+      <p>Essa maestria está ativa.<br>Deseja desativá-la?</p>
+    </div>`
+  : `<div class="attack-roll-dialog" style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="${mastery.mastery_img}" width="48" height="48" style="border:1px solid #555; border-radius:4px;" />
+        <div>
+          <h2 style="margin:0; font-size: 16px;">${mastery.mastery_name}</h2>
+          <div style="margin-top:4px;">
+            <span class="tag">${mastery.mastery_cost || "–"} PA</span>
+            <span class="tag">CD ${mastery.mastery_cd || "–"}</span>
+            <span class="tag">${mastery.mastery_range || "–"}m</span>
           </div>
         </div>
-        <div style="font-size: 13px; color: var(--color-text-light);">
-          ${mastery.mastery_description || "<i>Sem descrição</i>"}
-        </div>
-        <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 6px;">
-          <label>Dados:</label>
-          <button class="step-down">▼</button>
-          <strong><span class="dice-count">${diceCountRef.value}</span>d6</strong>
-          <button class="step-up">▲</button>
-        </div>
       </div>
-    `;
+      <div style="font-size: 13px; color: var(--color-text-light);">
+        ${mastery.mastery_description || "<i>Sem descrição</i>"}
+      </div>
+      <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 6px;">
+        <label>Dados:</label>
+        <button class="step-down">▼</button>
+        <strong><span class="dice-count">${diceCountRef.value}</span>d6</strong>
+        <button class="step-up">▲</button>
+      </div>
+    </div>`;
+
 
     const dialog = new Dialog({
       title: mastery.mastery_name,
       content: html,
-      buttons: {
-        cancel: { label: "Cancelar" },
-        confirm: {
-          icon: '<i class="fas fa-fire"></i>',
-          label: "Conjurar Maestria",
-////////////////////////////////////////////////
+buttons: isPersistentActive
+  ? {
+      cancel: { label: "Não" },
+      confirm: {
+        label: "Sim",
 callback: async () => {
+  await MasteryPersistent.deactivate(actor, mastery.id);
+  ui.notifications.info("Maestria desativada.");
+
+  const sheet = actor.sheet;
+  if (sheet?.rendered) {
+    const html = $(sheet.element);
+    await game.tm.ActionsPanel.render(html, actor);
+  }
+
+}
+
+      }
+    }
+  : {
+      cancel: { label: "Cancelar" },
+      confirm: {
+        icon: '<i class="fas fa-fire"></i>',
+        label: "Conjurar Maestria",
+        callback: async () => {
+////////////////////////////////////////////////
   // === VERIFICA SE PRECISA DE FOCO ARCANO
   const arcaneType = mastery.mastery_arcane_type;
   let arcaneCost = mastery.mastery_arcane_charges ?? 0;
@@ -115,9 +139,13 @@ const selectedTargets = Array.from(game.user.targets);
   });
 
   const cd = mastery.mastery_cd ?? 0;
-  if (cd > 0 && mastery.id && game.combat?.started) {
-    game.tm.MasteryCooldown.setCooldown(actor, mastery, cd);
-  }
+if (cd > 0 && mastery.id && game.combat?.started && !["posture", "conjuration"].includes(mastery.mastery_type)) {
+  game.tm.MasteryCooldown.setCooldown(actor, mastery, cd);
+}
+
+if (["posture", "conjuration"].includes(mastery.mastery_type)) {
+  await MasteryPersistent.activate(actor, mastery);
+}
 
   if (actor.sheet?.rendered) {
     const html = $(actor.sheet.element);
@@ -134,9 +162,12 @@ const selectedTargets = Array.from(game.user.targets);
 
     dialog.render(true);
 
-    Hooks.once("renderDialog", (app, htmlEl) => {
-      if (app.appId !== dialog.appId) return;
-      dialogHtml = htmlEl;
+Hooks.once("renderDialog", (app, htmlEl) => {
+  if (app.appId !== dialog.appId) return;
+  if (isPersistentActive) return;
+
+  dialogHtml = htmlEl;
+
 
       const dom = htmlEl;
       dom.find(".step-up").on("click", () => {

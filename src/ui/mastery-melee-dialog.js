@@ -132,9 +132,15 @@ buttons: isPersistentActive
     }
 
     const cd = mastery.mastery_cd ?? 0;
-    if (cd > 0 && mastery.id && game.combat?.started) {
-      game.tm.MasteryCooldown.setCooldown(actor, mastery, cd);
-    }
+if (
+  cd > 0 &&
+  mastery.id &&
+  game.combat?.started &&
+  !["posture", "conjuration"].includes(mastery.mastery_type)
+) {
+  game.tm.MasteryCooldown.setCooldown(actor, mastery, cd);
+}
+
 
     const sheet = actor.sheet;
     if (sheet?.rendered) {

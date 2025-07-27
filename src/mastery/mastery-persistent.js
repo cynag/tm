@@ -71,6 +71,14 @@ static async deactivate(actor, masteryId) {
 
   await actor.unsetFlag("tm", "persistentMasteryId");
 
+  const allDomains = Object.values(game.tm?.DomainsDB ?? {}).flat();
+const mastery = allDomains.find(m => m.id === masteryId);
+
+if (mastery && mastery.mastery_cd > 0 && game.combat?.started) {
+  game.tm.MasteryCooldown.setCooldown(actor, mastery, mastery.mastery_cd);
+}
+
+
   // Remove o efeito visual
   await EffectApply.remove(actor, `posture-${masteryId}`);
 
