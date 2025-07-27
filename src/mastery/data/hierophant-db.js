@@ -41,7 +41,7 @@ const HierophantDB = [
     mastery_cd: 3,
     mastery_range: "weapon_range",
     mastery_img: "systems/tm/styles/assets/masterys/fire/1a.webp",
-    mastery_description: `Você desfere uma estocada centrada nos pontos mais vulneráveis do inimigo, mirando brechas entre placas ou falhas na guarda. Se acertar o golpe, ignora 2 de proteção do alvo e causa 1d6 + 1d6/2ND de dano adicional. Se o alvo estiver sofrendo qualquer penalidade física (que necessita de um teste de RF para evitar), você recebe +1/ND na rolagem de ataque.`,
+    mastery_description: `Você eleva sua lâmina acima da cabeça, em posição agressiva. Enquanto mantiver esta postura, você ganha +2/NDi de dano extra com armas. Além disso, ao entrar nesta postura, seu próximo ataque recebe +1d6 de dano, +1m de alcance, e move você 1 metro para frente (se possível). Se atingir um alvo, ele é forçado a recuar 1 metro.`,
     mastery_limitation: " ",
     mastery_requirements: [
       { subtype: ["spear", "sword"] }
@@ -51,6 +51,7 @@ const HierophantDB = [
     weapon_damage_bonus: "+1d2",
     weapon_damage_bonus_2: "+1d4",
     weapon_extra: "target.prot =-2",
+    has_roll: false,
   },
   {
     id: "hierophant_3A",

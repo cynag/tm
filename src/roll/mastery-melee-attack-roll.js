@@ -12,6 +12,42 @@ export async function rollMasteryAttack({ attacker, target, mastery, hand = "rig
   const targetActor = target?.actor;
   if (!targetActor) return ui.notifications.warn("O alvo não possui ficha de ator.");
 
+if (mastery.has_roll === false) {
+  const fakeMsg = `
+    <div class="chat-roll" style="font-family: var(--font-primary); font-size: 1.1em;">
+      <div class="chat-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+        <img class="chat-img" src="${mastery.mastery_img}" width="35" height="35" style="border:1px solid #555; border-radius:4px;" />
+        <div>
+          <h2 class="chat-roll-name" style="margin: 0 0 4px 0; font-size: 16px;">${mastery.mastery_name}</h2>
+          <div class="chat-tags" style="display: flex; gap: 4px; justify-content: flex-end; margin-bottom: 2px;">
+            <span class="tag">${{
+              action: "AÇÃO", conjuration: "CONJURAÇÃO", reaction: "REAÇÃO", stance: "POSTURA", passive: "PASSIVA"
+            }[mastery.mastery_type] || mastery.mastery_type}</span>
+            <span class="tag">${mastery.mastery_cost || "–"} PA</span>
+            <span class="tag">CD ${mastery.mastery_cd || "–"}</span>
+            <span class="tag">${mastery.mastery_range || "–"}m</span>
+          </div>
+          <div class="chat-tags" style="display: flex; gap: 4px; justify-content: flex-end;">
+            ${(mastery.mastery_tags || []).map(tag => `<span class="tag">${tag}</span>`).join("")}
+          </div>
+        </div>
+      </div>
+      <div class="chat-description" style="font-size: 13px; color: var(--color-text-light); margin-bottom: 8px;">
+        ${mastery.mastery_description || "<i>Sem descrição</i>"}
+      </div>
+    </div>
+  `;
+
+  await ChatMessage.create({
+    user: game.user.id,
+    speaker: ChatMessage.getSpeaker({ actor: attacker }),
+    flavor: fakeMsg
+  });
+
+  return;
+}
+
+
   const DieTerm = foundry.dice.terms.Die;
   const attackerSystem = attacker.system;
   const targetSystem = targetActor.system;

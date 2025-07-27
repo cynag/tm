@@ -26,12 +26,15 @@ const html = isPersistentActive
       <div style="font-size: 13px; color: var(--color-text-light);">
         ${mastery.mastery_description || "<i>Sem descrição</i>"}
       </div>
-      <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 6px;">
-        <label>Dados:</label>
-        <button class="step-down">▼</button>
-        <strong><span class="dice-count">${diceCountRef.value}</span>d6</strong>
-        <button class="step-up">▲</button>
-      </div>
+${mastery.has_roll === false ? "" : `
+  <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 6px;">
+    <label>Dados:</label>
+    <button class="step-down">▼</button>
+    <strong><span class="dice-count">${diceCountRef.value}</span>d6</strong>
+    <button class="step-up">▲</button>
+  </div>
+`}
+
     </div>`;
 
 
@@ -61,7 +64,7 @@ callback: async () => {
       cancel: { label: "Cancelar" },
       confirm: {
         icon: '<i class="fas fa-fire"></i>',
-        label: "Conjurar Maestria",
+        label: "Usar Maestria",
         callback: async () => {
 ////////////////////////////////////////////////
   // === VERIFICA SE PRECISA DE FOCO ARCANO
