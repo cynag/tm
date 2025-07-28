@@ -179,7 +179,8 @@ export class ActionsPanel {
     id: base.id,
     level,
     actor,
-    mastery_name: base.mastery_name,
+    mastery_name: base.evolution_a.mastery_name,
+
     mastery_nd: base.mastery_nd,
     mastery_domain: domain,
     system: { domain }
@@ -190,7 +191,8 @@ export class ActionsPanel {
     id: base.id,
     level,
     actor,
-    mastery_name: base.mastery_name,
+    mastery_name: base.evolution_b.mastery_name,
+
     mastery_nd: base.mastery_nd,
     mastery_domain: domain,
     system: { domain }

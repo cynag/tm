@@ -201,7 +201,7 @@ const effectLines = mastery.weapon_extra?.split(";").map(s => s.trim()).filter(B
 const extraEffects = {};
 
 for (let line of effectLines) {
-  const match = line.match(/^target\.(\w+)\s*=\s*([-+]?\s*\d+)(?:\s*\/\s*(ND|NP))?$/i);
+  const match = line.match(/^target\.(\w+)\s*=\s*([-+]?\s*\d+)(?:\s*\/\s*(NDp|NDi|ND|NPp|NPi|NP))?$/i);
 
   if (match) {
   const key = match[1];
@@ -209,8 +209,14 @@ for (let line of effectLines) {
   const scale = match[3];
   let value = parseInt(formulaRaw);
 
-  if (scale === "ND") value *= mastery.mastery_nd;
-  if (scale === "NP") value *= Math.floor(mastery.mastery_nd / 2);
+  switch (scale) {
+  case "ND":  value *= mastery.mastery_nd; break;
+  case "NDp": value *= Math.floor(mastery.mastery_nd / 2); break;
+  case "NDi": value *= Math.floor((mastery.mastery_nd + 1) / 2); break;
+  case "NP":  value *= actor.system?.player_level ?? 1; break;
+  case "NPp": value *= Math.floor((actor.system?.player_level ?? 1) / 2); break;
+  case "NPi": value *= Math.floor(((actor.system?.player_level ?? 1) + 1) / 2); break;
+}
 
   extraEffects[key] = (extraEffects[key] ?? 0) + value;
   console.log(`🧪 weapon_extra aplicado: ${key} = ${extraEffects[key]}`);
