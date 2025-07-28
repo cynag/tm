@@ -11,21 +11,31 @@ export class DomainsPanel {
   const label = domainKey.charAt(0).toUpperCase() + domainKey.slice(1);
   return `<option value="${domainKey}">Domínio: ${label}</option>`;
 }).join("");
+const previousDomain = container.find("#domain-select").val();
+const selectedDomain = previousDomain || actor.getFlag("tm", "activeDomain") || "hierophant";
+
+
 
 panel.html(`
   <select id="domain-select" style="margin-bottom: 10px;">
-    ${selectHtml}
+    ${Object.keys(DOMAINS).map(domainKey => {
+      const label = domainKey.charAt(0).toUpperCase() + domainKey.slice(1);
+      const selected = domainKey === selectedDomain ? "selected" : "";
+      return `<option value="${domainKey}" ${selected}>Domínio: ${label}</option>`;
+    }).join("")}
   </select>
   <div id="domain-tree"></div>
 `);
+panel.find("#domain-select").val(selectedDomain);
+this.renderTree(selectedDomain, panel, actor);
 
 
-    this.renderTree("hierophant", panel, actor);
 
+panel.find("#domain-select").on("change", async function () {
+  await actor.setFlag("tm", "activeDomain", this.value);
+  DomainsPanel.renderTree(this.value, panel, actor);
+});
 
-    panel.find("#domain-select").on("change", function () {
-      DomainsPanel.renderTree(this.value, panel, actor);
-    });
   }
 
   static renderTree(domainKey, panel, actor) {

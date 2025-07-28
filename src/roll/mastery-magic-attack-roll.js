@@ -275,7 +275,8 @@ if (mastery.spell_extra) {
 
   // 🔢 Recalcula soma dos dados de ataque com os bônus agora
   const atkBonusRollTotal = bonusAtkRolls.reduce((sum, r) => sum + (r.total ?? 0), 0);
-  atkDiceTotal = atkRoll.total + atkBonusRollTotal;
+  atkDiceTotal = (atkRoll?.total ?? 0) + atkBonusRollTotal;
+
 
   // Lê os dados para exibição
   for (const roll of bonusAtkRolls) {

@@ -46,6 +46,11 @@ if (mastery.has_roll === false) {
 
   return;
 }
+let autoHit = false;
+if (mastery.mastery_auto_hit === true) {
+  autoHit = true;
+  console.log("🎯 [AUTO_HIT] Ataque automático ativado.");
+}
 
 
   const DieTerm = foundry.dice.terms.Die;
@@ -85,8 +90,17 @@ let masteryFixedDmgBonus = 0;
   const actionDiceBase = Number(attackerSystem?.player_action_dice) || 3;
   const atkBase = forcedDice ?? actionDiceBase;
   const atkDiceBase = atkBase + extraDice;
-  const atkRollBase = new Roll(`${atkDiceBase}d6`, {}, { async: true });
+let atkRollBase = new Roll(`${atkDiceBase}d6`, {}, { async: true });
+
+if (autoHit) {
+  // Gera um Roll simulado e já avaliado, pra evitar erro de validação
+atkRollBase = await Roll.create("100").evaluate({ async: true });
+
+} else {
   await atkRollBase.evaluate();
+}
+
+
 
 let atkRoll = atkRollBase;
 
@@ -107,7 +121,8 @@ const count6Preview = first3Preview.filter(d => d.result === 6).length;
 const count1Preview = first3Preview.filter(d => d.result === 1).length;
 
 let forcedMiss = false;
-if (count1Preview === 3 || count1Preview === 2) forcedMiss = true;
+if (!autoHit && (count1Preview === 3 || count1Preview === 2)) forcedMiss = true;
+
 
 // Aplica os dados bônus da maestria APENAS se não for falha
 if (!forcedMiss) {
@@ -234,7 +249,8 @@ if (descWeapon > 0 && descMastery > 0) {
 }
 
 let critMult = 1;
-let resultLabel = "";
+let resultLabel = autoHit ? "Automático" : "";
+
 
 if (count6 === 3) {
   critMult = 3;
@@ -260,7 +276,8 @@ if (count6 === 3) {
 
 const refBase = targetSystem.player_reflex ?? 10;
 const ref = refBase + (extraEffects?.reflex ?? 0);
-const hit = !forcedMiss && atkTotal > ref;
+const hit = autoHit || (!forcedMiss && atkTotal > ref);
+
 
 let baseRoll = null, baseDmg = 0, dmgBonus = 0;
 if (hit) {
@@ -530,29 +547,30 @@ if (masteryDmgRoll) {
 }).join("")}
 </div>
 
+${!autoHit ? `
 <hr />
-
 <div class="details-attack" style="margin-top: 10px; font-size: 13px; color: #ccc; display: flex; flex-direction: column; gap: 6px;">
 
   <div style="display: flex; justify-content: space-between; padding: 2px 0;">
-
     <span>Dados de Ataque:</span>
     <span>${atkRoll.total}</span>
   </div>
 
-    ${(atkBonus !== 0 || masteryFixedAtkBonus !== 0)
-? `<div style="display: flex; justify-content: space-between; padding: 2px 0;">
-    <span>Acréscimos:</span>
-    <span>${(atkBonus + fixed1 + fixed2) >= 0 ? "+" : ""}${atkBonus + fixed1 + fixed2}</span>
-
-  </div>`
-: ""}
+  ${(atkBonus !== 0 || masteryFixedAtkBonus !== 0)
+  ? `<div style="display: flex; justify-content: space-between; padding: 2px 0;">
+      <span>Acréscimos:</span>
+      <span>${(atkBonus + fixed1 + fixed2) >= 0 ? "+" : ""}${atkBonus + fixed1 + fixed2}</span>
+    </div>`
+  : ""}
 
   <div style="display: flex; justify-content: space-between; font-weight: bold;">
     <span>Valor Final:</span>
     <span>${atkTotal}</span>
   </div>
+
 </div>
+` : ""}
+
 
     <hr style="border: 0; border-top: 1px solid #444; margin: 6px 0 4px 0;" />
 
@@ -674,7 +692,8 @@ ${elementalRoll ? `
         text-shadow: 1px 1px 2px black;
         font-weight: bold;
       ">
-        ${atkTotal}
+${autoHit ? "✔️" : atkTotal}
+
       </div>
 
       <span style="font-weight: bold; color: ${
