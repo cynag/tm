@@ -62,8 +62,9 @@ let tagText = fullData.isMastery ? "MAESTRIA" :
         "player_pa_max": "PA",
         "player_reflex": "REF",
         "player_movement": "MOV",
-        "token_vision": "VISÃO"
-
+        "token_vision": "VISÃO",
+        "player_damage_bonus.sword": "DANO COM ESPADA",
+        "player_damage_bonus.spear": "DANO COM LANÇA"
       };
 
       // Coletar efeitos e somar acumulados

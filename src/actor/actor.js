@@ -9,6 +9,8 @@ export class TMActor extends Actor {
  async prepareBaseData() {
 
   super.prepareBaseData();
+// 🔄 Limpa cache de efeitos aplicados neste ciclo
+this.flags.tm.appliedEffectsCache = {};
 
 const physicalTypes = ["sword", "axe", "hammer", "spear", "bow", "crossbow", "gun", "shield", "throwing", "unarmed"];
 const dmgTypes = ["slashing", "piercing", "bludgeoning"];
@@ -495,7 +497,7 @@ s.masteryCooldowns ??= {};
   // === APLICAÇÃO DE EFEITOS ATIVOS ===
 this.flags ??= {};
 this.flags.tm ??= {};
-this.flags.tm.appliedEffects = {};
+//this.flags.tm.appliedEffects = {};
 
 const effects = s.activeEffects || [];
 for (let i = 0; i < effects.length; i++) {
@@ -515,13 +517,20 @@ for (let i = 0; i < effects.length; i++) {
     commands = commands.concat(effect.flags.tm.customEffect);
   }
 
-  for (const fx of commands) {
-    try {
-      EffectParser.apply(this, fx);
-    } catch (err) {
-      console.warn(`[EFFECT ERROR] ${effect.id} → ${fx}`, err);
-    }
+for (const fx of commands) {
+  const key = `flags.tm.appliedEffectsCache.${fx.trim()}`;
+  const alreadyApplied = foundry.utils.getProperty(this, key);
+
+  if (alreadyApplied) continue; // 🛑 já aplicado neste ciclo
+
+  try {
+    EffectParser.apply(this, fx);
+    foundry.utils.setProperty(this, key, true); // ✅ marca como aplicado
+  } catch (err) {
+    console.warn(`[EFFECT ERROR] ${effect.id} → ${fx}`, err);
   }
+}
+
 }
 
 // === MARCADORES DE EFEITOS FÍSICOS / MENTAIS ===

@@ -1,67 +1,66 @@
 import { EffectApply } from "../effects/effect-apply.js";
 import { EffectParser } from "../effects/effect-parser.js";
+import { MasteryParser } from "../mastery/mastery-parser.js";
 
 export class MasteryPersistent {
   static async activate(actor, mastery) {
-    if (!actor || !mastery) return;
+  if (!actor || !mastery) return;
 
-    const previous = await actor.getFlag("tm", "persistentMasteryId");
-    if (previous && previous !== mastery.id) {
-      await this.deactivate(actor, previous);
-    }
+  const previous = await actor.getFlag("tm", "persistentMasteryId");
+  if (previous && previous !== mastery.id) {
+    await this.deactivate(actor, previous);
+  }
 
-    await actor.setFlag("tm", "persistentMasteryId", mastery.id);
+  await actor.setFlag("tm", "persistentMasteryId", mastery.id);
 
-// Aplica modificadores diretamente no actor (efeito imediato)
-EffectParser.apply(actor, mastery.effect);
+  // 🧼 Remove qualquer efeito duplicado com o mesmo ID antes de aplicar
+  const effectId = `posture-${mastery.id}`;
+  const existingEffects = actor.effects.filter(e => e.getFlag("tm", "effectId") === effectId);
+  for (const effect of existingEffects) await effect.delete();
 
-// Cria o efeito visual + ActiveEffect
-await EffectApply.applyCustom({
-  actor,
-  effectId: `posture-${mastery.id}`,
-  label: mastery.mastery_name,
-  img: mastery.mastery_img,
-  duration: mastery.duration ?? null,
-  commands: mastery.effect || [],
-  isMastery: true,
-  effect: mastery.effect // ← adiciona explicitamente a lista de efeitos
+  // 🧪 Aplica efeito visual personalizado (uma vez)
+  await EffectApply.applyCustom({
+    actor,
+    effectId,
+    label: mastery.mastery_name,
+    img: mastery.mastery_img,
+    duration: mastery.duration ?? null,
+    commands: await this.#evaluateEffectCommands(actor, mastery),
+    isMastery: true
+  });
 
-});
-
-await actor.createEmbeddedDocuments("ActiveEffect", [
-  {
-    name: mastery.mastery_name,
-    icon: mastery.mastery_img,
-    origin: `Actor.${actor.id}`,
-    disabled: false,
-    duration: {}, // obrigatório para exibição
-    changes: [],
-    flags: {
-      core: {
-        statusId: `posture-${mastery.id}`
-      },
-      tm: {
-        source: "resistance-roll", // ← ESSENCIAL para o overlay
-        appliedFrom: "persistent-mastery",
-        effectId: `posture-${mastery.id}`,
-        isMastery: true,
-        persistentId: mastery.id,
-        customEffect: mastery.effect || []
+  // 🧾 Cria ActiveEffect registrado (base para reaplicações legítimas)
+  await actor.createEmbeddedDocuments("ActiveEffect", [
+    {
+      name: mastery.mastery_name,
+      icon: mastery.mastery_img,
+      origin: `Actor.${actor.id}`,
+      disabled: false,
+      duration: {},
+      changes: [],
+      flags: {
+        core: {
+          statusId: effectId
+        },
+        tm: {
+          source: "resistance-roll",
+          appliedFrom: "persistent-mastery",
+          effectId,
+          isMastery: true,
+          persistentId: mastery.id,
+          customEffect: mastery.effect || []
+        }
       }
     }
-  }
-]);
+  ]);
 
+  await actor.prepareData();
+  console.log(`[🔥] Postura/Conjuração ativada: ${mastery.mastery_name}`);
 
+  const sheet = actor.sheet;
+  if (sheet?.rendered) await sheet.render(true);
+}
 
-await actor.prepareData();
-
-
-
-    console.log(`[🔥] Postura/Conjuração ativada: ${mastery.mastery_name}`);
-    const sheet = actor.sheet;
-if (sheet?.rendered) await sheet.render(true);
-  }
 
 static async deactivate(actor, masteryId) {
   if (!actor || !masteryId) return;
@@ -90,5 +89,35 @@ if (mastery && mastery.mastery_cd > 0 && game.combat?.started) {
 
   console.log(`[💨] Postura/Conjuração removida: ${masteryId}`);
 }
+
+static async #evaluateEffectCommands(actor, mastery) {
+  const evaluated = [];
+
+  for (let raw of mastery.effect || []) {
+    const match = raw.match(/^if\[actor\|player_domain_(.+?)_level:(\d+),\s*([+\-]?\d+)\/(NDi|NDp|ND),\s*0\]\s*@\{(.+?)\}$/i);
+    if (match) {
+      const domain = match[1];
+      const minLevel = parseInt(match[2]);
+      const base = parseInt(match[3]);
+      const keyND = match[4];
+      const targetAttr = match[5];
+
+      const current = actor.system?.[`player_domain_${domain}_level`] ?? 0;
+      if (current >= minLevel) {
+        const result = await MasteryParser.evaluate(`${base}/${keyND}`, actor, null, "number", domain);
+        const value = result?.value ?? 0;
+        evaluated.push(`${value >= 0 ? "+" + value : value} @{${targetAttr}}`);
+      }
+    } else {
+      evaluated.push(raw);
+    }
+  }
+
+  console.log("[✅ Commands Finalizados]", evaluated);
+  return evaluated;
+}
+  
+
+
 
 }

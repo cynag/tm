@@ -65,9 +65,10 @@ const HierophantDB = [
     mastery_type: "posture",
     mastery_class: "melee",
 effect: [
-  "target.extra_damage_sword = 2/NDi",
-  "target.extra_damage_spear = 2/NDi"
+  "if[actor|player_domain_hierophant_level:1,+2/NDi,0] @{player_damage_bonus.sword}",
+  "if[actor|player_domain_hierophant_level:1,+2/NDi,0] @{player_damage_bonus.spear}"
 ]
+
 ,
     duration: null,
     mastery_roll_type: "mastery-melee-attack",
@@ -121,13 +122,18 @@ effect: [
     has_roll: false,
   }   
   },
+
+
+
+
+  
   {
     id: "hierophant_3A",
     mastery_name: "escalonavel",
     mastery_type: "action",
     mastery_class: "melee",
     mastery_roll_type: "mastery-melee-attack",
-    mastery_nd: 3,
+    mastery_nd: 2,
     maestry_points_value: 1,
     mastery_cost: 4,
     mastery_cd: 3,
@@ -150,7 +156,7 @@ effect: [
     mastery_type: "action",
     mastery_class: "melee",
     mastery_roll_type: "mastery-melee-attack",
-    mastery_nd: 4,
+    mastery_nd: 3,
     maestry_points_value: 1,
     mastery_cost: 4,
     mastery_cd: 3,

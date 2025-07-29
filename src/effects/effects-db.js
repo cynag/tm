@@ -204,5 +204,14 @@ export const EffectsDB = [
     effect_type: "rf",
     img: "systems/tm/styles/assets/effects/222.webp"
   }
-
+,
+  {
+    id: "test",
+    name: "test",
+    effect: "+1 @{player_movement}",
+    description: "+2 REF.",
+    duration: 1,
+    effect_type: "rf",
+    img: "systems/tm/styles/assets/effects/222.webp"
+  }
 ];
