@@ -25,7 +25,7 @@ const HierophantDB = [
     //weapon_damage_bonus_2: "",
     weapon_extra: "target.prot = -2/NDi",
 
-    evolution_a: {
+    /*  evolution_a: {
     id: "hierophant_1B",
     mastery_name: "Estocada Cirúrgica",
     maestry_points_value: 1,
@@ -40,7 +40,7 @@ const HierophantDB = [
     weapon_attack_bonus: "if[target|has_physical_effect:true,+1d6/NDi,0]",
     weapon_extra: "target.prot = -3/NDi",
   },
-  evolution_b: {
+      evolution_b: {
     id: "hierophant_1C",
     mastery_name: "Estocada Sanguinária",
     maestry_points_value: 1,
@@ -57,9 +57,9 @@ const HierophantDB = [
     //weapon_damage_bonus: "",
     //weapon_damage_bonus_2: "",
     weapon_extra: "target.prot = -2/NDi",
-  }
+  } */
   },
-    {
+  {
     id: "hierophant_2A",
     mastery_name: "Postura do Sol",
     mastery_type: "posture",
@@ -67,9 +67,7 @@ const HierophantDB = [
 effect: [
   "if[actor|player_domain_hierophant_level:1,+2/NDi,0] @{player_damage_bonus.sword}",
   "if[actor|player_domain_hierophant_level:1,+2/NDi,0] @{player_damage_bonus.spear}"
-]
-
-,
+],
     duration: null,
     mastery_roll_type: "mastery-melee-attack",
     mastery_nd: 1,
@@ -81,7 +79,7 @@ effect: [
     mastery_description: `Você eleva sua lâmina acima da cabeça, em posição agressiva. Enquanto mantiver esta postura, você ganha +2/NDi de dano extra com armas. Além disso, ao entrar nesta postura, seu próximo ataque recebe +1d6 de dano, +1m de alcance, e move você 1 metro para frente (se possível). Se atingir um alvo, ele é forçado a recuar 1 metro.`,
     has_roll: false,
 
-        evolution_a: {
+       /* evolution_a: {
     id: "hierophant_2B",
     mastery_name: "Postura da Estrela",
     mastery_type: "posture",
@@ -120,59 +118,96 @@ effect: [
     mastery_img: "systems/tm/styles/assets/masterys/hierophant/2a.webp",
     mastery_description: `Você eleva sua lâmina acima da cabeça, em posição agressiva. Enquanto mantiver esta postura, você ganha +2/NDi de dano extra com armas. Além disso, ao entrar nesta postura, seu próximo ataque recebe +1d6 de dano, +1m de alcance, e move você 1 metro para frente (se possível). Se atingir um alvo, ele é forçado a recuar 1 metro.`,
     has_roll: false,
-  }   
+  } */  
   },
+  {
+    id: "hierophant_3A",
+    mastery_name: "Represália",
+    mastery_type: "reaction",
+    mastery_class: "melee",
+    mastery_roll_type: "mastery-melee-attack",
+    mastery_nd: 1,
+    maestry_points_value: 1,
+    mastery_cost: 3,
+    mastery_cd: 0,
+    mastery_range: "weapon_range",
+    mastery_img: "systems/tm/styles/assets/masterys/hierophant/3A.webp",
+    mastery_description: `Através de um instinto refinado por rigoroso treinamento, você é capaz de responder imediatamente a ações inimigas. Até uma vez por rodada, sempre que um inimigo realizar um ataque corporal ou manobra contra você ou aliado adjacente, você pode declarar uma reação de represália, desferindo um ataque básico contra o agressor. `,
+    //mastery_limitation: " ",
+    //weapon_attack_bonus: "if[target|has_physical_effect:true,+1d6/NDi,0]",
+    //weapon_attack_bonus_2: "",
+    //weapon_damage_bonus: "",
+    //weapon_damage_bonus_2: "",
+    //weapon_extra: "target.prot = -2/NDi",
 
-
+          /*evolution_a: {
+    id: "hierophant_3B",
+    mastery_name: "Represália Punitiva",
+    maestry_points_value: 1,
+    mastery_type: "action",
+    mastery_class: "melee",
+    mastery_range: "weapon_range",
+    mastery_roll_type: "mastery-melee-attack",
+    mastery_img: "systems/tm/styles/assets/masterys/hierophant/1B.webp",
+    mastery_description: "A represália causa +1d4/NDi de dano físico extra.",
+    mastery_cost: 3,
+    mastery_cd: 0,
+    weapon_attack_bonus: "+1d4/NDi",
+  },
+      evolution_b: {
+    id: "hierophant_3C",
+    mastery_name: "Represália Impecável",
+    maestry_points_value: 1,
+    mastery_type: "action",
+    mastery_class: "melee",
+    mastery_range: "weapon_range",
+    mastery_roll_type: "mastery-melee-attack",
+    mastery_img: "systems/tm/styles/assets/masterys/hierophant/1C.webp",
+    mastery_description: "Você pode realizar até 2 represálias por rodada. Se a represália for desencadeada por um ataque que falhou contra você, recupere 1d4/NDi PV.",
+    mastery_cost: 4,
+    mastery_cd: 0,
+  }   */
+  },
+      {
+    id: "hierophant_4A",
+    mastery_name: "Ajuste de Guarda",
+    mastery_type: "action",
+    mastery_class: "melee",
+    has_roll: false,
+    mastery_roll_type: "mastery-melee-attack",
+    mastery_nd: 2,
+    maestry_points_value: 1,
+    mastery_cost: 1,
+    mastery_cd: 0,
+    //mastery_range: "weapon_range",
+    mastery_img: "systems/tm/styles/assets/masterys/hierophant/4A.webp",
+    mastery_description: `Você altera sua estancia no calor da batalha, aproveitando brechas deixadas por seus oponentes após uma reação. Uma vez por turno, sempre que utilizar uma reação, você poderá gastar 1PA para realizar uma das seguintes ações: Mover-se 1m em qualquer direção, sem custo de PA e sem provocar ataques de oportunidade – ou ganhar a condição ‘preparado’.`,
+  },
 
 
   
   {
-    id: "hierophant_3A",
-    mastery_name: "escalonavel",
+    id: "hierophant_6A",
+    mastery_name: "Touché",
     mastery_type: "action",
     mastery_class: "melee",
     mastery_roll_type: "mastery-melee-attack",
     mastery_nd: 2,
     maestry_points_value: 1,
-    mastery_cost: 4,
-    mastery_cd: 3,
+    mastery_cost: 6,
+    mastery_cd: 2,
     mastery_range: "weapon_range",
-    mastery_img: "systems/tm/styles/assets/masterys/hierophant/1A.webp",
-    mastery_description: `Você desfere uma estocada centrada nos pontos mais vulneráveis do inimigo, mirando brechas entre placas ou falhas na guarda. Se acertar o golpe, ignora 2 de proteção do alvo e causa 1d6 + 1d6/2ND de dano adicional. Se o alvo estiver sofrendo qualquer penalidade física (que necessita de um teste de RF para evitar), você recebe +1/ND na rolagem de ataque.`,
-    mastery_limitation: " ",
+    mastery_img: "systems/tm/styles/assets/masterys/hierophant/6A.webp",
+    mastery_description: `Você avança com precisão cirúrgica de um mestre do combate, oportunista, como um bom duelista. Mova-se até 3 metros em linha reta, desde que não esteja adjacente a inimigos. Em segui-da, realize um ataque corpo a corpo com uma arma. Se acertar, cause 1d8/NDp de dano físico perfurante. Se o alvo estiver ‘prostrado’ ou ‘desestabilizado’, o dano é dobrado.`,
     mastery_requirements: [
       { subtype: ["spear", "sword"] }
     ],
-    weapon_attack_bonus: "",
-    weapon_attack_bonus_2: "",
-    weapon_damage_bonus: "+100/ND",
-    weapon_damage_bonus_2: "+100/ND",
-    weapon_extra: "target.reflex =-2",
+    weapon_damage_bonus: "1d8/NDp",
   },
-      {
-    id: "hierophant_4A",
-    mastery_name: "condicional",
-    mastery_type: "action",
-    mastery_class: "melee",
-    mastery_roll_type: "mastery-melee-attack",
-    mastery_nd: 3,
-    maestry_points_value: 1,
-    mastery_cost: 4,
-    mastery_cd: 3,
-    mastery_range: "weapon_range",
-    mastery_img: "systems/tm/styles/assets/masterys/hierophant/1A.webp",
-    mastery_description: `Você desfere uma estocada centrada nos pontos mais vulneráveis do inimigo, mirando brechas entre placas ou falhas na guarda. Se acertar o golpe, ignora 2 de proteção do alvo e causa 1d6 + 1d6/2ND de dano adicional. Se o alvo estiver sofrendo qualquer penalidade física (que necessita de um teste de RF para evitar), você recebe +1/ND na rolagem de ataque.`,
-    mastery_limitation: " ",
-    mastery_requirements: [
-      { subtype: ["spear", "sword"] }
-    ],
-    weapon_attack_bonus: "+1d12",
-    weapon_attack_bonus_2: "",
-    weapon_damage_bonus: "",
-    weapon_damage_bonus_2: "",
-    weapon_extra: "target.reflex =-2",
-  },
+
+
+
+
 
 ];
 
