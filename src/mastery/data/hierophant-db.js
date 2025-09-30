@@ -78,7 +78,8 @@ effect: [
     mastery_img: "systems/tm/styles/assets/masterys/hierophant/2a.webp",
     mastery_description: `Você eleva sua lâmina acima da cabeça, em posição agressiva. Enquanto mantiver esta postura, você ganha +2/NDi de dano extra com armas. Além disso, ao entrar nesta postura, seu próximo ataque recebe +1d6 de dano, +1m de alcance, e move você 1 metro para frente (se possível). Se atingir um alvo, ele é forçado a recuar 1 metro.`,
     has_roll: false,
-
+    need_weapon: false,
+    need_target: false,
        /* evolution_a: {
     id: "hierophant_2B",
     mastery_name: "Postura da Estrela",
@@ -168,12 +169,14 @@ effect: [
     mastery_cd: 0,
   }   */
   },
-      {
+  {
     id: "hierophant_4A",
     mastery_name: "Ajuste de Guarda",
     mastery_type: "action",
     mastery_class: "melee",
     has_roll: false,
+    need_weapon: false,
+    need_target: false,
     mastery_roll_type: "mastery-melee-attack",
     mastery_nd: 2,
     maestry_points_value: 1,
@@ -181,11 +184,27 @@ effect: [
     mastery_cd: 0,
     //mastery_range: "weapon_range",
     mastery_img: "systems/tm/styles/assets/masterys/hierophant/4A.webp",
+    mastery_description: `Você aprendeu com exímio e disciplina a arte do combate com a espada, como um verdadeiro mestre do duelo. Sempre que empunhar e realizar ataques com espadas, receba +1/ND em qualquer teste de ataque.`,
+  },
+  {
+    id: "hierophant_5A",
+    mastery_name: "Técnica do Esgrimista",
+    mastery_img: "systems/tm/styles/assets/masterys/hierophant/5A.webp",
+   
+    mastery_type: "passive",
+    mastery_class: "melee",
+    mastery_roll_type: "mastery-melee-attack",
+    has_roll:false,
+    need_target: false,
+    need_weapon: false,
+
+    mastery_nd: 2,
+    maestry_points_value: 1,
+    
+    mastery_effect: "actor.player_attack_bonus.sword = +1/ND",
+
     mastery_description: `Você altera sua estancia no calor da batalha, aproveitando brechas deixadas por seus oponentes após uma reação. Uma vez por turno, sempre que utilizar uma reação, você poderá gastar 1PA para realizar uma das seguintes ações: Mover-se 1m em qualquer direção, sem custo de PA e sem provocar ataques de oportunidade – ou ganhar a condição ‘preparado’.`,
   },
-
-
-  
   {
     id: "hierophant_6A",
     mastery_name: "Touché",
@@ -204,9 +223,59 @@ effect: [
     ],
     weapon_damage_bonus: "1d8/NDp",
   },
-
-
-
+  {
+    id: "hierophant_7A",
+    mastery_name: "Molinete",
+    mastery_type: "action",
+    mastery_class: "melee",
+    mastery_roll_type: "mastery-melee-attack",
+    mastery_nd: 3,
+    maestry_points_value: 1,
+    mastery_cost: 6,
+    mastery_cd: 3,
+    mastery_range: "weapon_range",
+    mastery_img: "systems/tm/styles/assets/masterys/hierophant/7A.webp",
+    mastery_description: `Com fluidez e maestria, você realiza um movimento circular e desfere um golpe em arcos amplos e contínuos. Realize um único ataque amplo contra qualquer inimigo dentro da área frontal (fronte e flancos). O golpe causa +1d8/NDi de dano extra. Qualquer alvo atingido, mesmo que tenha se esquivado ou mitigado parte do dano, recuará 1 metro (se possível).`,
+    mastery_requirements: [
+      { subtype: ["sword"] }
+    ],
+    weapon_damage_bonus: "1d8/NDi",
+  },
+  {
+    id: "hierophant_8A",
+    mastery_name: "Postura do Tolo",
+    mastery_type: "posture",
+    mastery_class: "melee",
+effect: [
+  "if[actor|player_domain_hierophant_level:1,+2/NDi,0] @{player_reflex_bonus}"
+],
+    duration: null,
+    mastery_roll_type: "mastery-melee-attack",
+    mastery_nd: 3,
+    maestry_points_value: 1,
+    mastery_cost: 4,
+    mastery_cd: 0,
+    mastery_range: 1,
+    mastery_img: "systems/tm/styles/assets/masterys/hierophant/8a.webp",
+    mastery_description: `Você adota uma postura aparentemente vulnerável, com a lâ-mina baixa, atraindo o inimigo ao erro. Enquanto estiver nesta postura, você recebe +2/NDi em reflexos. Se um inimi-go errar um ataque contra você, você recebe 1d6/NDi de bônus de acerto no próximo ataque ou maestria corporal. Se você for atingido por um ataque ou não atacar ninguém no seu turno, a postura se desfaz. `,
+    has_roll: false,
+    need_weapon: false,
+    need_target: false,
+  },
+{
+  id: "hierophant_9A",
+  mastery_name: "Olhar Esperto",
+  mastery_type: "passive",
+  mastery_class: "melee",
+  mastery_nd: 3,
+  maestry_points_value: 1,
+  mastery_img: "systems/tm/styles/assets/masterys/hierophant/5A.webp",
+  mastery_description: "Você aprende a ler o campo de batalha com olhos bem treinados. Sempre que atingir um inimigo que já tenha sofrido dano direto causado por você neste turno, ganhe o traço ‘prepa-rado’.",
+  mastery_effect: "",
+  has_roll:false,
+  need_target: false,
+  need_weapon: false,
+},
 
 
 ];

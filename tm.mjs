@@ -68,6 +68,9 @@ import { MasteryCooldown } from "./src/mastery/cooldown.js";
 import { MasteryPersistent } from "./src/mastery/mastery-persistent.js";
 
 
+import { MasteryCureRoll } from "./src/roll/mastery-cure-roll.js";
+import { MasteryCureDialog } from "./src/ui/mastery-cure-dialog.js";
+
 
 
 import { EffectsPanel } from "./src/effects/effects-panel.js";
@@ -208,7 +211,8 @@ Hooks.once("ready", () => {
     MasteryMagicAttackRoll,
     MasteryMagicDialog,
     MasteryPersistent,
-
+    MasteryCureRoll,
+    MasteryCureDialog,
 
     EffectsPanel,
     EffectsDB,

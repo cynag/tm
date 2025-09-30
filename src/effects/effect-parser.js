@@ -7,11 +7,15 @@ static apply(actor, effect, domain = null) {
     .map(raw => this.#resolveCommand(raw, actor, domain))
     .filter(entry => entry !== null);
 
-  return commands.map(entry => ({
+return commands.map(entry => {
+  const isWeaponBonus = entry.key?.startsWith("player_attack_bonus.");
+  return {
     key: entry.key,
-    mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+    mode: isWeaponBonus ? CONST.ACTIVE_EFFECT_MODES.OVERRIDE : CONST.ACTIVE_EFFECT_MODES.ADD,
     value: entry.value
-  }));
+  };
+});
+
 }
 
 
@@ -117,20 +121,12 @@ static toFoundryChanges(effectCommand, actor) {
   const npp = np % 2 === 0 ? np : 0;
   const npi = np % 2 !== 0 ? np : 0;
 
-  for (const raw of commands) {
-    const clean = raw.trim();
-    if (!clean) continue;
+for (const raw of commands) {
+  const clean = raw.trim();
+  if (!clean) continue;
 
-    // Substituições reais
-    const parsed = clean
-      .replaceAll("NPp", npp)
-      .replaceAll("NPi", npi)
-      .replaceAll("NDp", ndp)
-      .replaceAll("NDi", ndi)
-      .replaceAll("ND", nd)
-      .replaceAll(/([+\-]?\d+)\s*\/\s*NDi\b/g, (_, num) => `${parseInt(num) * ndi}`)
-      .replaceAll(/([+\-]?\d+)\s*\/\s*NDp\b/g, (_, num) => `${parseInt(num) * ndp}`)
-      .replaceAll(/([+\-]?\d+)\s*\/\s*ND\b/g, (_, num) => `${parseInt(num) * nd}`);
+  // Já foi processado no #resolveCommand, não repetir substituições
+  const parsed = clean;
 
     let match;
 
@@ -162,22 +158,21 @@ static toFoundryChanges(effectCommand, actor) {
     }
 
     // MOD: +X @{key}
-match = parsed.match(/^([+\-]?\d+)\s*@{(.+?)}$/);
+match = parsed.match(/^([+\-]?\d+)\s*@\{(.+?)\}$/);
 if (match) {
   const value = parseInt(match[1]);
   const key = match[2].trim();
 
   if (!value || isNaN(value) || !key) {
     console.warn(`[toFoundryChanges] ❌ Comando inválido após parsing: ${parsed}`);
-    console.warn("→ Valor:", value);
-    console.warn("→ Chave:", key);
-    console.warn("→ Original:", raw);
     continue;
   }
 
+  // 📌 Se for bônus de ataque de arma, usa OVERRIDE para evitar somar 2x
+  const isWeaponBonus = key.startsWith("player_attack_bonus.");
   changes.push({
     key: `system.${key}`,
-    mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+    mode: isWeaponBonus ? CONST.ACTIVE_EFFECT_MODES.OVERRIDE : CONST.ACTIVE_EFFECT_MODES.ADD,
     value: value,
     priority: 20
   });

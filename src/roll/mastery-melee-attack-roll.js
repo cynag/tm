@@ -8,9 +8,17 @@ export async function rollMasteryAttack({ attacker, target, mastery, hand = "rig
   const item = equipped ? attacker.items.get(equipped.itemId) : null;
   const isUnarmed = !item;
 
-  if (!attacker || !target) return ui.notifications.warn("Selecione um atacante e um alvo.");
-  const targetActor = target?.actor;
-  if (!targetActor) return ui.notifications.warn("O alvo não possui ficha de ator.");
+  const needTarget = mastery.need_target !== false; // padrão: true
+
+if (!attacker || (needTarget && !target)) {
+  return ui.notifications.warn("Selecione um atacante" + (needTarget ? " e um alvo." : "."));
+}
+
+  
+const targetActor = target?.actor ?? null;
+if (needTarget && !targetActor) {
+  return ui.notifications.warn("O alvo não possui ficha de ator.");
+}
 
 if (mastery.has_roll === false) {
   const fakeMsg = `
@@ -55,7 +63,8 @@ if (mastery.mastery_auto_hit === true) {
 
   const DieTerm = foundry.dice.terms.Die;
   const attackerSystem = attacker.system;
-  const targetSystem = targetActor.system;
+  const targetSystem = targetActor?.system ?? {};
+
 
   const subtype = isUnarmed ? "unarmed" : item.system?.subtype?.toLowerCase();
   const damageType = isUnarmed ? "impacto" : item.system?.weapon_subtypes_2 || "impacto";

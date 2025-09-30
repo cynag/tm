@@ -261,25 +261,27 @@ const row = $(`
   row.on("mouseenter", e => game.tm?.CardTooltip?.show?.(m, e));
   row.on("mouseleave", () => game.tm?.CardTooltip?.close?.());
 
-  row.on("click", async () => {
-    const actor = m.actor;
-    if (!actor) {
-      ui.notifications.warn("Ator não encontrado para esta maestria.");
-      return;
-    }
+    row.on("click", async () => {
+      const actor = m.actor;
+      if (!actor) {
+        ui.notifications.warn("Ator não encontrado para esta maestria.");
+        return;
+      }
 
-    const type = m.mastery_type?.toLowerCase();
-    const cls = m.mastery_class?.toLowerCase();
+      const cls = m.mastery_class?.toLowerCase();
+      console.log("[ActionsPanel][mastery-click]", { id: m.id, cls });
 
-    if (cls === "melee") {
-  await game.tm.MasteryMeleeDialog.show({ actor, mastery: m });
-} else if (cls === "magic") {
-  await game.tm.MasteryMagicDialog.show({ actor, mastery: m });
-} else {
-  ui.notifications.info("Esse tipo de maestria ainda não é suportado.");
-}
+      if (cls === "melee") {
+        await game.tm.MasteryMeleeDialog.show({ actor, mastery: m });
+      } else if (cls === "magic") {
+        await game.tm.MasteryMagicDialog.show({ actor, mastery: m });
+      } else if (cls === "cure") {
+        await game.tm.MasteryCureDialog.show({ actor, mastery: m });
+      } else {
+        ui.notifications.info("Esse tipo de maestria ainda não é suportado.");
+      }
+    });
 
-  });
 
   tbody.append(row);
 }

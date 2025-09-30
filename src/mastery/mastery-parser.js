@@ -146,19 +146,35 @@ if (mode === "number") {
     return mode === "roll" ? { value: 0, roll: null } : 0;
   },
 
-  async extractEffects(raw, actor, target, domain = null) {
-    const result = {};
-    if (!raw || typeof raw !== "string") return result;
-    const lines = raw.split(";").map(s => s.trim()).filter(Boolean);
-    for (let line of lines) {
-      const match = line.match(/^target\.(\w+)\s*=\s*(.+)$/i);
-      if (match) {
-        const key = match[1];
-        const formula = match[2].trim();
-        const value = await MasteryParser.evaluate(formula, actor, target, "number", domain);
-        result[key] = value?.value ?? 0;
-      }
+async extractEffects(raw, actor, target, domain = null) {
+  const result = {};
+  if (!raw || typeof raw !== "string") return result;
+
+  const lines = raw.split(";").map(s => s.trim()).filter(Boolean);
+
+  for (let line of lines) {
+    // aceita "actor.X = ..." e "target.X = ..."
+    const m = line.match(/^(actor|target)\.([\w.\[\]_]+)\s*=\s*(.+)$/i);
+    if (!m) continue;
+
+    const scope = m[1].toLowerCase();
+    const key   = m[2];              // ex: player_damage_bonus.sword
+    const expr  = m[3].trim();       // ex: +2*NDi
+
+    const evalRes = await MasteryParser.evaluate(expr, actor, target, "number", domain);
+    const value   = evalRes?.value ?? 0;
+
+    if (scope === "actor") {
+      // guardamos só a parte de sistema; aplicaremos em ActiveEffect como "system.{key}"
+      result[key] = value;
+    } else if (scope === "target") {
+      // reservado pra futuro; aqui não aplicamos (efeito passivo é na ficha)
+      console.log(`[Passive][ignore target] ${key} = ${value}`);
     }
-    return result;
   }
+
+  console.log("[Passive][extractEffects] result =>", result);
+  return result;
+}
+
 };

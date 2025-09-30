@@ -6,11 +6,17 @@ import { EffectsDB } from "../effects/effects-db.js";
 
 
 export class TMActor extends Actor {
- async prepareBaseData() {
-
+async prepareBaseData() {
   super.prepareBaseData();
-// 🔄 Limpa cache de efeitos aplicados neste ciclo
-this.flags.tm.appliedEffectsCache = {};
+
+  // Garante que system existe
+  this.system = this.system || {};
+  this.system.appliedEffectsCache = {};
+
+  // Garante que flags e flags.tm existem
+  this.flags = this.flags || {};
+  this.flags.tm = this.flags.tm || {};
+  this.flags.tm.appliedEffectsCache = {};
 
 const physicalTypes = ["sword", "axe", "hammer", "spear", "bow", "crossbow", "gun", "shield", "throwing", "unarmed"];
 const dmgTypes = ["slashing", "piercing", "bludgeoning"];
@@ -196,7 +202,10 @@ s.mod_virtue     = calcMod(s.player_virtue);
 s.mod_protection = Math.floor(s.player_protection / 2); // ⚠️ PROT segue lógica normal
 
 // === CÁLCULOS DERIVADOS REGRADOS ===
-s.player_reflex = 9 + s.mod_dexterity;
+const reflexBase = 9 + s.mod_dexterity;
+const reflexBonus = s.player_reflex_bonus ?? 0;   // soma de efeitos
+s.player_reflex = reflexBase + reflexBonus;
+
 
 s.player_maneuver = s.mod_impulse > 0 ? s.mod_impulse * 3 : 0;
 s.player_resistance_phys = s.mod_impulse > 0 ? s.mod_impulse * 7 : 0;

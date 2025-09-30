@@ -76,16 +76,28 @@ buttons: isPersistentActive
   icon: '<i class="fas fa-fist-raised"></i>',
   label: "Usar Maestria",
   callback: async () => {
-    const target = Array.from(game.user.targets)[0];
-    const selectedHand = dialogHtml.find(".hand-select").val() || "right";
-    const slotKey = selectedHand === "right" ? "slot_weapon1" : "slot_weapon2";
-    const equipped = actor.system.gearSlots?.[slotKey];
-    const item = equipped ? actor.items.get(equipped.itemId) : null;
+const needTarget = mastery.need_target !== false; // default = true
+const target = Array.from(game.user.targets)[0] || null;
 
-    if (!item) {
-      ui.notifications.warn("Você precisa equipar uma arma");
-      return;
-    }
+if (needTarget && !target) {
+  ui.notifications.warn("Você precisa selecionar um alvo.");
+  return;
+}
+console.log("[Dialog][NeedTarget]", { needTarget, hasTarget: !!target });
+
+
+const selectedHand = dialogHtml.find(".hand-select").val() || "right";
+const slotKey = selectedHand === "right" ? "slot_weapon1" : "slot_weapon2";
+const equipped = actor.system.gearSlots?.[slotKey];
+const item = equipped ? actor.items.get(equipped.itemId) : null;
+
+const needWeapon = mastery.need_weapon !== false; // default = true
+if (needWeapon && !item) {
+  ui.notifications.warn("Você precisa equipar uma arma");
+  return;
+}
+
+
 
     const cdKey = {
       mastery_domain: mastery.mastery_domain ?? mastery.system?.domain ?? "unknown",
@@ -99,9 +111,10 @@ buttons: isPersistentActive
       return;
     }
 
-    const subtype = item?.system?.subtype?.toLowerCase();
-    const damage = item?.system?.weapon_subtypes_2?.toLowerCase();
-    const size = item?.system?.weapon_subtypes_3?.toLowerCase();
+const subtype = item?.system?.subtype?.toLowerCase() || null;
+const damage  = item?.system?.weapon_subtypes_2?.toLowerCase() || null;
+const size    = item?.system?.weapon_subtypes_3?.toLowerCase() || null;
+
     const requirements = mastery.mastery_requirements;
 
     const fails = requirements && Array.isArray(requirements) && !requirements.some(req => {

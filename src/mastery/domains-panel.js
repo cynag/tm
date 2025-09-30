@@ -123,6 +123,18 @@ panel.find("#domain-select").on("change", async function () {
           if (existing) {
             newTrees[domainKey][ndKey] = newTrees[domainKey][ndKey].filter(e => e.id !== mastery.id);
             await actor.update({ "system.masteryTrees": newTrees });
+
+try {
+  if (mastery.mastery_type === "passive") {
+    await game.tm.MasteryPersistent.deactivate(actor, mastery.id);
+    console.log(`[Passive][Remove] ${mastery.id}`);
+  }
+} catch (err) {
+  console.error("[Passive][Remove] erro:", err);
+}
+
+
+
             console.log(`🗑️ Maestria removida: ${mastery.id}`);
             DomainsPanel.renderTree(domainKey, panel, actor);
             return;
@@ -142,6 +154,17 @@ panel.find("#domain-select").on("change", async function () {
           }
 
           await actor.update(updateData);
+
+try {
+  if (mastery.mastery_type === "passive") {
+    await game.tm.MasteryPersistent.activate(actor, mastery);
+    console.log(`[Passive][Acquire] ${mastery.id}`);
+  }
+} catch (err) {
+  console.error("[Passive][Acquire] erro:", err);
+}
+
+
           console.log(`🧠 Maestria adquirida: ${mastery.id}`);
           DomainsPanel.renderTree(domainKey, panel, actor);
         });

@@ -3,15 +3,67 @@ import { EffectParser } from "../effects/effect-parser.js";
 import { MasteryParser } from "../mastery/mastery-parser.js";
 
 export class MasteryPersistent {
-  static async activate(actor, mastery) {
+static async activate(actor, mastery) {
   if (!actor || !mastery) return;
 
+  // 🔹 PASSIVE: aplica e sai (sem flag, sem toggle)
+  if (mastery.mastery_type === "passive") {
+    const effectId = `passive-${mastery.id}`;
+
+    // remove duplicados desta passiva
+    const existing = actor.effects.filter(e => e.getFlag("tm", "effectId") === effectId);
+    for (const ef of existing) await ef.delete();
+
+    // calcula changes a partir de mastery_effect
+    const changesMap = await MasteryParser.extractEffects(
+      mastery.mastery_effect || "",
+      actor,
+      null,
+      mastery.mastery_domain || mastery.system?.domain || null
+    );
+
+    const changes = Object.entries(changesMap).map(([k, v]) => ({
+      key: `system.${k}`,
+      mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+      value: v
+    }));
+
+    const [created] = await actor.createEmbeddedDocuments("ActiveEffect", [{
+      name: mastery.mastery_name,
+      icon: mastery.mastery_img,
+      origin: `Actor.${actor.id}`,
+      disabled: false,
+      duration: {},
+      changes,
+      flags: {
+        tm: {
+          source: "passive-mastery",
+          isMastery: true,
+          persistentId: mastery.id,
+          effectId,
+          customEffect: mastery.mastery_effect || ""
+        }
+      }
+    }]);
+
+    console.log(`[✅ Passive] Aplicada: ${mastery.mastery_name}`, created?.toObject());
+    const sheet = actor.sheet;
+    if (sheet?.rendered) await sheet.render(true);
+    return; // ⬅️ encerra aqui para não cair na lógica de postura/conjuração
+  }
+
+  // 🔸 POSTURE/CONJURATION: fluxo com flag/toggle
   const previous = await actor.getFlag("tm", "persistentMasteryId");
   if (previous && previous !== mastery.id) {
     await this.deactivate(actor, previous);
   }
 
-  await actor.setFlag("tm", "persistentMasteryId", mastery.id);
+  // só seta flag para postura/conjuração
+  if (["posture", "conjuration"].includes(mastery.mastery_type)) {
+    await actor.setFlag("tm", "persistentMasteryId", mastery.id);
+  }
+
+
 
   // 🧼 Remove qualquer efeito duplicado com o mesmo ID antes de aplicar
   const effectId = `posture-${mastery.id}`;
@@ -65,23 +117,39 @@ export class MasteryPersistent {
 static async deactivate(actor, masteryId) {
   if (!actor || !masteryId) return;
 
+  // Descobre tipo da maestria
+  const allDomains = Object.values(game.tm?.DomainsDB ?? {}).flat();
+  const mastery = allDomains.find(m => m.id === masteryId);
+  const type = mastery?.mastery_type ?? "unknown";
+
+  // 🔹 PASSIVE: remove efeito e sai (não usa flag)
+  if (type === "passive") {
+    const passiveEffects = actor.effects.filter(e =>
+      e.getFlag("tm", "persistentId") === masteryId &&
+      e.getFlag("tm", "source") === "passive-mastery"
+    );
+    for (const ef of passiveEffects) await ef.delete();
+    console.log(`[🧹 Passive] Removida: ${masteryId} (deleted=${passiveEffects.length})`);
+
+    const sheet = actor.sheet;
+    if (sheet?.rendered) await sheet.render(true);
+    return; // ⬅️ encerra aqui; nada de flag/visual
+  }
+
+  // 🔸 POSTURE/CONJURATION: fluxo antigo com flag/toggle
   const current = await actor.getFlag("tm", "persistentMasteryId");
   if (current !== masteryId) return;
 
   await actor.unsetFlag("tm", "persistentMasteryId");
 
-  const allDomains = Object.values(game.tm?.DomainsDB ?? {}).flat();
-const mastery = allDomains.find(m => m.id === masteryId);
+  if (mastery && mastery.mastery_cd > 0 && game.combat?.started) {
+    game.tm.MasteryCooldown.setCooldown(actor, mastery, mastery.mastery_cd);
+  }
 
-if (mastery && mastery.mastery_cd > 0 && game.combat?.started) {
-  game.tm.MasteryCooldown.setCooldown(actor, mastery, mastery.mastery_cd);
-}
-
-
-  // Remove o efeito visual
+  // Remove o efeito visual (posture-*)
   await EffectApply.remove(actor, `posture-${masteryId}`);
 
-  // Remove o ActiveEffect do token/ficha
+  // Remove qualquer ActiveEffect ligado a esta persistente
   const effects = actor.effects.filter(e => e.getFlag("tm", "persistentId") === masteryId);
   for (const effect of effects) {
     await effect.delete();
@@ -89,6 +157,7 @@ if (mastery && mastery.mastery_cd > 0 && game.combat?.started) {
 
   console.log(`[💨] Postura/Conjuração removida: ${masteryId}`);
 }
+
 
 static async #evaluateEffectCommands(actor, mastery) {
   const evaluated = [];
