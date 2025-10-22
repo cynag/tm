@@ -57,19 +57,21 @@ import { AttackRoll } from "./src/roll/attack-roll.js";
 import {DomainsPanel} from "./src/mastery/domains-panel.js";
 import { DomainsDB } from "./src/mastery/data/domains-index.js";
 
-import { MasteryMagicAttackRoll } from "./src/roll/mastery-magic-attack-roll.js";
+
 import { MasteryMagicDialog } from "./src/ui/mastery-magic-dialog.js";
 
 
-import { MasteryMeleeAttackRoll } from "./src/roll/mastery-melee-attack-roll.js";
+
 import { MasteryMeleeDialog } from "./src/ui/mastery-melee-dialog.js";
 import { MasteryParser } from "./src/mastery/mastery-parser.js";
 import { MasteryCooldown } from "./src/mastery/cooldown.js";
 import { MasteryPersistent } from "./src/mastery/mastery-persistent.js";
 
 
-import { MasteryCureRoll } from "./src/roll/mastery-cure-roll.js";
 import { MasteryCureDialog } from "./src/ui/mastery-cure-dialog.js";
+
+import { MasteryMagicAttackRoll, MasteryMeleeAttackRoll, MasteryCureRoll } from "./src/roll/mastery-rolls.js";
+
 
 
 

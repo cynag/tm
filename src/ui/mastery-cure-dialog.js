@@ -1,5 +1,6 @@
 // src/ui/mastery-cure-dialog.js
-import { MasteryCureRoll } from "../roll/mastery-cure-roll.js";
+import { MasteryCureRoll } from "../roll/mastery-rolls.js";
+
 import { MasteryPersistent } from "../mastery/mastery-persistent.js";
 
 export class MasteryCureDialog {

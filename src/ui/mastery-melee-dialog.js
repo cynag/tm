@@ -1,4 +1,5 @@
-import { MasteryMeleeAttackRoll } from "../roll/mastery-melee-attack-roll.js";
+import { MasteryMeleeAttackRoll } from "../roll/mastery-rolls.js";
+
 import { MasteryPersistent } from "../mastery/mastery-persistent.js";
 
 export class MasteryMeleeDialog {

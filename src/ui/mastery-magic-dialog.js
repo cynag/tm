@@ -1,4 +1,4 @@
-import { MasteryMagicAttackRoll } from "../roll/mastery-magic-attack-roll.js";
+import { MasteryMagicAttackRoll } from "../roll/mastery-rolls.js";
 import { MasteryPersistent } from "../mastery/mastery-persistent.js";
 
 export class MasteryMagicDialog {
